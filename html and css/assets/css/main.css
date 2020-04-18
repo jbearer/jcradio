@@ -43,24 +43,26 @@
 /* Sidebar */
 
  .sidebar {
-  height: 100%; /* Full-height: remove this if you want "auto" height */
-  position: fixed; /* Fixed Sidebar (stay in place on scroll) */
-  top: 0; /* Stay at the top */
-  left: 0;
-  overflow-x: hidden; /* Disable horizontal scroll */
-  padding-top: 50px;
-  width: 340px;
+  	height: 100%; /* Full-height: remove this if you want "auto" height */
+  	position: fixed; /* Fixed Sidebar (stay in place on scroll) */
+  	top: 0; /* Stay at the top */
+  	left: 0;
+  	overflow-x: hidden; /* Disable horizontal scroll */
+  	padding-top: 50px;
+  	width: 340px;
 	background: linear-gradient(220deg, #00dbff 0%, #000000 60%);
 	background-size: cover;
 	background-repeat: no-repeat;
+	text-align: center;
 	}
 
 	.sidebar h2 {
-			font-size: 2em;
-			line-height: 1.4;
-			margin-bottom: 0;
-			color: #fff;
-			padding-left: 16px;
+		font-size: 2em;
+		line-height: 1.4;
+		margin-bottom: 0;
+		color: #fff;
+		margin-top: 30px;
+		/*text-align: center;*/
 		}
 
 	.sidebar p {
@@ -68,6 +70,8 @@
 		font-weight: bold;
 		line-height: 1.5em;
 		margin-bottom: 1.5em;
+		text-align: center;
+		color: #999;
 	}
 
 	/* The navigation menu links */
@@ -80,21 +84,88 @@
 	}
 
 	/* When you mouse over the navigation links, change their color */
-	 .sidebar a:hover {
-	  color: #f1f1f1;
+	.sidebar a:hover {
+	  	color: #f1f1f1;
 	}
 
-/*Footer*/
-	.footer {
-	  position: fixed;
-	  left: 0;
-	  bottom: 0;
-	  width: 100%;
+/*Music Bar*/
+	.musicBar {
 	  background-color: #000;
+	  bottom: 0;
 	  color: white;
+	  left: 0;
+	  position: fixed;  
 	  text-align: center;
+	  width: 100%;
 	}
 
+	.musicBar p{
+		color: #999;
+		font-size: 1.15em;
+		font-weight: bold;
+		line-height: 1.5em;
+		margin-bottom: 1.5em;
+		text-align: center;
+	}
+
+		.column {
+		  float: left;
+		}
+
+		.left, .right {
+		  width: 25%;
+		}
+
+		.middle {
+		  width: 50%;
+		}
+
+		/* Responsive layout - when the screen is less than 600px wide, make the three columns stack on top of each other instead of next to each other */
+		@media screen and (max-width: 600px) {
+		  .column {
+		    width: 100%;
+		  }
+		}
+
+		canvas {
+		  background:#fff;
+		  height:auto;
+		  width:60%;
+		  
+		}
+
+/* Login */
+
+	/* Full-width inputs */
+	input[type=text], input[type=password] {
+	  width: 80%;
+	  padding: 10px 10px;
+	  margin: 8px 0;
+	  display: inline-block;
+	  border: 1px solid #ccc;
+	  box-sizing: border-box;
+	}
+
+	/* Set a style for all buttons */
+	button {
+	  	background-color: rgba(255,255,255, 0.3);
+	  	color: white;
+	  	margin: 10px 0;
+	  	border: none;
+	  	cursor: pointer;
+	  	width: 150px;
+	  	font-size: 1.15em;
+		font-weight: bold;
+		line-height: 1.7em;
+		margin-bottom: 1.5em;
+		text-align: center;
+		color: #ccc;
+	}
+
+	/* Add a hover effect for buttons */
+	button:hover {
+	  opacity: 0.5;
+	}
 
 /*Main*/
 	.main {
@@ -103,6 +174,7 @@
 	  padding-top: 70px;
 	}
 
+/*Not sure what this does*/
 	@media screen and (max-height: 450px) {
 	  .sidebar {padding-top: 15px;}
 	  .sidebar a {font-size: 18px;}
