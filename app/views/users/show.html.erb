@@ -1,0 +1,15 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Username:</strong>
+  <%= @user.username %>
+</p>
+
+<p>
+  <strong>Position:</strong>
+  <%= @user.position %>
+</p>
+
+<% if logged_in? and current_user.id == @user.id %>
+    <%= link_to 'Log out', "/sessions", method: :delete %>
+<% end %>
