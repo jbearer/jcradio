@@ -4,7 +4,7 @@ Rails.application.routes.draw do
   delete "/sessions", to: 'sessions#destroy'  # API
   post "/logout", to: "sessions#destroy"      # Forms
 
-  resources :stations
+  resources :stations, only: [:index, :show]
 
   root 'stations#index'
 

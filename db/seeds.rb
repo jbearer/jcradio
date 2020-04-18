@@ -5,3 +5,12 @@
 #
 #   cities = City.create([{ name: 'Chicago' }, { name: 'Copenhagen' }])
 #   Mayor.create(name: 'Emanuel', city: cities.first)
+
+if Rails.env.development?
+    station = Station.create name: "Jingle Churro"
+
+    queue = Song.create([
+        {source: "Spotify", source_id: "bogus", title: "Interlude", artist: "Alt-J", album: "An Awesome Wave"}
+    ])
+    station.update songs: queue
+end

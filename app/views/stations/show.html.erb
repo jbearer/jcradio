@@ -1,0 +1,21 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Next up, on <%= @station.name %>...</h1>
+
+<!-- Song queue -->
+<table>
+  <% @station.songs.each_with_index do |song, i| %>
+    <tr>
+      <th></th>
+      <th>Song</th>
+      <th>Artist</th>
+      <th>Album</th>
+    </tr>
+    <tr>
+      <td><%= i + 1 %></td>
+      <td><%= song.title %></td>
+      <td><%= song.artist %></td>
+      <td><%= song.album %></td>
+    </tr>
+  <% end %>
+</table>
