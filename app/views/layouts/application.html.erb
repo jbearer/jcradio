@@ -1,14 +1,143 @@
-<!DOCTYPE html>
+<!DOCTYPE HTML>
+
 <html>
-<head>
-  <title>Jcradio</title>
-  <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track' => true %>
-  <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
-  <%= csrf_meta_tags %>
-</head>
-<body>
 
-<%= yield %>
+    <!-- Header -->
+        <head>
+            <title>Jingle Churro Radio</title>
+            <meta charset="utf-8" />
+            <meta name="viewport" content="width=device-width, initial-scale=1" />
+            <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track' => true %>
+          <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
+          <%= csrf_meta_tags %>
+        </head>
 
-</body>
+    <body>
+
+    <!-- Navigation Bar -->
+        <div class="topnav">
+             <a class="active" href="#home">Home</a>
+             <a href="#queue">Selector</a>
+             <a href="#Plots">Plots</a>
+        </div>
+
+    <!-- Side Bar -->
+        <div class="sidebar">
+            <h2>Jingle Churro Radio </h2>
+
+    <!-- Login -->
+    <% if logged_in? %>
+        <p>Hey there, <%= current_user.username %>!
+        <form action="/logout" method="post" class="in_place_form">
+            <button type="submit">Switch accounts</button>
+        </form>
+        </p>
+    <% else %>
+            <p><form action="/sessions" method="post" class="in_place_form">
+                <input type="text" placeholder="Enter Name" name="username" required>
+                <button type="submit">Join Radio</button>
+            </form></p>
+    <% end %>
+
+        </div>
+
+    <!-- Page Content -->
+        <div class="main">
+
+            <%= yield %>
+        </div>
+
+    <!-- Music Bar -->
+        <div class="musicBar">
+            <div class = "column left">
+                <p>Song name here</p>
+            </div>
+            <div class = "column middle">
+                <br>
+                <span id="current-time"></span>
+                <canvas id="progress" width="500" height="10"></canvas>
+
+                <audio id="audio" ontimeupdate="updateBar()"
+                       src="http://k007.kiwi6.com/hotlink/tfaw4el9c5/Moon_River_Jazz.mp3">
+                </audio>
+                <span id="duration"></span>
+                <br>
+            </div>
+
+            <div class = "column right">
+                <button id="audioControl" onclick="togglePlaying()">Play</button>
+            </div>
+
+        </div>
+
+    </body>
+
+<!-- Javascript -->
+    <script>
+        var canvasWidth = 500 ;
+        var audioEl = document.getElementById("audio");
+        var canvas = document.getElementById("progress").getContext('2d');
+        var ctrl = document.getElementById('audioControl');
+
+        audioEl.addEventListener('loadedmetadata', function() {
+          var duration = audioEl.duration;
+          var currentTime = audioEl.currentTime;
+          document.getElementById("duration").innerHTML = convertElapsedTime(duration);
+          document.getElementById("current-time").innerHTML = convertElapsedTime(currentTime);
+          canvas.fillRect(0, 0, canvasWidth, 50);
+        });
+
+        function togglePlaying() {
+
+          var play = ctrl.innerHTML === 'Play'
+          var method
+
+          if (play) {
+            ctrl.innerHTML = 'Pause'
+            method = 'play'
+          } else {
+            ctrl.innerHTML = 'Play'
+            method = 'pause'
+          }
+
+          audioEl[method]()
+
+        }
+
+        function updateBar() {
+          canvas.clearRect(0, 0, canvasWidth, 50)
+          canvas.fillStyle = "#333";
+          canvas.fillRect(0, 0, canvasWidth, 50)
+
+          var currentTime = audioEl.currentTime
+          var duration = audioEl.duration
+
+          if (currentTime === duration) {
+            ctrl.innerHTML = "Play"
+          }
+
+          document.getElementById("current-time").innerHTML = convertElapsedTime(currentTime)
+
+          var percentage = currentTime / duration
+          var progress = (canvasWidth * percentage)
+          canvas.fillStyle = "#00dbff"
+          canvas.fillRect(0, 0, progress, 50)
+        }
+
+        function convertElapsedTime(inputSeconds) {
+          var seconds = Math.floor(inputSeconds % 60)
+          if (seconds < 10) {
+            seconds = "0" + seconds
+          }
+          var minutes = Math.floor(inputSeconds / 60)
+          return minutes + ":" + seconds
+        }
+
+        // Add a hidden input to all .in_place_form objects to tell the server where to redirect.
+        $(document).ready(function() {
+            redirect = window.location.href
+            $(".in_place_form").append('<input type="hidden" name="redirect" value="' + redirect + '">')
+        });
+    </script>
+
 </html>

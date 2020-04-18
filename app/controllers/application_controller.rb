@@ -24,6 +24,7 @@ class ApplicationController < ActionController::Base
     def json_ok
         respond_to do |format|
             format.json { render json: {success: true} }
+            format.html
         end
     end
 
@@ -34,5 +35,11 @@ class ApplicationController < ActionController::Base
             format.json { render json: {success: false, error: msg} }
             format.html
         end
+    end
+
+    # Return to the page that the user was on when they submitted a form.
+    helper_method :return_to_page
+    def return_to_page
+        redirect_to (params[:redirect] || request.original_url)
     end
 end
