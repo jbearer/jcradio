@@ -7,6 +7,7 @@
             <title>Jingle Churro Radio</title>
             <meta charset="utf-8" />
             <meta name="viewport" content="width=device-width, initial-scale=1" />
+            <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"/>
             <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track' => true %>
           <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
           <%= csrf_meta_tags %>
@@ -17,44 +18,71 @@
     <!-- Navigation Bar -->
         <div class="topnav">
              <a class="active" href="#home">Home</a>
-             <a href="#queue">Selector</a>
+             <a href="#Selector">Selector</a>
              <a href="#Plots">Plots</a>
         </div>
 
     <!-- Side Bar -->
-        <div class="sidebar">
+        <div class = "row">
+          <div class = "column sidebar">
+
+            <br>
+            <br>
+            <br>
             <h2>Jingle Churro Radio </h2>
+            <br>
 
     <!-- Login -->
-    <% if logged_in? %>
-        <p>Hey there, <%= current_user.username %>!
-        <form action="/logout" method="post" class="in_place_form">
-            <button type="submit">Switch accounts</button>
-        </form>
-        </p>
-    <% else %>
-            <p><form action="/sessions" method="post" class="in_place_form">
-                <input type="text" placeholder="Enter Name" name="username" required>
-                <button type="submit">Join Radio</button>
-            </form></p>
-    <% end %>
+
+            <% if logged_in? %>
+                <p>Hey there, <%= current_user.username %>!
+                <form action="/logout" method="post" class="in_place_form">
+                    <button class="button button1" type="submit">Switch accounts</button>
+                </form>
+                </p>
+            <% else %>
+                    <p><form action="/sessions" method="post" class="in_place_form">
+                        <input type="text" placeholder="Enter Name" name="username" required>
+                        <button class="button button1" type="submit">Join Radio</button>
+                    </form></p>
+            <% end %>
 
         </div>
 
     <!-- Page Content -->
-        <div class="main">
+        <div class="column main">
+            <br>
+            <br>
+            <br>
+            <h3> Your Letter:</h3>
+            <br>
+            <div class="search-container">
+                <form action="/action_page.php">
+                  <input type="text" placeholder="Search.." name="search">
+                  <button class="button button3" type="submit"><i class="fa fa-search"></i></button>
+                </form>
+             </div>
+            <br>
+            <p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>last</p>
+            <br>
+            <br>
+            <br>
+            <br>
+      
 
             <%= yield %>
         </div>
+      </div>
 
     <!-- Music Bar -->
-    <% if logged_in? and current_user.station.now_playing %>
+    <% if logged_in? and current_user.station.now_playing %> 
         <div class="musicBar">
-            <div class = "column left">
-                <p><%= current_user.station.now_playing.title %><br>
-                   <%= current_user.station.now_playing.artist %></p>
+          <div class = "columnMus leftMus">
+                <p><%= current_user.station.now_playing.title %></p><br>
+                   <%= current_user.station.now_playing.artist %>
             </div>
-            <div class = "column middle">
+
+            <div class = "columnMus middleMus">
                 <br>
                 <span id="current-time"></span>
                 <canvas id="progress" width="500" height="10"></canvas>
@@ -66,8 +94,8 @@
                 <br>
             </div>
 
-            <div class = "column right">
-                <button id="audioControl" onclick="togglePlaying()">Play</button>
+            <div class = "columnMus rightMus">
+              <button class="button button2" id="audioControl" onclick="togglePlaying()">Play</button>
             </div>
 
         </div>

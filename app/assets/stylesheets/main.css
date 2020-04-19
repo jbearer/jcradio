@@ -1,31 +1,33 @@
 
 /*General Formatting*/
 	body, html {
-	   border: 0;
-	   padding: 0;
-	   margin: 0;
-	  font-family: Arial, Helvetica, sans-serif;
+	  	border: 0; 
+	  	font-family: Arial, Helvetica, sans-serif;
+	  	margin: 0;
+	  	padding: 0;
 	}
 
 /* Navigation Bar */
 	.topnav {
 	  background-color: #000;
+	  margin-left: 0;
 	  overflow: hidden;
-	  z-index: 1;
-	  top: 0px;
-	  padding: 0px 360px;
+	  position: fixed;
+	  top: 0;
 	  width: 100%;
-	  position: fixed; 
+	  z-index: 1;
+	   
 	}
 
 		/* Style the links inside the navigation bar */
 		.topnav a {
-		  float: left;
 		  color: #f2f2f2;
-		  text-align: center;
-		  padding: 14px 16px;
-		  text-decoration: none;
+		  float: left;
 		  font-size: 17px;
+		  padding: 14px 16px;
+		  text-align: center;
+		  text-decoration: none;
+		  
 		}
 
 		/* Change the color of links on hover */
@@ -35,25 +37,38 @@
 		}
 
 		/* Add a color to the active/current link */
-		.topnav a.active {
+		.topnav .active {
 		  background-color: #107b87;
 		  color: white;
+		}
+
+/*Split Screen*/
+	 .column{
+	 	float: left;
+	 }
+
+	 /* Clear floats after the columns */
+		.row:after {
+		  content: "";
+		  display: table;
+		  clear: both;
 		}
 
 /* Sidebar */
 
  .sidebar {
-  	height: 100%; /* Full-height: remove this if you want "auto" height */
-  	position: fixed; /* Fixed Sidebar (stay in place on scroll) */
-  	top: 0; /* Stay at the top */
-  	left: 0;
-  	overflow-x: hidden; /* Disable horizontal scroll */
-  	padding-top: 50px;
-  	width: 340px;
-	background: linear-gradient(220deg, #00dbff 0%, #000000 60%);
+  	background: linear-gradient(220deg, #00dbff 0%, #000000 60%);
+  	background-repeat: no-repeat;
 	background-size: cover;
-	background-repeat: no-repeat;
-	text-align: center;
+  	height: 100%; 
+  	left: 0;
+  	overflow-x: hidden; 
+  	padding-top: 70px;
+  	position: fixed; 
+  	text-align: center;
+  	top: 0; /* Stay at the top */
+  	width: 30%;
+	
 	}
 
 	.sidebar h2 {
@@ -62,7 +77,6 @@
 		margin-bottom: 0;
 		color: #fff;
 		margin-top: 30px;
-		/*text-align: center;*/
 		}
 
 	.sidebar p {
@@ -92,7 +106,7 @@
 	.musicBar {
 	  background-color: #000;
 	  bottom: 0;
-	  color: white;
+	  color: #666;
 	  left: 0;
 	  position: fixed;  
 	  text-align: center;
@@ -101,30 +115,24 @@
 
 	.musicBar p{
 		color: #999;
-		font-size: 1.15em;
+		font-size: 1em;
 		font-weight: bold;
-		line-height: 1.5em;
-		margin-bottom: 1.5em;
+		line-height: 1.2em;
+		margin-bottom: 0;
 		text-align: center;
 	}
 
-		.column {
+		.columnMus {
 		  float: left;
 		}
 
-		.left, .right {
+		.leftMus, .rightMus {
 		  width: 25%;
 		}
 
-		.middle {
+		.middleMus {
 		  width: 50%;
-		}
-
-		/* Responsive layout - when the screen is less than 600px wide, make the three columns stack on top of each other instead of next to each other */
-		@media screen and (max-width: 600px) {
-		  .column {
-		    width: 100%;
-		  }
+		  margin-top: 1.5em;
 		}
 
 		canvas {
@@ -136,9 +144,8 @@
 
 /* Login */
 
-	/* Full-width inputs */
-	input[type=text], input[type=password] {
-	  width: 80%;
+	input[type=text]{
+	  width: 70%;
 	  padding: 10px 10px;
 	  margin: 8px 0;
 	  display: inline-block;
@@ -146,14 +153,15 @@
 	  box-sizing: border-box;
 	}
 
+/*Button*/
+
 	/* Set a style for all buttons */
 	button {
 	  	background-color: rgba(255,255,255, 0.3);
-	  	color: white;
 	  	margin: 10px 0;
 	  	border: none;
 	  	cursor: pointer;
-	  	width: 150px;
+	  	/*width: 150px;*/
 	  	font-size: 1.15em;
 		font-weight: bold;
 		line-height: 1.7em;
@@ -167,17 +175,58 @@
 	  opacity: 0.5;
 	}
 
+	.button1 {width: 150px;}
+	.button2 {width: 100px;}
+	.button3 {width: 50px;}
+	
+
 /*Main*/
 	.main {
-	  margin-left: 350px;
-	  padding: 0px 10px;
-	  padding-top: 70px;
+	  width: 70%;
+	  text-align: center;
+	  float: right;
+	  background-color: #222;
+	  color: #888;
 	}
 
-/*Not sure what this does*/
-	@media screen and (max-height: 450px) {
-	  .sidebar {padding-top: 15px;}
-	  .sidebar a {font-size: 18px;}
+	 h3{
+		font-size: 1.5em;
+		line-height: 1.4;
+		margin-bottom: 0;
+		color: #ccc;
+		margin-top: 30px;
+	}
+
+/*Screen Flex*/
+	@media screen and (max-width: 800px) {
+	  .column {
+	    width: 100%;
+	  }
+
+	  .columnMus {
+	    width: 100%;
+	    font-size: 0.9em;
+	  	line-height: 1.2em;
+	  	margin-top: 0;
+
+	  }
+
+	  .sidebar{
+	  	position: static;
+	  }
+
+	}
+
+	@media screen and (max-width: 500px) {
+	  .column {
+	    width: 100%;
+	  }
+
+	  .columnMus {
+	    font-size: 0.7em;
+	  	line-height: 1em;
+
+	  }
 
 
 
