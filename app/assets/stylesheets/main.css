@@ -132,7 +132,7 @@
 
 		.middleMus {
 		  width: 50%;
-		  margin-top: 1.5em;
+		  margin-top: 0.5em;
 		}
 
 		canvas {
@@ -187,6 +187,8 @@
 	  float: right;
 	  background-color: #222;
 	  color: #888;
+	  padding-top: 70px;
+	  padding-bottom: 75px;
 	}
 
 	 h3{
@@ -215,6 +217,11 @@
 	  	position: static;
 	  }
 
+	  .main{
+	  	padding-top: 15px;
+	  	padding-bottom: 150px;
+	  }
+
 	}
 
 	@media screen and (max-width: 500px) {
@@ -226,6 +233,10 @@
 	    font-size: 0.7em;
 	  	line-height: 1em;
 
+	  }
+
+	  .main{
+	  	padding-bottom: 100px;
 	  }
 
 

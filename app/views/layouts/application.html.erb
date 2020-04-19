@@ -51,11 +51,6 @@
 
     <!-- Page Content -->
         <div class="column main">
-            <br>
-            <br>
-            <br>
-            <h3> Your Letter:</h3>
-            <br>
             <div class="search-container">
                 <form action="/songs/search">
                   <input type="text" placeholder="Search..." name="title">
@@ -64,6 +59,9 @@
              </div>
 
             <%= yield %>
+
+            <!-- <p>first test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>last test</p> -->
+            
         </div>
       </div>
 
@@ -71,7 +69,7 @@
     <% if logged_in? and current_user.station.now_playing %>
         <div class="musicBar">
           <div class = "columnMus leftMus">
-                <p><%= current_user.station.now_playing.title %></p><br>
+                <p><%= current_user.station.now_playing.title %></p>
                    <%= current_user.station.now_playing.artist %>
             </div>
 
