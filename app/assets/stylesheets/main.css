@@ -178,6 +178,7 @@
 	.button1 {width: 150px;}
 	.button2 {width: 100px;}
 	.button3 {width: 50px;}
+	.button4 {width: 200px;}
 	
 /*Main*/
 	.main {
@@ -236,7 +237,7 @@
 
 	  .main{
 	  	padding-top: 15px;
-	  	padding-bottom: 150px;
+	  	padding-bottom: 180px;
 	  }
 
 	}
@@ -253,7 +254,7 @@
 	  }
 
 	  .main{
-	  	padding-bottom: 100px;
+	  	padding-bottom: 120px;
 	  }
 
 
