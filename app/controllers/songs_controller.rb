@@ -5,11 +5,9 @@ class SongsController < ApplicationController
     end
 
     # GET /songs/search
-    #   title: optional string
-    #   album: optional string
-    #   artist: optional string
+    #   query: string of keywords
     def search
-        @songs = Song.where(params.delete_if{|k,v| v.empty?}.permit(:title, :album, :artist))
+        @songs = Song.fuzzy_search(params[:query].split)
             # TODO look up from Spotify; our database is only populated _after_ a
             # song has been searched in Spotify.
         render template: "songs/index"

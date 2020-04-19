@@ -49,4 +49,4 @@ group :development do
 end
 
 gem 'tzinfo-data'
-
+gem 'fuzzily'
