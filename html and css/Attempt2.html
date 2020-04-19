@@ -8,6 +8,7 @@
 			<meta charset="utf-8" />
 			<meta name="viewport" content="width=device-width, initial-scale=1" />
 			<link rel="stylesheet" href="assets/css/main.css" />
+			<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"/>
 		</head>
 
 	<body>
@@ -32,8 +33,8 @@
 				
 	<!-- Login -->
 					<p><form action="/sessions" method="post">
-						<input type="text" placeholder="Enter Name" name="uname" required>
-						<button type="submit">Join Radio</button>
+						<input type="text" placeholder="Enter Name" name="uname" required><br>
+						<button class="button button1" type="submit">Join Radio</button>
 					</form></p>
 
 			</div>
@@ -44,7 +45,15 @@
 				<br>
 				<br>
 				<br>
-				test1
+				<h3> Your Letter:</h3>
+				<br>
+				<div class="search-container">
+				    <form action="/action_page.php">
+				      <input type="text" placeholder="Search.." name="search">
+				      <button class="button button3" type="submit"><i class="fa fa-search"></i></button>
+				    </form>
+				 </div>
+				<br>
 				<p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>last</p>
 				<br>
 				<br>
@@ -57,9 +66,10 @@
 		<div class="musicBar">
 			<div class = "columnMus leftMus">
 				<p>Song name here</p>
+				Artist<br>
 			</div>
 			<div class = "columnMus middleMus">
-				<br>
+				
 				<span id="current-time"></span>
 				<canvas id="progress" width="500" height="10"></canvas>
 
@@ -71,7 +81,7 @@
 			</div>
 
 			<div class = "columnMus rightMus">
-				<button id="audioControl" onclick="togglePlaying()">Play</button>
+				<button class="button button2" id="audioControl" onclick="togglePlaying()">Play</button>
 			</div>
 
 		</div>
