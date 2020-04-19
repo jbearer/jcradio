@@ -5,6 +5,7 @@
 	  	font-family: Arial, Helvetica, sans-serif;
 	  	margin: 0;
 	  	padding: 0;
+	  	background-color: #222;
 	}
 
 /* Navigation Bar */
@@ -183,6 +184,7 @@
 /*Main*/
 	.main {
 	  width: 70%;
+	  height: 100%;
 	  text-align: center;
 	  float: right;
 	  background-color: #222;
