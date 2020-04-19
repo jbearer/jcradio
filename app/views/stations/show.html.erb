@@ -4,13 +4,13 @@
 
 <!-- Song queue -->
 <table>
-  <% @station.songs.each_with_index do |song, i| %>
     <tr>
       <th></th>
       <th>Song</th>
       <th>Artist</th>
       <th>Album</th>
     </tr>
+  <% @station.queue.each_with_index do |song, i| %>
     <tr>
       <td><%= i + 1 %></td>
       <td><%= song.title %></td>

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20200418225434) do
+ActiveRecord::Schema.define(version: 20200418234254) do
 
   create_table "songs", force: :cascade do |t|
     t.string   "source"
@@ -26,7 +26,10 @@ ActiveRecord::Schema.define(version: 20200418225434) do
   create_table "songs_stations", id: false, force: :cascade do |t|
     t.integer "song_id"
     t.integer "station_id"
+    t.integer "position"
   end
+
+  add_index "songs_stations", ["position"], name: "index_songs_stations_on_position"
 
   create_table "stations", force: :cascade do |t|
     t.string   "name"
