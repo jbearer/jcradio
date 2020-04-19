@@ -1,6 +1,8 @@
 <p id="notice"><%= notice %></p>
 
-<h1>Next up, on <%= @station.name %>...</h1>
+<h3>Next up, on <%= @station.name %>...</h3>
+<br>
+<br>
 
 <!-- Song queue -->
 <table>
@@ -9,6 +11,7 @@
       <th>Song</th>
       <th>Artist</th>
       <th>Album</th>
+      <th>Selector</th>
     </tr>
   <% @station.queue.each_with_index do |song, i| %>
     <tr>
@@ -16,6 +19,8 @@
       <td><%= song.title %></td>
       <td><%= song.artist %></td>
       <td><%= song.album %></td>
+      <td>Selector Name</td>
     </tr>
   <% end %>
 </table>
+
