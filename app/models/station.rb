@@ -9,9 +9,16 @@ class Station < ActiveRecord::Base
     has_many :users
 
     def queue
-        SongsStations
-            .where(station: self)
-            .order(:position)
-            .map { |relation| relation.song }
+        song_relations.map { |relation| relation.song }
     end
+
+    def queue_song(song)
+        SongsStations.create song: song, station: self,
+            position: (song_relations.maximum(:position) || 0) + 1
+    end
+
+    private
+        def song_relations
+            SongsStations.where(station: self).order(:position)
+        end
 end

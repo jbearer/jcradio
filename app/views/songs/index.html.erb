@@ -1,0 +1,28 @@
+<form action="/songs/search">
+    <input type="text" placeholder="Title" name="title">
+    <input type="text" placeholder="Artist" name="artist">
+    <input type="text" placeholder="Album" name="album">
+    <button type="submit">Search</button>
+</form>
+
+<table>
+    <tr>
+        <th>Song</th>
+        <th>Artist</th>
+        <th>Album</th>
+        <th></th>
+    </tr>
+    <% @songs.each do |song| %>
+        <td> <%= song.title %> </td>
+        <td> <%= song.artist %> </td>
+        <td> <%= song.album %> </td>
+        <td>
+            <% if logged_in? and current_user.can_add_to_queue %>
+                <form action=<%="/stations/#{current_user.station.id}"%> method="post" class="in_place_form">
+                    <input type="hidden" name="song_id" value=<%= song.id %> >
+                    <button type="submit">Add to queue</button>
+                </form>
+            <% end %>
+        </td>
+    <% end %>
+</table>

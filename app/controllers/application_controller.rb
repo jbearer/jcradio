@@ -24,7 +24,7 @@ class ApplicationController < ActionController::Base
     def json_ok
         respond_to do |format|
             format.json { render json: {success: true} }
-            format.html
+            format.html { return_to_page }
         end
     end
 
@@ -33,7 +33,7 @@ class ApplicationController < ActionController::Base
         respond_to do |format|
             error msg
             format.json { render json: {success: false, error: msg} }
-            format.html
+            format.html { return_to_page }
         end
     end
 

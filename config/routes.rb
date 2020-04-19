@@ -4,7 +4,11 @@ Rails.application.routes.draw do
   delete "/sessions", to: 'sessions#destroy'  # API
   post "/logout", to: "sessions#destroy"      # Forms
 
+  resources :songs, only: [:index]
+  get "/songs/search", to: "songs#search"
+
   resources :stations, only: [:index, :show]
+  post "/stations/:id", to: 'stations#update'
 
   root 'stations#index'
 
