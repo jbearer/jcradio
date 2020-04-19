@@ -11,7 +11,22 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20200418195442) do
+ActiveRecord::Schema.define(version: 20200418225434) do
+
+  create_table "songs", force: :cascade do |t|
+    t.string   "source"
+    t.string   "source_id"
+    t.string   "title"
+    t.string   "artist"
+    t.string   "album"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "songs_stations", id: false, force: :cascade do |t|
+    t.integer "song_id"
+    t.integer "station_id"
+  end
 
   create_table "stations", force: :cascade do |t|
     t.string   "name"

@@ -1,17 +1,4 @@
 class SessionsController < ApplicationController
-  # GET /sessions
-  def index
-    Rails.logger.error "Logged in as #{current_user}"
-    if logged_in?
-        redirect_to "/users/#{current_user.id}"
-    else
-        redirect_to "/sessions/new"
-    end
-  end
-
-  def new
-  end
-
   # POST /sessions
   #     username: string
   def create
@@ -24,11 +11,10 @@ class SessionsController < ApplicationController
         else
             @user.update position: (User.maximum(:position) || -1) + 1
             session[:user_id] = @user.id
-            Rails.logger.error "Logged in as #{current_user}"
         end
     end
 
-    redirect_to "/sessions"
+    return_to_page
   end
 
   # DELETE /sessions
@@ -40,6 +26,6 @@ class SessionsController < ApplicationController
         error "cannot log out (not logged in)"
     end
 
-    redirect_to "/sessions"
+    return_to_page
   end
 end

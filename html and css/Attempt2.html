@@ -20,6 +20,7 @@
 		</div>
 
 	<!-- Side Bar -->
+
 		<div class = "row">
 			<div class = "column sidebar">
 
@@ -59,10 +60,10 @@
 			</div>
 			<div class = "columnMus middleMus">
 				<br>
-				<span id="current-time"></span> 
+				<span id="current-time"></span>
 				<canvas id="progress" width="500" height="10"></canvas>
 
-				<audio id="audio" ontimeupdate="updateBar()" 
+				<audio id="audio" ontimeupdate="updateBar()"
 				       src="http://k007.kiwi6.com/hotlink/tfaw4el9c5/Moon_River_Jazz.mp3">
 				</audio>
 				<span id="duration"></span>
@@ -113,16 +114,16 @@
 		  canvas.clearRect(0, 0, canvasWidth, 50)
 		  canvas.fillStyle = "#333";
 		  canvas.fillRect(0, 0, canvasWidth, 50)
-		  
+
 		  var currentTime = audioEl.currentTime
 		  var duration = audioEl.duration
-		  
+
 		  if (currentTime === duration) {
 		    ctrl.innerHTML = "Play"
 		  }
-		  
+
 		  document.getElementById("current-time").innerHTML = convertElapsedTime(currentTime)
-		  
+
 		  var percentage = currentTime / duration
 		  var progress = (canvasWidth * percentage)
 		  canvas.fillStyle = "#00dbff"
