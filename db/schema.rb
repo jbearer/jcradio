@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20200418234254) do
+ActiveRecord::Schema.define(version: 20200419001711) do
 
   create_table "songs", force: :cascade do |t|
     t.string   "source"
@@ -33,15 +33,21 @@ ActiveRecord::Schema.define(version: 20200418234254) do
 
   create_table "stations", force: :cascade do |t|
     t.string   "name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at",     null: false
+    t.datetime "updated_at",     null: false
+    t.integer  "now_playing_id"
   end
+
+  add_index "stations", ["now_playing_id"], name: "index_stations_on_now_playing_id"
 
   create_table "users", force: :cascade do |t|
     t.string   "username"
     t.integer  "position"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer  "station_id"
   end
+
+  add_index "users", ["station_id"], name: "index_users_on_station_id"
 
 end
