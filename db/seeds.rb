@@ -21,8 +21,8 @@ end
 
 if Rails.env.development?
     station = spotify_station "Jingle Churro", [
-        {title: "Interlude", artist: "Alt-J", album: "An Awesome Wave", duration: 11},
-        {title: "Down Down the Deep River", artist: "Okkervil River", album: "The Silver Gymnasium", duration: 12}
+        {title: "Interlude", artist: "Alt-J", album: "An Awesome Wave"},
+        {title: "Down Down the Deep River", artist: "Okkervil River", album: "The Silver Gymnasium"}
     ]
 
     now_playing = spotify_song title: "One Sweet World", artist: "Dave Matthews Band", album: "Under the Table and Dreaming"

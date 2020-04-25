@@ -3,7 +3,6 @@
         <th>Song</th>
         <th>Artist</th>
         <th>Album</th>
-        <th>Duration</th>
         <th></th>
     </tr>
     <% @songs.each do |song| %>
@@ -11,7 +10,6 @@
         <td> <%= song.title %> </td>
         <td> <%= song.artist %> </td>
         <td> <%= song.album %> </td>
-        <td> <%= song.duration %> </td>
         <td>
             <% if logged_in? and current_user.can_add_to_queue %>
                 <form action=<%="/stations/#{current_user.station.id}"%> method="post" class="in_place_form">
