@@ -9,7 +9,7 @@
 
 /* Navigation Bar */
 	.topnav {
-	  background-color: #000;
+	  background-color: #131515;
 	  margin-left: 0;
 	  overflow: hidden;
 	  position: fixed;
@@ -21,7 +21,7 @@
 
 		/* Style the links inside the navigation bar */
 		.topnav a {
-		  color: #f2f2f2;
+		  color: #eae8ff;
 		  float: left;
 		  font-size: 17px;
 		  padding: 14px 16px;
@@ -32,14 +32,14 @@
 
 		/* Change the color of links on hover */
 		.topnav a:hover {
-		  background-color: #ddd;
-		  color: black;
+		  background-color: #e2f1af;
+		  color: #131515;
 		}
 
 		/* Add a color to the active/current link */
 		.topnav .active {
-		  background-color: #107b87;
-		  color: white;
+		  background-color: #131515;
+		  color: #ef959d;
 		}
 
 /*Split Screen*/
@@ -57,7 +57,7 @@
 /* Sidebar */
 
  .sidebar {
-  	background: linear-gradient(220deg, #00dbff 0%, #000000 60%);
+  	background: linear-gradient(220deg, #e2f1af 0%, #ef959d 50%, #131515 90%);
   	background-repeat: no-repeat;
 	background-size: cover;
   	height: 100%; 
@@ -75,7 +75,7 @@
 		font-size: 2em;
 		line-height: 1.4;
 		margin-bottom: 0;
-		color: #fff;
+		color: #3f0c32;
 		margin-top: 30px;
 		}
 
@@ -85,28 +85,28 @@
 		line-height: 1.5em;
 		margin-bottom: 1.5em;
 		text-align: center;
-		color: #999;
+		color: #eae8ff;
 	}
 
 	/* The navigation menu links */
-	.sidebar a {
+/*	.sidebar a {
 	  padding: 6px 8px 6px 16px;
 	  text-decoration: none;
 	  font-size: 25px;
 	  color: #818181;
 	  display: block;
 	}
-
+*/
 	/* When you mouse over the navigation links, change their color */
-	.sidebar a:hover {
+	/*.sidebar a:hover {
 	  	color: #f1f1f1;
 	}
-
+*/
 /*Music Bar*/
 	.musicBar {
-	  background-color: #000;
+	  background-color: #131515;
 	  bottom: 0;
-	  color: #666;
+	  color: #eae8ff;
 	  left: 0;
 	  position: fixed;  
 	  text-align: center;
@@ -114,7 +114,7 @@
 	}
 
 	.musicBar p{
-		color: #999;
+		color: #ef959d;
 		font-size: 1em;
 		font-weight: bold;
 		line-height: 1.2em;
@@ -149,15 +149,16 @@
 	  padding: 10px 10px;
 	  margin: 8px 0;
 	  display: inline-block;
-	  border: 1px solid #ccc;
+	  border: 1px solid #eae8ff;
 	  box-sizing: border-box;
+	  border-radius: 5px;
 	}
 
 /*Button*/
 
 	/* Set a style for all buttons */
 	button {
-	  	background-color: rgba(255,255,255, 0.3);
+	  	background-color: rgba(255,255,255, 0.2);
 	  	margin: 10px 0;
 	  	border: none;
 	  	cursor: pointer;
@@ -167,7 +168,8 @@
 		line-height: 1.7em;
 		margin-bottom: 1.5em;
 		text-align: center;
-		color: #ccc;
+		color: #eae8ff;
+		border-radius: 5px;
 	}
 
 	/* Add a hover effect for buttons */
@@ -185,8 +187,9 @@
 	  width: 70%;
 	  text-align: center;
 	  float: right;
-	  background-color: #222;
-	  color: #888;
+	  /*background-color: #3f0c32;*/
+	  background: linear-gradient(0deg, #3f0c32 0%, #131515 70%);
+	  color: #ef959d;
 	  padding-top: 70px;
 	  padding-bottom: 75px;
 	}
@@ -195,7 +198,7 @@
 		font-size: 1.5em;
 		line-height: 1.4;
 		margin-bottom: 0;
-		color: #ccc;
+		color: rgba(234, 232, 255, 0.4);
 		margin-top: 30px;
 	}
 
@@ -209,12 +212,12 @@
 	  }
 
 	th{
-		color: #ccc;
+		color: rgba(239,149,157,0.5);
 		font-weight: bold;
 	}
 
 	td{
-		color: #888;
+		color: #eae8ff;
 	}
 
 /*Screen Flex*/
@@ -256,7 +259,4 @@
 	  .main{
 	  	padding-bottom: 120px;
 	  }
-
-
-
 
