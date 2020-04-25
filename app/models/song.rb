@@ -1,3 +1,5 @@
+require 'rspotify'
+
 class Trigram < ActiveRecord::Base
   include Fuzzily::Model
 end
@@ -23,4 +25,27 @@ class Song < ActiveRecord::Base
 
         counts.sort_by { |song, count| -count }.map { |song, count| song }
     end
+
+    def self.spotify_search(entry)
+        # Currently only searches for the song.
+        # TODO: Incorporate artist and album
+        spotify_songs = RSpotify::Track.search(entry)
+
+        songs = []
+
+        spotify_songs.each do |ss|
+            songs.append(Song.new({
+                'title'     => ss.name,
+                'artist'    => ss.artists.first.name,  # TODO: List multiple artists
+                'album'     => ss.album.name,
+                'source'    => "Spotify",
+                'source_id' => ss.id,
+                'duration'  => ss.duration_ms
+            }))
+        end
+
+        # TODO: "More results" button
+        songs
+    end
+
 end
