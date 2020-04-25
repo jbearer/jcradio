@@ -35,6 +35,20 @@ class StationsController < ApplicationController
         station.queue_song song, current_user
         current_user.update position: station.users.maximum(:position) + 1
 
+        # Notify the next user that it's their turn to pick a song.
+        next_user = station.users.order(:position)[0]
+        if next_user.subscription
+            subscription = JSON.parse(next_user.subscription)
+            Rails.logger.error subscription
+            Webpush.payload_send({
+                message: "Hey #{next_user.username}! It's your turn to pick a song on jcradio!",
+                endpoint: subscription["endpoint"],
+                p256dh: subscription["keys"]["p256dh"],
+                auth: subscription["keys"]["auth"],
+                api_key: "" # TODO we need this for Chrome
+            })
+        end
+
         json_ok
     end
 

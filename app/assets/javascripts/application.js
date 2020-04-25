@@ -44,3 +44,18 @@ function flash(msg, {type, dismissible, selector, timeout} = {}) {
 
   $(selector).append($(error))
 }
+
+// Subscribe to push notifications
+if ('serviceWorker' in navigator) {
+  console.log('Service Worker is supported');
+  navigator.serviceWorker.register('/notifications.js')
+    .then(function(registration) {
+      console.log('Successfully registered!', ':^)', registration);
+      registration.pushManager.subscribe({ userVisibleOnly: true })
+        .then(function(subscription) {
+            $.post("/sessions/subscribe", subscription.toJSON())
+        });
+  }).catch(function(error) {
+    console.log('Registration failed', ':^(', error);
+  });
+}
