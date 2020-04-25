@@ -9,6 +9,7 @@ Rails.application.routes.draw do
 
   resources :stations, only: [:index, :show]
   post "/stations/:id", to: 'stations#update'
+  get "/stations/:id/next", to: 'stations#next'
 
   root 'stations#index'
 

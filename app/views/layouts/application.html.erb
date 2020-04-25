@@ -86,8 +86,8 @@
     <% if logged_in? and current_user.station.now_playing %>
         <div class="musicBar">
           <div class = "columnMus leftMus">
-                <p><%= current_user.station.now_playing.title %></p>
-                   <%= current_user.station.now_playing.artist %>
+                <p><%= current_user.station.now_playing.song.title %></p>
+                   <%= current_user.station.now_playing.song.artist %>
             </div>
 
             <div class = "columnMus middleMus">
@@ -104,6 +104,13 @@
 
             <div class = "columnMus rightMus">
               <button class="button button2" id="audioControl" onclick="togglePlaying()">Play</button>
+              <% if current_user.station.now_playing.selector == current_user %>
+                <form action="/stations/<%= current_user.station.id %>/next" class="in_place_form">
+                  <button class="button button2" type="submit">Next</button>
+                </form>
+              <% else %>
+                <div>Chosen by <%= current_user.station.now_playing.selector.username %></div>
+              <% end %>
             </div>
 
         </div>
