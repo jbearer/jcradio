@@ -21,6 +21,8 @@
               <% end %>
             })
           </script>
+
+          <link rel="manifest" href="/manifest.json">
         </head>
 
     <body style="background-color: #3f0c32;">
@@ -162,7 +164,7 @@
 
               var percentage = currentTime / duration
               var progress = (canvasWidth * percentage)
-              canvas.fillStyle = "#00dbff"
+              canvas.fillStyle = "#e2f1af"
               canvas.fillRect(0, 0, progress, 50)
             }
 

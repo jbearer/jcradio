@@ -1,0 +1,7 @@
+{
+  "name": "jcradio",
+  "short_name": "jcradio",
+  "icons": [],
+  "start_url": "/",
+  "display": "standalone"
+}

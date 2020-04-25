@@ -3,6 +3,7 @@ Rails.application.routes.draw do
   resources :sessions, only: [:create]
   delete "/sessions", to: 'sessions#destroy'  # API
   post "/logout", to: "sessions#destroy"      # Forms
+  post "/sessions/subscribe", to: "sessions#subscribe"
 
   resources :songs, only: [:index]
   get "/songs/search", to: "songs#search"

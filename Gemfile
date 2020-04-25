@@ -50,3 +50,4 @@ end
 
 gem 'tzinfo-data'
 gem 'fuzzily'
+gem "webpush"
