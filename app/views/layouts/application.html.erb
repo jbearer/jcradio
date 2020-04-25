@@ -11,6 +11,16 @@
             <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track' => true %>
           <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
           <%= csrf_meta_tags %>
+
+          <script type="text/javascript">
+            $(document).ready(function() {
+              <% flash.each do |status, message| %>
+                // flash('<%= message %>', { type: '<%= status %>', dismissible: true })
+                console.log('<%= message %>')
+                flash('<%= message %>', { type: '<%= status %>', dismissible: true })
+              <% end %>
+            })
+          </script>
         </head>
 
     <body style="background-color: #222;">
@@ -51,6 +61,13 @@
 
     <!-- Page Content -->
         <div class="column main">
+            <div class="row" id="flash_row">
+              <div class="col-xs-12 text-center">
+                <div id="flash">
+                </div>
+              </div>
+            </div>
+
             <div class="search-container">
                 <form action="/songs/search">
                   <input type="text" placeholder="Search..." name="query">
@@ -61,7 +78,7 @@
             <%= yield %>
 
             <!-- <p>first test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>test</p><p>last test</p> -->
-            
+
         </div>
       </div>
 
