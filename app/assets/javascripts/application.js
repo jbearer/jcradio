@@ -14,3 +14,33 @@
 //= require jquery_ujs
 //= require turbolinks
 //= require_tree .
+
+function flash(msg, {type, dismissible, selector, timeout} = {}) {
+  type = type || 'notify'
+  dismissible = dismissible || true
+  selector = selector || '#flash'
+  timeout = timeout || 5000
+
+  if (type == 'error') {
+    type = 'danger'
+  }
+
+  error = $('<div>')
+  error.addClass("alert alert-" + type)
+
+  close = function(){error.fadeOut({complete: function() {error.remove()}})}
+
+  if (dismissible) {
+    error.addClass("alert-dismissible")
+    close_button = $('<button type="button" class="close" data-dismiss="alert">&times;</button>')
+    close_button.on("click", close)
+    error.append(close_button)
+  }
+  error.append(msg)
+
+  if (timeout >= 0) {
+    setTimeout(close, timeout)
+  }
+
+  $(selector).append($(error))
+}

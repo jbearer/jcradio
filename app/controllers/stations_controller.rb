@@ -32,10 +32,37 @@ class StationsController < ApplicationController
             return json_error "no such song"
         end
 
-        station.queue_song song
-        current_user.update position: (station.users.maximum(:position) || 0) + 1
+        station.queue_song song, current_user
+        current_user.update position: station.users.maximum(:position) + 1
 
         json_ok
+    end
+
+    # GET /stations/1/next
+    # Skip to the next queued song.
+    #
+    # Eventually, this method should be called by the server-side streaming engine whenever it
+    # finishes broadcasting a song, and it should not be exposed to an API endpoint. For now, since
+    # the streaming engine does not exist, we let the user who selected the current song go to the
+    # next song, for testing purposes.
+    def next
+        if not logged_in?
+            return json_error "must log in to skip a song"
+        end
+
+        station = current_user.station
+        if not station
+            return json_error "join a station to skip songs"
+        end
+
+        if station.now_playing.selector != current_user
+            return json_error "you can't skip a song you didn't add"
+        end
+
+        station.update now_playing: station.queue[0]
+        station.now_playing.update station: nil if station.now_playing
+
+        return json_ok
     end
 
     private

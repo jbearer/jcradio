@@ -13,7 +13,8 @@ end
 def spotify_station(station, songs)
     station = Station.create name: station
     songs.each_with_index do |song, i|
-        SongsStations.create station: station, song: spotify_song(song), position: i
+        user = User.create username: "User#{i}"
+        SongsStations.create station: station, song: spotify_song(song), position: i, selector: user
     end
     station
 end
@@ -23,5 +24,8 @@ if Rails.env.development?
         {title: "Interlude", artist: "Alt-J", album: "An Awesome Wave"},
         {title: "Down Down the Deep River", artist: "Okkervil River", album: "The Silver Gymnasium"}
     ]
-    station.update now_playing: (spotify_song title: "One Sweet World", artist: "Dave Matthews Band", album: "Under the Table and Dreaming")
+
+    now_playing = spotify_song title: "One Sweet World", artist: "Dave Matthews Band", album: "Under the Table and Dreaming"
+    queue_entry = SongsStations.create station: station, song: now_playing, position: 0, selector: User.find(1)
+    station.update now_playing: queue_entry
 end
