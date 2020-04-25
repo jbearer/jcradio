@@ -13,7 +13,8 @@ end
 def spotify_station(station, songs)
     station = Station.create name: station
     songs.each_with_index do |song, i|
-        SongsStations.create station: station, song: spotify_song(song), position: i
+        user = User.create username: "User#{i}"
+        SongsStations.create station: station, song: spotify_song(song), position: i, selector: user
     end
     station
 end
