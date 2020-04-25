@@ -32,8 +32,8 @@ class StationsController < ApplicationController
             return json_error "no such song"
         end
 
-        station.queue_song song
-        current_user.update position: (station.users.maximum(:position) || 0) + 1
+        station.queue_song song, current_user
+        current_user.update position: station.users.maximum(:position) + 1
 
         json_ok
     end

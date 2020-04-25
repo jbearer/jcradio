@@ -13,8 +13,9 @@ class Station < ActiveRecord::Base
         SongsStations.where(station: self).order(:position)
     end
 
-    def queue_song(song)
+    def queue_song(song, selector)
         SongsStations.create song: song, station: self,
-            position: (queue.maximum(:position) || 0) + 1
+            position: (queue.maximum(:position) || 0) + 1,
+            selector: selector
     end
 end

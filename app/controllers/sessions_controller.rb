@@ -13,6 +13,8 @@ class SessionsController < ApplicationController
                 station = Station.find 1
                 @user.update station: station,
                              position: (station.users.maximum(:position) || -1) + 1
+            else
+                raise "position must not be nil" if @user.position.nil?
             end
             session[:user_id] = @user.id
         end
