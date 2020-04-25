@@ -57,7 +57,10 @@
 /* Sidebar */
 
  .sidebar {
-  	background: linear-gradient(220deg, #e2f1af 0%, #ef959d 50%, #131515 90%);
+  	/*background: linear-gradient(220deg, #e2f1af 0%, #ef959d 50%, #131515 90%);*/
+  	background-image:
+        linear-gradient(220deg, rgba(226,241,175,0.7) 0%, rgba(239,149,157,0.7) 50%, rgba(19,21,21,0.7) 90%), 
+        url('https://i.ibb.co/CmygZL1/94426167-583747368918688-6925737925619482624-n.jpg');
   	background-repeat: no-repeat;
 	background-size: cover;
   	height: 100%;
