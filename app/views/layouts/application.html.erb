@@ -57,7 +57,7 @@
             <% end %>
 
             <%= link_to '/auth/spotify' do %>
-              <button class="button button 4" type="submit">Sign in with Spotify</button>
+              <button class="button button5" type="submit">Sign in with Spotify</button>
             <% end -%>
 
         </div>
@@ -93,6 +93,7 @@
                    <%= current_user.station.now_playing.song.artist %>
             </div>
 
+            <!-- Song Duration -->
             <div class = "columnMus middleMus">
                 <br>
                 <span id="current-time"></span>
@@ -105,15 +106,22 @@
                 <br>
             </div>
 
+            <!-- Play/Pause and Selector Name -->
             <div class = "columnMus rightMus">
-              <button class="button button2" id="audioControl" onclick="togglePlaying()">Play</button>
-              <% if current_user.station.now_playing.selector == current_user %>
-                <form action="/stations/<%= current_user.station.id %>/next" class="in_place_form">
-                  <button class="button button2" type="submit">Next</button>
-                </form>
-              <% else %>
-                <div>Chosen by <%= current_user.station.now_playing.selector.username %></div>
-              <% end %>
+            <span style="float: left; width: 32%; text-align: left;">&nbsp;</span>
+            <span style="float: left; width: 32%; text-align: center; margin-top: 0.5em;">
+              <button class="button button3" id="audioControl" onclick="togglePlaying()">&#9205;</button>
+            </span>
+
+              <span style="float: left; width: 32%; text-align: right; margin-top: 1em;">
+                <% if current_user.station.now_playing.selector == current_user %>
+                  <form action="/stations/<%= current_user.station.id %>/next" class="in_place_form">
+                    <button class="button button3" type="submit">Next</button>
+                  </form>
+                <% else %>
+                  Chosen by <%= current_user.station.now_playing.selector.username %>
+                <% end %>
+              </span>
             </div>
 
         </div>
@@ -134,14 +142,14 @@
 
             function togglePlaying() {
 
-              var play = ctrl.innerHTML === 'Play'
+              var play = ctrl.innerHTML === '⏵'
               var method
 
               if (play) {
-                ctrl.innerHTML = 'Pause'
+                ctrl.innerHTML = '⏸'
                 method = 'play'
               } else {
-                ctrl.innerHTML = 'Play'
+                ctrl.innerHTML = '⏵'
                 method = 'pause'
               }
 

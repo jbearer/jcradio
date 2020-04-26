@@ -32,14 +32,14 @@
 
 		/* Change the color of links on hover */
 		.topnav a:hover {
-		  background-color: #ef959d;
-		  color: #131515;
+		  background-color: rgba(239,149,157,0.8);
+		  color: #eae8ff;
 		}
 
 		/* Add a color to the active/current link */
 		.topnav .active {
-		  background-color: #e2f1af;
-		  color: #131515;
+		  background-color: rgba(239,149,157,0.5);
+		  color: #eae8ff;
 		}
 
 /*Split Screen*/
@@ -59,7 +59,7 @@
  .sidebar {
   	/*background: linear-gradient(220deg, #e2f1af 0%, #ef959d 50%, #131515 90%);*/
   	background-image:
-        linear-gradient(220deg, rgba(226,241,175,0.7) 0%, rgba(239,149,157,0.7) 50%, rgba(19,21,21,0.7) 90%), 
+        linear-gradient(220deg, rgba(226,241,175,1) 0%, rgba(239,149,157,0.7) 50%, rgba(19,21,21,0.7) 90%), 
         url('https://i.ibb.co/CmygZL1/94426167-583747368918688-6925737925619482624-n.jpg');
   	background-repeat: no-repeat;
 	background-size: cover;
@@ -90,7 +90,7 @@
 		line-height: 1.5em;
 		margin-bottom: 1.5em;
 		text-align: center;
-		color: rgba(63,12,50,0.7);
+		color: rgba(19,21,21,0.7);
 	}
 
 	/* The navigation menu links */
@@ -112,7 +112,7 @@
 	.musicBar {
 	  background-color: #131515;
 	  bottom: 0;
-	  color: #eae8ff;
+	  color: rgba(234,232,255,0.5);
 	  left: 0;
 	  position: fixed;
 	  text-align: center;
@@ -120,7 +120,7 @@
 	}
 
 	.musicBar p{
-		color: #e2f1af;
+		color: #eae8ff;
 		font-size: 1em;
 		font-weight: bold;
 		line-height: 1.2em;
@@ -134,6 +134,7 @@
 
 		.leftMus, .rightMus {
 		  width: 25%;
+		  display: inline-block;
 		}
 
 		.middleMus {
@@ -144,7 +145,7 @@
 		canvas {
 		  background:#fff;
 		  height:auto;
-		  width:60%;
+		  width:70%;
 
 		}
 
@@ -185,8 +186,19 @@
 
 	.button1 {width: 150px;}
 	.button2 {width: 100px;}
-	.button3 {width: 50px;}
+	/*Search and Play/Pause Button*/
+	.button3 {
+		width: 50px;
+		display: inline-block;
+	}
 	.button4 {width: 200px;}
+	/*Spotify Button*/
+	.button5 {
+		width: 200px;
+		background-color: rgba(239,149,157,0.5);
+		color: #eae8ff;
+		font-weight: normal;
+	}
 
 /*Main*/
 	.main {
@@ -225,14 +237,15 @@
 	  }
 
 	th{
-		color: rgba(239,149,157,0.5);
+		color: #eae8ff;
 		font-weight: bold;
 		padding-bottom: 6px;
+		font-size: 1.3em;
 	}
 
 	td{
-		color: #eae8ff;
-		font-size: 0.8em;
+		color: rgba(234,232,255,0.5);
+		font-size: 1em;
 		padding-top: 6px;
 		padding-bottom: 6px;
 	}
@@ -256,7 +269,15 @@
 
 	  }
 
-	  .sidebar{
+	  td {
+	  	font-size: 0.8em;
+	  }
+
+	  th{
+	  	font-size: 1em;
+	  }
+
+	  .sidebar {
 	  	position: static;
 	  }
 
