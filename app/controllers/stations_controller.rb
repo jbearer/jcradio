@@ -13,13 +13,13 @@ class StationsController < ApplicationController
         #   Put this in an initialization place instead
         #   Don't commit the secret to the repo (this isn't a big deal since we can reset the secret)
 
-        $spotify_user = RSpotify::User.new({
-            'id' => "1285766091",
-            'credentials' => {
-              'token' => "BQBhNG08y4Fs57MR9dB5aP78Ox7lUCCegd9fCML6zWQNLYLcvm0vEhGS8e_xNwcl069BF_ZpGGXVSqdHeEjBdK7StfLs3vzXg_UJT3uwS4U_-AGvyxLb58VjmXDSkBH6klZvXefgTf6PcpG0BbB7Q9yShnHPxb6MSSQlX2_BZmPrImEcfaGxRUxcJTLnU03S4owlNnAUcYulJf8jMG60Vw",
-              'refresh_token' => "AQDq3nkvfQdX_mPbnq8U9D_ChWG4DSQF2rIGbMflhrb4s362TEQsfVEGCvmILB-5fOa1YmD-NScAp3wDpdQeDRHZut1SFGH-ii_ksNkb5T60IsQuL0M3kELwlK0jN8wMPU4"
-            }
-          })
+        # $spotify_user = RSpotify::User.new({
+        #     'id' => "1285766091",
+        #     'credentials' => {
+        #       'token' => "BQBhNG08y4Fs57MR9dB5aP78Ox7lUCCegd9fCML6zWQNLYLcvm0vEhGS8e_xNwcl069BF_ZpGGXVSqdHeEjBdK7StfLs3vzXg_UJT3uwS4U_-AGvyxLb58VjmXDSkBH6klZvXefgTf6PcpG0BbB7Q9yShnHPxb6MSSQlX2_BZmPrImEcfaGxRUxcJTLnU03S4owlNnAUcYulJf8jMG60Vw",
+        #       'refresh_token' => "AQDq3nkvfQdX_mPbnq8U9D_ChWG4DSQF2rIGbMflhrb4s362TEQsfVEGCvmILB-5fOa1YmD-NScAp3wDpdQeDRHZut1SFGH-ii_ksNkb5T60IsQuL0M3kELwlK0jN8wMPU4"
+        #     }
+        #   })
 
 
         redirect_to "/stations/1"
