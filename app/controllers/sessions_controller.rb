@@ -14,7 +14,11 @@ class SessionsController < ApplicationController
                 @user.update station: station,
                              position: (station.users.maximum(:position) || -1) + 1
             else
-                raise "position must not be nil" if @user.position.nil?
+              if @user.position.nil?
+                # If we're already a member of a station, but we're not in line to add
+                # songs to that station, join the back of the line.
+                @user.update position: (@user.station.users.maximum(:position) || -1) + 1
+              end
             end
             session[:user_id] = @user.id
 
@@ -31,7 +35,7 @@ class SessionsController < ApplicationController
   # DELETE /sessions
   def destroy
     if logged_in?
-        current_user.update position: nil
+        current_user.update station: nil, position: nil
         reset_session
     else
         error "cannot log out (not logged in)"
