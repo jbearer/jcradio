@@ -43,12 +43,12 @@
 		}
 
 /*Split Screen*/
-	 .column{
+	.column{
 	 	float: left;
 	 }
 
-	 /* Clear floats after the columns */
-		.row:after {
+	/* Clear floats after the columns */
+	.row:after {
 		  content: "";
 		  display: table;
 		  clear: both;
@@ -225,11 +225,20 @@
 	th{
 		color: rgba(239,149,157,0.5);
 		font-weight: bold;
+		padding-bottom: 6px;
 	}
 
 	td{
 		color: #eae8ff;
+		font-size: 0.8em;
+		padding-top: 6px;
+		padding-bottom: 6px;
 	}
+
+	tr:not(:first-child):hover { 
+		background: rgba(226,241,175,0.1);
+	}
+
 
 /*Screen Flex*/
 	@media screen and (max-width: 800px) {
