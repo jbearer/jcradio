@@ -12,7 +12,6 @@ class StationsController < ApplicationController
         #   Use the refresh token
         #   Put this in an initialization place instead
         #   Don't commit the secret to the repo (this isn't a big deal since we can reset the secret)
-        RSpotify.authenticate("b0f411963a924c1497bae046d67e03c9", "d4216a91bd1249e9aee62c3062c18a34")
 
         $spotify_user = RSpotify::User.new({
             'id' => "1285766091",
