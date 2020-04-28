@@ -110,7 +110,7 @@
             <div class = "columnMus rightMus">
             <span style="float: left; width: 32%; text-align: left;">&nbsp;</span>
             <span style="float: left; width: 32%; text-align: center; margin-top: 0.5em;">
-              <button class="button button3" id="audioControl" onclick="togglePlaying()">&#9205;</button>
+              <button class="button button3" id="audioControl" onclick="togglePlaying()"><i class="fa fa-volume-up"></i></button>
             </span>
 
               <span style="float: left; width: 32%; text-align: right; margin-top: 1em;">
@@ -142,14 +142,14 @@
 
             function togglePlaying() {
 
-              var play = ctrl.innerHTML === '⏵'
+              var play = ctrl.innerHTML === '<i class="fa fa-volume-up"></i>'
               var method
 
               if (play) {
-                ctrl.innerHTML = '⏸'
+                ctrl.innerHTML = '<i class="fa fa-volume-off"></i>'
                 method = 'play'
               } else {
-                ctrl.innerHTML = '⏵'
+                ctrl.innerHTML = '<i class="fa fa-volume-up"></i>'
                 method = 'pause'
               }
 
