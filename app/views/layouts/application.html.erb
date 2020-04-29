@@ -32,6 +32,7 @@
              <%= link_to "Queue", "/stations", :class => current_class?("/stations") %>
              <%= link_to "Selector", "/songs", :class => current_class?("/songs") %>
              <a href="#Plots">Plots</a>
+             <a href="#Chat">Chat</a>
         </div>
 
     <!-- Side Bar -->
@@ -159,7 +160,7 @@
 
             function updateBar() {
               canvas.clearRect(0, 0, canvasWidth, 50)
-              canvas.fillStyle = "#453e3b";
+              canvas.fillStyle = "#496e73";
               canvas.fillRect(0, 0, canvasWidth, 50)
 
               var currentTime = audioEl.currentTime
