@@ -25,7 +25,7 @@
           <link rel="manifest" href="/manifest.json">
         </head>
 
-    <body style="background-color: #463730;">
+    <body style="height: 100%;">
 
     <!-- Navigation Bar -->
         <div class="topnav">
@@ -110,7 +110,7 @@
             <div class = "columnMus rightMus">
             <span style="float: left; width: 32%; text-align: left;">&nbsp;</span>
             <span style="float: left; width: 32%; text-align: center; margin-top: 0.5em;">
-              <button class="button button3" id="audioControl" onclick="togglePlaying()"><i class="fa fa-volume-up"></i></button>
+              <button class="button button3" id="audioControl" onclick="togglePlaying()"><i class="fa fa-volume-up fa-lg"></i></button>
             </span>
 
               <span style="float: left; width: 32%; text-align: right; margin-top: 1em;">
@@ -142,14 +142,14 @@
 
             function togglePlaying() {
 
-              var play = ctrl.innerHTML === '<i class="fa fa-volume-up"></i>'
+              var play = ctrl.innerHTML === '<i class="fa fa-volume-up fa-lg"></i>'
               var method
 
               if (play) {
-                ctrl.innerHTML = '<i class="fa fa-volume-off"></i>'
+                ctrl.innerHTML = '<i class="fa fa-volume-off fa-lg"></i><i class="fa fa-remove" style="font-size: 0.8em;"></i>'
                 method = 'play'
               } else {
-                ctrl.innerHTML = '<i class="fa fa-volume-up"></i>'
+                ctrl.innerHTML = '<i class="fa fa-volume-up fa-lg"></i>'
                 method = 'pause'
               }
 
