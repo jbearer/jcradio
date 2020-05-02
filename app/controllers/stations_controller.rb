@@ -36,7 +36,11 @@ class StationsController < ApplicationController
             return json_error "it's not your turn to add to the queue"
         end
 
-        station.spotify_queue_song(params[:title], params[:uri])
+        err_str = station.spotify_queue_song(params[:title], params[:uri])
+
+        if err_str != "" then
+            return json_error err_str
+        end
 
         # song = Song.find(params[:song_id])
         # if !song

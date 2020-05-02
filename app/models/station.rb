@@ -26,12 +26,25 @@ class Station < ActiveRecord::Base
     end
 
     def spotify_queue_song(song, uri)
+        if not $spotify_user
+            return "Please log into spotify"
+        end
+
         player = $spotify_user.player
+
+        # TODO: Automatically create the spotify player. I don't think this
+        # can be done with the spotify API
+        if not player
+            return "No spotify player found.  Please start playing spotify on a device."
+        end
+
         if player.playing?
             internal_spotify_add_to_queue_wrapper(uri)
         else
             player.play_track(uri)
         end
+
+        return ""
     end
 
     def internal_spotify_add_to_queue_wrapper(uri)
