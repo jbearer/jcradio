@@ -27,7 +27,7 @@
             <% if logged_in? and current_user.can_add_to_queue %>
                 <form action=<%="/stations/#{current_user.station.id}"%> method="post" class="in_place_form">
                     <input type="hidden" name="uri" value=<%= song.uri %> >
-                    <button class="button button6" type="submit"><i class="fa fa-plus"></i></button>
+                    <button class="button button6" onclick="confirmSong()"><i class="fa fa-plus"></i></button>
                 </form>
             <% end %>
         </td>
@@ -35,8 +35,24 @@
 
     <% end %>
 
+<!-- help -->
 
 </table>
 
+<!-- Show More Songs Button -->
 <br>
 <button class="button button8" type="submit">Show More</button>
+
+
+<!-- Confirm Song Popup -->
+<script>
+function confirmSong() {
+  // var txt;
+  if (confirm("Add song to queue?")) {
+    // txt = "You pressed OK!";
+  } else {
+    // txt = "You pressed Cancel!";
+  }
+  // document.getElementById("demo").innerHTML = txt;
+}
+</script>

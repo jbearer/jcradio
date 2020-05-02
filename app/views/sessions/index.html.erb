@@ -1,7 +1,9 @@
 <!-- Login -->
 
+<div style ="font-size: 10em; color: rgba(146,220,229,0.3)"><i class="fa fa-user-circle"></i></div>
+
             <% if logged_in? %>
-                <p>Hey there, <%= current_user.username %>!
+                <p>Welcome <%= current_user.username %>!
                 <form action="/logout" method="post" class="in_place_form">
                     <button class="button button4" type="submit">Switch Accounts</button>
                 </form>
