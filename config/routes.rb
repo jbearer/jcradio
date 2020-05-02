@@ -4,6 +4,9 @@ Rails.application.routes.draw do
   delete "/sessions", to: 'sessions#destroy'  # API
   post "/logout", to: "sessions#destroy"      # Forms
   post "/sessions/subscribe", to: "sessions#subscribe"
+  if Rails.env.development?
+    post "/sessions/notifyme", to: "sessions#test_notifications"
+  end
 
   resources :songs, only: [:index]
   get "/songs/search", to: "songs#search"

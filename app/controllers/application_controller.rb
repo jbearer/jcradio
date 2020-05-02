@@ -42,4 +42,32 @@ class ApplicationController < ActionController::Base
     def return_to_page
         redirect_to (params[:redirect] || request.original_url)
     end
+
+    helper_method :vapid_key
+    def vapid_key
+        vapid = Vapid.find(1)
+        {
+            public_key: vapid.public_key,
+            private_key: vapid.private_key,
+        }
+    end
+
+    helper_method :push
+    def push(text, user=current_user)
+        if user
+            subscription = JSON.parse(user.subscription)
+        elsif session[:subscription]
+            subscription = session[:subscription]
+        else
+            return
+        end
+
+        Webpush.payload_send({
+            message: text,
+            endpoint: subscription["endpoint"],
+            p256dh: subscription["keys"]["p256dh"],
+            auth: subscription["keys"]["auth"],
+            vapid: vapid_key
+        })
+    end
 end

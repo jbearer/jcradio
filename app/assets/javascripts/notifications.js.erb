@@ -1,0 +1,20 @@
+function subscribeUserToPush() {
+  return navigator.serviceWorker.register('/notifications.js')
+  .then(function(registration) {
+    const subscribeOptions = {
+      userVisibleOnly: true,
+      applicationServerKey: "<%= Vapid.find(1).public_key[0..-2] %>",
+    };
+
+    return registration.pushManager.subscribe(subscribeOptions);
+  })
+  .then(function(pushSubscription) {
+    console.log('Received PushSubscription: ', JSON.stringify(pushSubscription));
+    return pushSubscription;
+  });
+}
+
+subscribeUserToPush()
+.then(function(subscription) {
+    $.post("/sessions/subscribe", subscription.toJSON());
+});
