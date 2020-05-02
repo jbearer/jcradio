@@ -1,6 +1,6 @@
 Rails.application.routes.draw do
   resources :users, only: [:show, :new, :create, :destroy]
-  resources :sessions, only: [:create]
+  resources :sessions, only: [:index, :create]
   delete "/sessions", to: 'sessions#destroy'  # API
   post "/logout", to: "sessions#destroy"      # Forms
   post "/sessions/subscribe", to: "sessions#subscribe"
@@ -14,7 +14,7 @@ Rails.application.routes.draw do
 
   get '/auth/spotify/callback', to: 'stations#index'
 
-  root 'stations#index'
+  root 'sessions#index'
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

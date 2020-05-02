@@ -29,6 +29,7 @@
 
     <!-- Navigation Bar -->
         <div class="topnav">
+             <%= link_to "Home", "/sessions", :class => current_class?("/sessions") %>
              <%= link_to "Queue", "/stations", :class => current_class?("/stations") %>
              <%= link_to "Selector", "/songs", :class => current_class?("/songs") %>
              <a href="#Plots">Plots</a>
@@ -40,26 +41,6 @@
           <div class = "column sidebar">
 
             <span><h2>Jingle Churro Radio</h2></span>
-
-    <!-- Login -->
-
-            <% if logged_in? %>
-                <p>Hey there, <%= current_user.username %>!
-                <form action="/logout" method="post" class="in_place_form">
-                    <button class="button button4" type="submit">Switch accounts</button>
-                </form>
-                </p>
-            <% else %>
-                    <p><form action="/sessions" method="post" class="in_place_form">
-                        <input type="text" placeholder="Enter Name" name="username" required>
-                        <br>
-                        <button class="button button1" type="submit">Join Radio</button>
-                    </form></p>
-            <% end %>
-
-            <%= link_to '/auth/spotify' do %>
-              <button class="button button5" type="submit">Sign in with Spotify</button>
-            <% end -%>
 
         </div>
 
@@ -73,12 +54,7 @@
               </div>
             </div>
 
-            <div class="search-container">
-                <form action="/songs/search">
-                  <input type="text" placeholder="Search..." name="query">
-                  <button class="button button3" type="submit"><i class="fa fa-search"></i></button>
-                </form>
-             </div>
+
 
             <%= yield %>
 

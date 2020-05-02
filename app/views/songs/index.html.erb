@@ -1,5 +1,13 @@
+<div class="search-container">
+    <form action="/songs/search">
+      <input type="text" placeholder="Search..." name="query">
+      <button class="button button3" type="submit"><i class="fa fa-search"></i></button>
+    </form>
+ </div>
+
+
 <table>
-    <thead>
+ 
     <tr>
         <th>Song</th>
         <th>Artist</th>
@@ -7,9 +15,9 @@
         <th>Duration</th>
         <th></th>
     </tr>
-    </thead>
+
     <% @songs.each do |song| %>
-    <tbody>
+
     <tr>
         <td> <%= song.title %> </td>
         <td> <%= song.artist %> </td>
@@ -24,6 +32,11 @@
             <% end %>
         </td>
     </tr>
-    </tbody>
+
     <% end %>
+
+
 </table>
+
+<br>
+<button class="button button8" type="submit">Show More</button>

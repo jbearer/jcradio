@@ -212,6 +212,13 @@
 	.button7{
 	}
 
+	/*Show More*/
+	.button8{
+		font-weight: normal;
+		/*width: 150px;*/
+		font-size: 1em;
+	}
+
 	.fa{
 		vertical-align: middle;
 	}
