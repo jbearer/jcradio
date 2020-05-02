@@ -17,3 +17,10 @@
             <%= link_to '/auth/spotify' do %>
               <button class="button button5" type="submit">Sign in with Spotify</button>
             <% end -%>
+
+<% if Rails.env.development? %>
+    <form action="/sessions/notifyme" method="post" class="in_place_form">
+        <input type="text" name="text">
+        <input type="submit" value="Notify me!">
+    </form>
+<% end %>

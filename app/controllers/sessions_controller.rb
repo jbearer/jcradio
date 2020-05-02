@@ -5,10 +5,6 @@ class SessionsController < ApplicationController
 
   # POST /sessions
   #     username: string
-
-  def index
-  end
-
   def create
     if logged_in?
         error "cannot log in (already logged in as #{current_user.username}"
