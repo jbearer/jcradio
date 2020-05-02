@@ -12,7 +12,7 @@ Rails.application.routes.draw do
   post "/stations/:id", to: 'stations#update'
   get "/stations/:id/next", to: 'stations#next'
 
-  get '/auth/spotify/callback', to: 'stations#index'
+  get '/auth/spotify/callback', to: 'stations#spotify_create_user'
 
   root 'stations#index'
 

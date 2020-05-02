@@ -27,8 +27,6 @@ class Song < ActiveRecord::Base
     end
 
     def self.spotify_search(entry)
-        # Currently only searches for the song.
-        # TODO: Incorporate artist and album
         spotify_songs = RSpotify::Track.search(entry)
 
         songs = []
@@ -40,7 +38,8 @@ class Song < ActiveRecord::Base
                 'album'     => ss.album.name,
                 'source'    => "Spotify",
                 'source_id' => ss.id,
-                'duration'  => ss.duration_ms
+                'duration'  => ss.duration_ms,
+                'uri'       => ss.uri
             }))
         end
 

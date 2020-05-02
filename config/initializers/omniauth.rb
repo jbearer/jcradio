@@ -5,7 +5,7 @@ begin
   RSpotify.authenticate("b0f411963a924c1497bae046d67e03c9", "d4216a91bd1249e9aee62c3062c18a34")
 
   Rails.application.config.middleware.use OmniAuth::Builder do
-    provider :spotify, "b0f411963a924c1497bae046d67e03c9", "d4216a91bd1249e9aee62c3062c18a34", scope: 'playlist-modify-public'
+    provider :spotify, "b0f411963a924c1497bae046d67e03c9", "d4216a91bd1249e9aee62c3062c18a34", scope: 'playlist-modify-public user-modify-playback-state user-read-playback-state'
   end
 rescue RestClient::BadRequest => e
   puts "=======\n" \

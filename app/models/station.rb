@@ -24,4 +24,20 @@ class Station < ActiveRecord::Base
             update now_playing: (SongsStations.create song: song, selector: selector)
         end
     end
+
+    def spotify_queue_song(song, uri)
+        player = $spotify_user.player
+        if player.playing?
+            internal_spotify_add_to_queue_wrapper(uri)
+        else
+            player.play_track(uri)
+        end
+    end
+
+    def internal_spotify_add_to_queue_wrapper(uri)
+        url = "me/player/queue"
+        url += "?uri=#{uri}"
+        RSpotify::User.oauth_post($spotify_user.id, url, {})
+    end
+
 end

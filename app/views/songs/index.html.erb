@@ -15,7 +15,7 @@
         <td>
             <% if logged_in? and current_user.can_add_to_queue %>
                 <form action=<%="/stations/#{current_user.station.id}"%> method="post" class="in_place_form">
-                    <input type="hidden" name="song_id" value=<%= song.id %> >
+                    <input type="hidden" name="uri" value=<%= song.uri %> >
                     <button class="button button3" type="submit"><i class="fa fa-plus"></i></button>
                 </form>
             <% end %>

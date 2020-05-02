@@ -3,25 +3,15 @@ class StationsController < ApplicationController
 
     # GET /stations
     def index
+        redirect_to "/stations/1"
+    end
 
-        # This is done hackily for now:
-        #   Hard code a user, and save as a global variable $spotify_user
-        # TODO:
-        #   Put this functionality in a different place. maybe a login button?
-        #   Automatically log the user in to get the token, with a username and password
-        #   Use the refresh token
-        #   Put this in an initialization place instead
-        #   Don't commit the secret to the repo (this isn't a big deal since we can reset the secret)
-
-        # $spotify_user = RSpotify::User.new({
-        #     'id' => "1285766091",
-        #     'credentials' => {
-        #       'token' => "BQBhNG08y4Fs57MR9dB5aP78Ox7lUCCegd9fCML6zWQNLYLcvm0vEhGS8e_xNwcl069BF_ZpGGXVSqdHeEjBdK7StfLs3vzXg_UJT3uwS4U_-AGvyxLb58VjmXDSkBH6klZvXefgTf6PcpG0BbB7Q9yShnHPxb6MSSQlX2_BZmPrImEcfaGxRUxcJTLnU03S4owlNnAUcYulJf8jMG60Vw",
-        #       'refresh_token' => "AQDq3nkvfQdX_mPbnq8U9D_ChWG4DSQF2rIGbMflhrb4s362TEQsfVEGCvmILB-5fOa1YmD-NScAp3wDpdQeDRHZut1SFGH-ii_ksNkb5T60IsQuL0M3kELwlK0jN8wMPU4"
-        #     }
-        #   })
-
-
+    def spotify_create_user
+        # TODO: Move to the appropriate place
+        # TODO: don't make this a global variable. probably a static class
+        # variable.
+        # TODO: Make "Sign in with Spotify" button go away if user exists
+        $spotify_user = RSpotify::User.new(request.env['omniauth.auth'])
         redirect_to "/stations/1"
     end
 
@@ -46,12 +36,14 @@ class StationsController < ApplicationController
             return json_error "it's not your turn to add to the queue"
         end
 
-        song = Song.find(params[:song_id])
-        if !song
-            return json_error "no such song"
-        end
+        station.spotify_queue_song(params[:title], params[:uri])
 
-        station.queue_song song, current_user
+        # song = Song.find(params[:song_id])
+        # if !song
+        #     return json_error "no such song"
+        # end
+
+        # station.queue_song song, current_user
         current_user.update position: station.users.maximum(:position) + 1
 
         # Notify the next user that it's their turn to pick a song.
