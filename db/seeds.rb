@@ -29,3 +29,6 @@ if Rails.env.development?
     queue_entry = SongsStations.create station: station, song: now_playing, position: 0, selector: User.find(1)
     station.update now_playing: queue_entry
 end
+
+vapid_key = Webpush.generate_key
+Vapid.create public_key: vapid_key.public_key, private_key: vapid_key.private_key

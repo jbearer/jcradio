@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20200425211151) do
+ActiveRecord::Schema.define(version: 20200502204501) do
 
   create_table "songs", force: :cascade do |t|
     t.string   "source"
@@ -64,5 +64,10 @@ ActiveRecord::Schema.define(version: 20200425211151) do
   end
 
   add_index "users", ["station_id"], name: "index_users_on_station_id"
+
+  create_table "vapid", force: :cascade do |t|
+    t.string "public_key"
+    t.string "private_key"
+  end
 
 end

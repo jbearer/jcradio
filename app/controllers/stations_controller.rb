@@ -59,13 +59,7 @@ class StationsController < ApplicationController
         if next_user.subscription
             subscription = JSON.parse(next_user.subscription)
             Rails.logger.error subscription
-            Webpush.payload_send({
-                message: "Hey #{next_user.username}! It's your turn to pick a song on jcradio!",
-                endpoint: subscription["endpoint"],
-                p256dh: subscription["keys"]["p256dh"],
-                auth: subscription["keys"]["auth"],
-                api_key: "" # TODO we need this for Chrome
-            })
+            push "Hey #{next_user.username}! It's your turn to pick a song on jcradio!", next_user
         end
 
         json_ok
