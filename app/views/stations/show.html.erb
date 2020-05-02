@@ -1,5 +1,12 @@
 <p id="notice"><%= notice %></p>
 
+<div class="search-container">
+    <form action="/songs/search">
+      <input type="text" placeholder="Search..." name="query">
+      <button class="button button3" type="submit"><i class="fa fa-search"></i></button>
+    </form>
+ </div>
+
 <h3>Next up, on <%= @station.name %>...</h3>
 <br>
 <br>

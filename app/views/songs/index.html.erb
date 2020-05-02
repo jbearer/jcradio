@@ -1,4 +1,13 @@
+<div class="search-container">
+    <form action="/songs/search">
+      <input type="text" placeholder="Search..." name="query">
+      <button class="button button3" type="submit"><i class="fa fa-search"></i></button>
+    </form>
+ </div>
+
+
 <table>
+ 
     <tr>
         <th>Song</th>
         <th>Artist</th>
@@ -6,7 +15,9 @@
         <th>Duration</th>
         <th></th>
     </tr>
+
     <% @songs.each do |song| %>
+
     <tr>
         <td> <%= song.title %> </td>
         <td> <%= song.artist %> </td>
@@ -16,10 +27,16 @@
             <% if logged_in? and current_user.can_add_to_queue %>
                 <form action=<%="/stations/#{current_user.station.id}"%> method="post" class="in_place_form">
                     <input type="hidden" name="uri" value=<%= song.uri %> >
-                    <button class="button button3" type="submit"><i class="fa fa-plus"></i></button>
+                    <button class="button button6" type="submit"><i class="fa fa-plus"></i></button>
                 </form>
             <% end %>
         </td>
     </tr>
+
     <% end %>
+
+
 </table>
+
+<br>
+<button class="button button8" type="submit">Show More</button>

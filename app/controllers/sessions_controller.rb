@@ -1,4 +1,8 @@
 class SessionsController < ApplicationController
+  # GET /sessions
+  def index
+  end
+
   # POST /sessions
   #     username: string
   def create
@@ -54,11 +58,23 @@ class SessionsController < ApplicationController
     if logged_in?
       # If we already have a session, just associate the subscription with the user.
       current_user.update subscription: JSON.dump(params)
-      return json_ok
     else
       # Otherwise, store the subscription in the session, so that if the user logs in later we can
       # associated this subscription with their account.
       session[:subscription] = params
+    end
+
+    json_ok
+  end
+
+  if Rails.env.development?
+    # POST /sessions/notifyme
+    #   text:string
+    #
+    # This endpoint is just for developers to check if notifications are working correctly.
+    def test_notifications
+      push params[:text]
+      return_to_page
     end
   end
 end

@@ -171,7 +171,6 @@
 	  	margin: 10px 0;
 	  	border: none;
 	  	cursor: pointer;
-	  	/*width: 150px;*/
 	  	font-size: 1.15em;
 		font-weight: bold;
 		height: 1.7em;
@@ -194,12 +193,30 @@
 		display: inline-block;
 	}
 	.button4 {width: 200px;}
+
 	/*Spotify Button*/
 	.button5 {
 		width: 200px;
 		background-color: rgba(146,220,229,0.5);
 		color: #eae8ff;
 		font-weight: normal;
+	}
+
+	/*add*/
+	.button6{
+		margin: 0 0;
+		margin-bottom: 0;
+	}
+
+	/*play/pause*/
+	.button7{
+	}
+
+	/*Show More*/
+	.button8{
+		font-weight: normal;
+		/*width: 150px;*/
+		font-size: 1em;
 	}
 
 	.fa{
@@ -262,6 +279,19 @@
 	}
 
 /*Screen Flex*/
+	@media screen and (max-width: 1600px) {
+
+		.button7{
+	  	font-size: 0.8em;
+	  }
+
+	  .button6{
+	  	font-size: 0.8em;
+	  }
+
+	}
+
+
 	@media screen and (max-width: 800px) {
 	  .column {
 	    width: 100%;
@@ -291,6 +321,7 @@
 	  	padding-top: 15px;
 	  	padding-bottom: 180px;
 	  }
+
 
 	}
 
