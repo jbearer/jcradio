@@ -66,6 +66,15 @@
 		  clear: both;
 		}
 
+/*Sidebar Split Screen*/
+	/*	.sideRow{
+			width: 100%;
+		 }
+
+		.sideCol:after {
+			  float: left;
+			}*/
+
 /* Sidebar */
 
  .sidebar {
@@ -73,36 +82,30 @@
   	background-image:
         linear-gradient(220deg, rgba(226,241,175,1) 0%, rgba(146,220,229,0.7) 50%, rgba(44,34,30,0.7) 90%), 
         url('https://i.ibb.co/CmygZL1/94426167-583747368918688-6925737925619482624-n.jpg');
+    /*background-color: rgba(226,241,175,0.03);*/
   	background-repeat: no-repeat;
 	background-size: cover;
   	height: 100%;
   	left: 0;
   	overflow-x: hidden;
-  	padding-top: 70px;
+  	padding-top: 60px;
   	position: fixed;
   	text-align: center;
   	top: 0; /* Stay at the top */
   	width: 30%;
-  	/*border-style: solid;
-  	border-color: rgba(234,232,255,0.5);
-  	border-left-style: hidden;
-  	border-top-style: hidden;
-  	border-bottom-style: hidden;*/
 
 	}
 
 	.sidebar h2 {
 		font-size: 2em;
-		color: rgba(4,31,50,0.4);
+		color: rgba(4,31,50,0.5);
 		/*color: rgba(226,241,175,0.5);*/
 		margin-bottom: 0;
-		/*margin-top: 300px;*/
 		}
 
 	.sidebar h4{
 		font-size: 3.75em;
-		/*margin-bottom: 150px;*/
-		color: rgba(4,31,50,0.4);
+		color: rgba(4,31,50,0.5);
 		/*color: rgba(226,241,175,0.5);*/
 		margin-top: 0;
 	}
@@ -117,7 +120,7 @@
 	}
 
 	.userlist{
-		background-color: rgba(4,31,50,0.2);
+		background-color: rgba(4,31,50,0.3);
 		border-radius: 15px;
 		width: 70%;
 		height: 30%;
@@ -126,7 +129,7 @@
 
 	.userlist p{
 		margin: 1em;
-		color: white;
+		color: rgba(234,232,255,0.8);
 		font-weight: normal;
 	}
 
@@ -329,6 +332,16 @@
 	  .column {
 	    width: 100%;
 	  }
+
+	  /*.sideCol{
+	  	width: 50%;
+	  	float: left;
+	  }*/
+
+	  /*.userlist{
+	  	height: 200px;
+	  }*/
+
 
 	  .columnMus {
 	    width: 100%;
