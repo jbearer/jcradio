@@ -268,6 +268,13 @@
 		vertical-align: middle;
 	}
 
+/*Search Container*/
+
+	.search-container{
+		position: sticky;
+		top: 50px;
+	}
+
 /*Main*/
 	.main {
 	  width: 70%;
@@ -365,7 +372,7 @@
 	/* Chat containers */
 	.chatbox {
 	  background-color: rgba(226,241,175,0.2);
-	  color: #e2f1af;
+	  color: #eae8ff;
 	  border-radius: 10px;
 	  padding: 10px;
 	  margin-left: 15%;
@@ -379,7 +386,6 @@
 	.rightChat {
 	  background-color: rgba(234,232,255,0.2);
 	  margin-right: 15%;
-	  color: #eae8ff;
 	  float: right;
 	  text-align: right;
 	}
@@ -398,7 +404,6 @@
 	  margin-top: 1em;
 	  width: 70%;
 	}
-
 
 /*Screen Flex*/
 	@media screen and (max-width: 1600px) {
