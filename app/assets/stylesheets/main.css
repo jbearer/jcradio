@@ -342,7 +342,7 @@
 	.dialog-ovelay .dialog {
 	    width: 400px;
 	    margin: 100px auto 0;
-	    background: linear-gradient(0deg, black 0%, #041f32 70%, #e2f1af 150%);
+	    background: linear-gradient(10deg, black 0%, #041f32 50%, #e2f1af 130%);
 	    border-radius: 15px;
 	    border-style: solid;
 	    border-width: thin;
@@ -387,15 +387,6 @@
 	    width: 100%;
 	  }
 
-	  /*.sideCol{
-	  	width: 50%;
-	  	float: left;
-	  }*/
-
-	  /*.userlist{
-	  	height: 200px;
-	  }*/
-
 
 	  .columnMus {
 	    width: 100%;
@@ -422,6 +413,15 @@
 	  	padding-bottom: 180px;
 	  }
 
+  	.dialog-ovelay .dialog .dialog-msg p{
+		font-size: 1em;
+		line-height: 1.2em;
+	}
+
+	.button2{
+		font-size: 1em;
+	}
+
 
 	}
 
@@ -439,5 +439,15 @@
 	  .main{
 	  	padding-bottom: 120px;
 	  }
+
+	  .dialog-ovelay .dialog .dialog-msg p{
+		font-size: 0.8em;
+		line-height: 1em;
+	}
+
+	.button2{
+		font-size: 0.8em;
+	}
+
 
 
