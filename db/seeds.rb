@@ -12,11 +12,6 @@ end
 
 def spotify_station(station, songs)
 
-    user = User.create username: "Austin"
-    user = User.create username: "Aurora"
-    user = User.create username: "Jeb"
-    user = User.create username: "Daniel"
-
     station = Station.create name: station
     songs.each_with_index do |song, i|
         user = User.create username: "User#{i}"
@@ -26,6 +21,12 @@ def spotify_station(station, songs)
 end
 
 if Rails.env.development?
+
+    User.create username: "Austin"
+    User.create username: "Aurora"
+    User.create username: "Jeb"
+    User.create username: "Daniel"
+
     station = spotify_station "Jingle Churro", [
         {title: "Interlude", artist: "Alt-J", album: "An Awesome Wave", duration: 11},
         {title: "Down Down the Deep River", artist: "Okkervil River", album: "The Silver Gymnasium", duration: 12}

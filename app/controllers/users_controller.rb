@@ -1,6 +1,10 @@
 class UsersController < ApplicationController
   before_action :set_user, only: [:show, :destroy]
 
+  def index
+    @user = User.all.order("created_at ASC")
+  end
+
   # GET /users/1
   # GET /users/1.json
   def show

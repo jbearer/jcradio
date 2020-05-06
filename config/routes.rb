@@ -1,5 +1,5 @@
 Rails.application.routes.draw do
-  resources :users, only: [:show, :new, :create, :destroy]
+  resources :users, only: [:index, :show, :new, :create, :destroy]
   resources :sessions, only: [:index, :create]
   delete "/sessions", to: 'sessions#destroy'  # API
   post "/logout", to: "sessions#destroy"      # Forms

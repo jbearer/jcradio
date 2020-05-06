@@ -16,7 +16,7 @@
         <th></th>
     </tr>
 
-    <% @songs.each do |song| %>
+    <% @songs.each_with_index do |song, ind| %>
 
     <tr>
         <td> <%= song.title %> </td>
@@ -25,8 +25,8 @@
         <td> <%= msToMinSec(song.duration) %> </td>
         <td>
             <% if logged_in? and current_user.can_add_to_queue %>
-                <button class="button button6" onclick="confirmSong()"><i class="fa fa-plus"></i></button>
-                <form id="addSong" action=<%="/stations/#{current_user.station.id}"%> method="post">
+                <button class="button button6" onclick="confirmSong(<%=ind%>)" ><i class="fa fa-plus"></i></button>
+                <form id="addSong<%=ind%>" action=<%="/stations/#{current_user.station.id}"%> method="post">
                     <input type="hidden" name="uri" value=<%= song.uri %> >
                 </form>
 
@@ -50,7 +50,7 @@
 <script>
 
 
-function confirmSong() { /*change*/
+function confirmSong(ind) { /*change*/
         var $content =  "<div class='dialog-ovelay'>" +
                         "<div class='dialog'>" +
                      "<div class='dialog-msg'>" +
@@ -68,8 +68,7 @@ function confirmSong() { /*change*/
 
          // Add Song To Queue
       $('.doAction').click(function () {
-
-        document.getElementById("addSong").submit();
+        document.getElementById("addSong"+ind).submit();
 
         $(this).parents('.dialog-ovelay').fadeOut(500, function () {
           $(this).remove();
