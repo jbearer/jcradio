@@ -360,6 +360,46 @@
 		line-height: 1.2em;
 	}
 
+/*Chat Room*/
+
+	/* Chat containers */
+	.chatbox {
+	  background-color: rgba(226,241,175,0.2);
+	  color: #e2f1af;
+	  border-radius: 10px;
+	  padding: 10px;
+	  margin-left: 15%;
+	  margin-top: 1em;
+	  width: 60%;
+	  text-align: left;
+	  float: left;
+	}
+
+	/* Darker chat container */
+	.rightChat {
+	  background-color: rgba(234,232,255,0.2);
+	  margin-right: 15%;
+	  color: #eae8ff;
+	  float: right;
+	  text-align: right;
+	}
+
+	/* Clear floats */
+	.chatbox::after {
+	  content: "";
+	  clear: both;
+	  display: table;
+	}
+
+	.emptychat{
+	  background-color: rgba(1,1,1,0);
+	  padding: 10px;
+	  margin-left: 15%;
+	  margin-top: 1em;
+	  width: 70%;
+	}
+
+
 /*Screen Flex*/
 	@media screen and (max-width: 1600px) {
 
