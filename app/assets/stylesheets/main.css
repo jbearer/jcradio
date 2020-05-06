@@ -14,6 +14,23 @@
 	    background-attachment: fixed;
 	}
 
+	body::-webkit-scrollbar {
+	  width: 0.5em;
+	}
+	 
+	 
+	body::-webkit-scrollbar-thumb {
+	  background: linear-gradient(220deg, #e2f1af 0%, #92dce5 50%);
+	  border-style: solid;
+	  border-radius: 1em;
+	  border-color: black;
+	  /*border-width: thin;*/
+	}
+
+	body::-webkit-scrollbar-track-piece{
+		background: black;
+	}
+
 /* Navigation Bar */
 	.topnav {
 	  background-color: #000;
@@ -304,6 +321,43 @@
 
 	tr:not(:first-child):hover { 
 		background: rgba(226,241,175,0.1);
+	}
+
+/*Confirm Popup*/
+
+	.dialog-ovelay {
+	    /*position: absolute;*/
+	    position: fixed;
+	    top: 0;
+	    left: 0;
+	    right: 0;
+	    bottom: 0;
+	    background-color: rgba(0, 0, 0, 0.7);
+	    background-size: cover;
+	    background-repeat: no-repeat;
+	    background-attachment: fixed;
+	    z-index: 999999;
+	    text-align: center;
+	}
+	.dialog-ovelay .dialog {
+	    width: 400px;
+	    margin: 100px auto 0;
+	    background: linear-gradient(0deg, black 0%, #041f32 70%, #e2f1af 150%);
+	    border-radius: 15px;
+	    border-style: solid;
+	    border-width: thin;
+	    border-color: #eae8ff;
+	    overflow: hidden;
+	}
+
+	.dialog-ovelay .dialog .dialog-msg {
+	    padding: 12px 10px;
+	}
+	.dialog-ovelay .dialog .dialog-msg p{
+	    color: #eae8ff;
+		font-size: 1.2em;
+		/*font-weight: bold;*/
+		line-height: 1.2em;
 	}
 
 /*Screen Flex*/

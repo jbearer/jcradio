@@ -44,15 +44,54 @@
 <button class="button button8" type="submit">Show More</button>
 
 
+
 <!-- Confirm Song Popup -->
 <script>
-function confirmSong() {
-  // var txt;
-  if (confirm("Add song to queue?")) {
-    // txt = "You pressed OK!";
-  } else {
-    // txt = "You pressed Cancel!";
-  }
-  // document.getElementById("demo").innerHTML = txt;
-}
+
+// function confirmSong() {
+//   // var txt;
+//   if (confirm("Add song to queue?")) {
+//     // txt = "You pressed OK!";
+//   } else {
+//     return false;
+//   }
+// }
+
+
+function confirmSong() { /*change*/
+        var $content =  "<div class='dialog-ovelay'>" +
+                        "<div class='dialog'>" +
+                     "<div class='dialog-msg'>" +
+                         " <p> Add song to queue? </p> " +
+                     "</div>" +
+                     "<div class='controls'>" +
+                         " <button class='button button2 doAction'>Yes</button> " +
+                         "&nbsp; &nbsp;"+
+                         " <button class='button button2 cancelAction'>No</button> " +
+                     "</div>" +
+                  "</div>" +
+                "</div>";
+
+         $('body').prepend($content);
+
+         // Add Song To Queue
+      $('.doAction').click(function () {
+
+        window.open("https://www.google.com/", "_blank"); //Add song to Spotify Queue
+
+        $(this).parents('.dialog-ovelay').fadeOut(500, function () {
+          $(this).remove();
+        });
+      });
+
+      // Close Dialog Box
+$('.cancelAction, .fa-close').click(function () {
+        $(this).parents('.dialog-ovelay').fadeOut(500, function () {
+          $(this).remove();
+        });
+      });
+      
+   }
+
+
 </script>
