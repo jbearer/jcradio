@@ -369,14 +369,43 @@
 
 /*Chat Room*/
 
+	.chatcontainer{
+		height: 500px;
+		width: 70%;
+		margin-left: 15%;
+		overflow: auto;
+		background-color: rgba(255,255,255,0.1);
+		border-radius: 15px;
+		/*position: relative;*/
+	}
+
+	.chatcontainer::-webkit-scrollbar {
+	  width: 0.5em;
+	}
+	 
+	 
+	.chatcontainer::-webkit-scrollbar-thumb {
+	  background: linear-gradient(220deg, #e2f1af 0%, #92dce5 50%);
+	  border-style: solid;
+	  border-radius: 1em;
+	  border-color: black;
+	  /*border-width: thin;*/
+	}
+
+	.chatcontainer::-webkit-scrollbar-track-piece{
+		background-color: rgba(255,255,255,0);
+	}
+
 	/* Chat containers */
 	.chatbox {
 	  background-color: rgba(226,241,175,0.2);
 	  color: #eae8ff;
-	  border-radius: 10px;
-	  padding: 10px;
-	  margin-left: 15%;
-	  margin-top: 1em;
+	  border-radius: 30px 30px 30px 0;
+	  padding: 5px;
+	  margin-left: 2%;
+	  margin-top: 0.5em;
+	  margin bottom: 0.5em;
+	  line-height: 1.2em;
 	  width: 60%;
 	  text-align: left;
 	  float: left;
@@ -385,9 +414,10 @@
 	/* Darker chat container */
 	.rightChat {
 	  background-color: rgba(234,232,255,0.2);
-	  margin-right: 15%;
+	  margin-right: 2%;
 	  float: right;
-	  text-align: right;
+	  text-align: left;
+	  border-radius: 30px 30px 0 30px;
 	}
 
 	/* Clear floats */
@@ -395,6 +425,11 @@
 	  content: "";
 	  clear: both;
 	  display: table;
+	}
+
+	.chatbox p{
+		margin-left: 0.5em;
+		margin-right: 0.5em;
 	}
 
 	.emptychat{
@@ -423,6 +458,10 @@
 	  .button6{
 	  	font-size: 0.8em;
 	  }
+
+	  .chatcontainer{
+		height: 375px;
+	}
 
 	}
 
@@ -492,6 +531,23 @@
 
 	.button2{
 		font-size: 0.8em;
+	}
+
+	.chatcontainer{
+		height: 275px;
+		width: 90%;
+		margin-left: 5%
+	}
+
+	.chatbox{
+		line-height: 1em;
+		padding: 2px;
+	}
+
+	.chatbox p{
+		font-size: 0.8em;
+	}
+
 	}
 
 
