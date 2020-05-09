@@ -49,12 +49,13 @@
 <!-- Confirm Song Popup -->
 <script>
 
-
-function confirmSong(ind) { /*change*/
+// function confirmSong(title,artist){
+function confirmSong(ind) {
         var $content =  "<div class='dialog-ovelay'>" +
                         "<div class='dialog'>" +
                      "<div class='dialog-msg'>" +
-                         " <p> Add song to queue? </p> " +
+                         " <p> Add (song name goes here) by (artist goes here) to queue? </p> " +
+                         // " <p> Add "$title" by "$artist" to queue? </p> " +
                      "</div>" +
                      "<div class='controls'>" +
                          " <button class='button button2 doAction'>Yes</button> " +
