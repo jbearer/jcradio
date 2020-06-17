@@ -67,6 +67,10 @@ class SessionsController < ApplicationController
     json_ok
   end
 
+  def test_webrtc
+
+  end
+
   if Rails.env.development?
     # POST /sessions/notifyme
     #   text:string
