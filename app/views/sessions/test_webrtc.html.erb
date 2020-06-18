@@ -146,7 +146,7 @@
             hasRemoteDesc = false;
 
             pc.onicecandidate = function (event) {
-                if (event.candidate) {
+                if (event.candidate && event.candidate.length > 0) {
                     var candidate = {
                         sdpMLineIndex: event.candidate.sdpMLineIndex,
                         sdpMid: event.candidate.sdpMid,
