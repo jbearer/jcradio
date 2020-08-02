@@ -139,3 +139,12 @@ Command to run librespot
                                 increase volume linear instead of logarithmic.
                 --autoplay      autoplay similar songs when your music ends.
 
+
+Install DarkIce and IceCast2
+    https://maker.pro/raspberry-pi/projects/how-to-build-an-internet-radio-station-with-raspberry-pi-darkice-and-icecast
+
+
+wget https://github.com/x20mar/darkice-with-mp3-for-raspberry-pi/blob/master/darkice_1.0.1-999~mp3+1_armhf.deb?raw=true
+mv darkice_1.0.1-999~mp3+1_armhf.deb?raw=true darkice_1.0.1-999~mp3+1_armhf.deb
+sudo apt-get install libmp3lame0 libtwolame0
+sudo dpkg -i darkice_1.0.1-999~mp3+1_armhf.deb
