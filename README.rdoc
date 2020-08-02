@@ -1,28 +1,18 @@
 == README
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+Ruby version: 2.4.9
+Rails version: 4.2.8
 
-Things you may want to cover:
+To set up the database, run
 
-* Ruby version
+    rake db:setup
+    rake db:migrate
 
-* System dependencies
+To start the server, run
 
-* Configuration
+    rails server
 
-* Database creation
+Note: if you do `bundle install`, it may try to update the version of rspotify's dependency
+omniauth-oauth2 from 1.3.1 to 1.5.0.  This version of omniauth-oauth2 does not currently work
+with rspotify.  You must revert the version of this package back to 1.3.1 in `Gemfile.lock`.
 
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
-
-
-Please feel free to use a different markup language if you do not plan to run
-<tt>rake doc:app</tt>.
