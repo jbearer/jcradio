@@ -16,9 +16,14 @@
         </form></p>
 <% end %>
 
-<%= link_to '/auth/spotify' do %>
-  <button class="button button5" type="submit">Sign in with Spotify</button>
-<% end -%>
+<% if not $spotify_user %>
+    <%= link_to '/auth/spotify' do %>
+    <button class="button button5" type="submit">Sign in with Spotify</button>
+    <% end -%>
+<% else %>
+        Logged into Spotify account of: <%= $spotify_user.display_name %>.
+        You can't log out.
+<% end %>
 
 
 <!--  

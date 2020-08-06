@@ -39,18 +39,20 @@ class Station < ActiveRecord::Base
         end
 
         if player.playing?
-            internal_spotify_add_to_queue_wrapper(uri)
+            # If we are currently playing a song, add this to the queue
+            internal_spotify_add_to_queue(uri)
         else
+            # Otherwise, play this song immediately
+            # TODO: Causes RestClient::NotFound :( :( :(
             player.play_track(uri)
         end
 
         return ""
     end
 
-    def internal_spotify_add_to_queue_wrapper(uri)
+    def internal_spotify_add_to_queue(uri)
         url = "me/player/queue"
         url += "?uri=#{uri}"
         RSpotify::User.oauth_post($spotify_user.id, url, {})
     end
-
 end

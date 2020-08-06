@@ -12,6 +12,8 @@ class StationsController < ApplicationController
         # variable.
         # TODO: Make "Sign in with Spotify" button go away if user exists
         $spotify_user = RSpotify::User.new(request.env['omniauth.auth'])
+        # Update the song that's currently playing
+        TitleExtractorWorker.perform_async(self)
         redirect_to "/stations/1"
     end
 
@@ -93,3 +95,55 @@ class StationsController < ApplicationController
           @station = Station.find(params[:id])
         end
 end
+
+################ Background process to update song title
+# https://blog.appsignal.com/2019/04/02/background-processing-system-in-ruby.html
+module Magique
+    module Worker
+      def self.included(base)
+        base.extend(ClassMethods)
+      end
+
+      module ClassMethods
+        def perform_now(*args)
+          new.perform(*args)
+        end
+        def perform_async(*args)
+          Thread.new { new.perform(*args) }
+        end
+      end
+
+      def perform(*)
+        raise NotImplementedError
+      end
+    end
+  end
+
+  class TitleExtractorWorker
+    include Magique::Worker
+
+    def perform(station)
+
+        testUser = User.create username: "User0"
+
+        while true
+
+            playing_info = $spotify_user.player.currently_playing
+
+            theSong = Song.new({
+                'title'     => playing_info.name,
+                'artist'    => playing_info.artists.first.name,  # TODO: List multiple artists
+                'album'     => playing_info.album.name,
+                'source'    => "Spotify",
+                'source_id' => playing_info.id,
+                'duration'  => playing_info.duration_ms,
+                'uri'       => playing_info.uri
+            })
+
+            station.update now_playing: (SongsStations.create song: theSong, selector: user)
+
+        end
+    end
+  end
+#device id for my phone for testing
+$daniels_phone="11b8da8cb3a8144bda76d1f50599ed0b98a09ee1"
