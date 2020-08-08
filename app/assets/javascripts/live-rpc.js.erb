@@ -1,0 +1,25 @@
+// Subscribe to events.
+
+function liverpc_subscribe() {
+    new EventSource("/sessions/subscribe")
+        .addEventListener("live-rpc", (event) => {
+            msg = JSON.parse(event.data)
+            window[msg.function].apply(window, msg.args)
+        });
+}
+
+function push(msg) {
+    navigator.serviceWorker.controller.postMessage({
+        body: msg
+    })
+}
+
+// Test endpoint
+function notifyme(msg) {
+    console.log("Received LiveRPC test message: " + msg)
+    push(msg)
+}
+
+function refresh() {
+    location.reload()
+}

@@ -42,21 +42,11 @@ class StationsController < ApplicationController
             return json_error err_str
         end
 
-        # song = Song.find(params[:song_id])
-        # if !song
-        #     return json_error "no such song"
-        # end
-
-        # station.queue_song song, current_user
         current_user.update position: station.users.maximum(:position) + 1
 
         # Notify the next user that it's their turn to pick a song.
         next_user = station.users.order(:position)[0]
-        if next_user.subscription
-            subscription = JSON.parse(next_user.subscription)
-            Rails.logger.error subscription
-            push "Hey #{next_user.username}! It's your turn to pick a song on jcradio!", next_user
-        end
+        notify next_user, :turn_notification
 
         json_ok
     end

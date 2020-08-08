@@ -194,11 +194,17 @@
 
 <!-- Javascript -->
     <script>
+        navigator.serviceWorker.register('/notifications.js');
+
         // Add a hidden input to all .in_place_form objects to tell the server where to redirect.
         $(document).ready(function() {
             redirect = window.location.href
             $(".in_place_form").append('<input type="hidden" name="redirect" value="' + redirect + '">')
         });
+
+        <% if logged_in? %>
+          $(() => liverpc_subscribe())
+        <% end %>
     </script>
 
 </html>

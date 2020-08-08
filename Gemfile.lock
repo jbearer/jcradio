@@ -94,6 +94,7 @@ GEM
     multi_xml (0.6.0)
     multipart-post (2.1.1)
     netrc (0.11.0)
+    nio4r (2.5.2)
     nokogiri (1.10.9)
       mini_portile2 (~> 2.4.0)
     nokogiri (1.10.9-x64-mingw32)
@@ -113,6 +114,8 @@ GEM
       oauth2 (~> 1.1)
       omniauth (~> 1.2)
     public_suffix (3.1.1)
+    puma (4.3.5)
+      nio4r (~> 2.0)
     rack (1.6.13)
     rack-test (0.6.3)
       rack (>= 1.0)
@@ -225,6 +228,7 @@ DEPENDENCIES
   fuzzily
   jbuilder (~> 2.0)
   jquery-rails
+  puma
   rails (= 4.2.8)
   rspotify
   sass-rails (~> 5.0)

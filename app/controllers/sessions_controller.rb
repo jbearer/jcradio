@@ -1,4 +1,6 @@
 class SessionsController < ApplicationController
+  include ActionController::Live
+
   # GET /sessions
   def index
   end
@@ -48,37 +50,26 @@ class SessionsController < ApplicationController
     return_to_page
   end
 
-  # POST /sessions/subscribe
-  #   endpoint:string: subscription server endpoint
-  #   keys: {
-  #     auth:string
-  #     p256dh: "string"
-  #   }
+  # GET /sessions/subscribe
   def subscribe
     if logged_in?
-      # If we already have a session, just associate the subscription with the user.
-      current_user.update subscription: JSON.dump(params)
+      response.headers['Content-Type'] = 'text/event-stream'
+      LiveRPC.serve current_user.id, response.stream
     else
-      # Otherwise, store the subscription in the session, so that if the user logs in later we can
-      # associated this subscription with their account.
-      session[:subscription] = params
+      json_error "must be logged in to subscribe to events"
     end
-
-    json_ok
-  end
-
-  def test_webrtc
-
   end
 
   if Rails.env.development?
+    client_function :notifyme
+
     # POST /sessions/notifyme
     #   text:string
     #
     # This endpoint is just for developers to check if notifications are working correctly.
     def test_notifications
-      push params[:text]
-      return_to_page
+      notifyme params[:text]
+      json_ok
     end
   end
 end
