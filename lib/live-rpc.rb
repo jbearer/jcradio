@@ -98,7 +98,7 @@ module LiveRPC
                     msg = @queue[0]
 
                     if msg.nil?
-                        break
+                        return
                     end
 
                     # Send the message to the remote session.
