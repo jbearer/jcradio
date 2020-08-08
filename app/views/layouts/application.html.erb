@@ -46,8 +46,18 @@
 
 
               <div class="userlist">
-                  <p>current online users go here</p>
-                  <p>current online users go here</p>
+                  <table>
+                    <thead>
+                      Next up...
+                    </thead>
+                    <tbody>
+                      <% User.where.not(position: nil).each do |user| %>
+                        <tr class="<%= user.position == 0 ? "user-active" : "user" %>">
+                          <td><%= user.username %></td>
+                        </tr>
+                      <% end %>
+                    </tbody>
+                  </table>
                 </div>
 
                 <br><br><br>
@@ -184,11 +194,17 @@
 
 <!-- Javascript -->
     <script>
+        navigator.serviceWorker.register('/notifications.js');
+
         // Add a hidden input to all .in_place_form objects to tell the server where to redirect.
         $(document).ready(function() {
             redirect = window.location.href
             $(".in_place_form").append('<input type="hidden" name="redirect" value="' + redirect + '">')
         });
+
+        <% if logged_in? %>
+          $(() => liverpc_subscribe())
+        <% end %>
     </script>
 
 </html>

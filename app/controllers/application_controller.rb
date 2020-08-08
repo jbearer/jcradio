@@ -1,3 +1,5 @@
+require "live-rpc"
+
 class ApplicationController < ActionController::Base
     protect_from_forgery with: :exception
     if Rails.env.development?
@@ -43,31 +45,66 @@ class ApplicationController < ActionController::Base
         redirect_to (params[:redirect] || request.original_url)
     end
 
-    helper_method :vapid_key
-    def vapid_key
-        vapid = Vapid.find(1)
-        {
-            public_key: vapid.public_key,
-            private_key: vapid.private_key,
-        }
-    end
-
-    helper_method :push
-    def push(text, user=current_user)
-        if user
-            subscription = JSON.parse(user.subscription)
-        elsif session[:subscription]
-            subscription = session[:subscription]
-        else
-            return
+    # Declare a client-side function to be callable from the server.
+    #
+    # Usage:
+    #   class MyController < ApplicationController
+    #       client_function :my_javascript_function
+    #
+    #       ...
+    #
+    #       def some_endpoint
+    #           my_javascript_function arg1, arg2, ...
+    #       end
+    #   end
+    #
+    # Calling a function declared with client_function will cause the function
+    # of the same name to be called in the currently logged-in user's browser.
+    # To call a client_function in a different user's session, use `notify` or
+    # `broadcast`.
+    #
+    # Note that the call is fire-and-forget: the server-side function call will
+    # return as soon as the message is sent to the client, even if the client-
+    # side JavaScript function runs for some time. There is no way to get the
+    # return value of the JavaScript function. This is a limitation of the
+    # current implementation only; synchronous client-side calls can be added if
+    # needed.
+    def self.client_function(*functions)
+        functions.each do |function|
+            define_method function do |*args|
+                if subscribed?
+                    LiveRPC.call current_user.id, function, args
+                end
+            end
         end
-
-        Webpush.payload_send({
-            message: text,
-            endpoint: subscription["endpoint"],
-            p256dh: subscription["keys"]["p256dh"],
-            auth: subscription["keys"]["auth"],
-            vapid: vapid_key
-        })
     end
+
+    # Call a client-side function in the given user's session.
+    #
+    # Usage: notify user, :my_javascript_function, arg1, arg2, ...
+    #
+    # This is like calling my_javascript_function(arg1, arg2, ...) in user's
+    # browser.
+    def notify(user, function, *args)
+        LiveRPC.call user.id, function, args
+    end
+
+    # Call a client-side function in every active user's session.
+    #
+    # Usage: broadcast :my_javascript_function, arg1, arg2, ...
+    #
+    # This is like calling my_javascript_function(arg1, arg2, ...) in the
+    # browser of every currently logged-in user.
+    def broadcast(function, *args)
+        LiveRPC.broadcast function, args
+    end
+
+    # Check if the current session has a subscription to LiveRPC calls.
+    helper_method :subscribed?
+    def subscribed?
+        logged_in? and LiveRPC.server? current_user.id
+    end
+
+    # JavaScript function to refresh the page.
+    client_function :refresh
 end
