@@ -8,18 +8,6 @@ function liverpc_subscribe() {
         });
 }
 
-function push(msg) {
-    navigator.serviceWorker.controller.postMessage({
-        body: msg
-    })
-}
-
-// Test endpoint
-function notifyme(msg) {
-    console.log("Received LiveRPC test message: " + msg)
-    push(msg)
-}
-
 function refresh() {
     location.reload()
 }

@@ -1,9 +1,0 @@
-{
-  "name": "jcradio",
-  "short_name": "jcradio",
-  "icons": [],
-  "start_url": "/",
-  "display": "standalone",
-  "gcm_sender_id": "375779214598",
-  "gcm_user_visible_only": true
-}
