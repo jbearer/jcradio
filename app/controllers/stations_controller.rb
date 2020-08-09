@@ -7,13 +7,9 @@ class StationsController < ApplicationController
     end
 
     def spotify_create_user
-        # TODO: Move to the appropriate place
-        # TODO: don't make this a global variable. probably a static class
-        # variable.
-        # TODO: Make "Sign in with Spotify" button go away if user exists
         $spotify_user = RSpotify::User.new(request.env['omniauth.auth'])
         # Update the song that's currently playing
-        # TitleExtractorWorker.perform_async(self)
+        TitleExtractorWorker.perform_async(self)
         redirect_to "/stations/1"
     end
 
@@ -115,23 +111,33 @@ module Magique
 
     def perform(station)
 
-        testUser = User.create username: "User0"
-
         while true
+            sleep 5
+
+            if not $spotify_user.player
+                puts "@@@@@@@@@@@@@@@@@"
+                puts "@@@ NO PLAYER @@@"
+                puts "@@@@@@@@@@@@@@@@@"
+                next
+            end
+
+            if not $spotify_user.player.playing?
+                puts "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+                puts "@@@ NOT CURRENTLY PLAYING @@@"
+                puts "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+                next
+            end
 
             playing_info = $spotify_user.player.currently_playing
 
-            theSong = Song.new({
-                'title'     => playing_info.name,
-                'artist'    => playing_info.artists.first.name,  # TODO: List multiple artists
-                'album'     => playing_info.album.name,
-                'source'    => "Spotify",
-                'source_id' => playing_info.id,
-                'duration'  => playing_info.duration_ms,
-                'uri'       => playing_info.uri
-            })
+            puts "@@@@@@@@@@@@@@@@@@@@@@@@@@"
+            puts "@@@ PRINTING SONG INFO @@@"
+            puts "@@@@@@@@@@@@@@@@@@@@@@@@@@"
 
-            station.update now_playing: (SongsStations.create song: theSong, selector: user)
+            print "Song: "
+            puts playing_info.name
+            print "Artist: "
+            puts playing_info.artists.first.name
 
         end
     end
