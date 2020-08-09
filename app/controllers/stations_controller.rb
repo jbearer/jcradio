@@ -111,6 +111,8 @@ module Magique
 
     def perform(station)
 
+        curr_song = nil
+
         while true
             sleep 5
 
@@ -128,17 +130,22 @@ module Magique
                 next
             end
 
-            playing_info = $spotify_user.player.currently_playing
+            this_song = $spotify_user.player.currently_playing
 
-            puts "@@@@@@@@@@@@@@@@@@@@@@@@@@"
-            puts "@@@ PRINTING SONG INFO @@@"
-            puts "@@@@@@@@@@@@@@@@@@@@@@@@@@"
+            if (not curr_song) or (this_song.name != curr_song.name)
 
-            print "Song: "
-            puts playing_info.name
-            print "Artist: "
-            puts playing_info.artists.first.name
+                puts "@@@@@@@@@@@@@@@@@@@@@@@@@@"
+                puts "@@@ PRINTING SONG INFO @@@"
+                puts "@@@@@@@@@@@@@@@@@@@@@@@@@@"
 
+                print "Song: "
+                puts this_song.name
+                print "Artist: "
+                puts this_song.artists.first.name
+
+                curr_song = this_song
+
+            end
         end
     end
   end
