@@ -13,7 +13,7 @@ class StationsController < ApplicationController
         # TODO: Make "Sign in with Spotify" button go away if user exists
         $spotify_user = RSpotify::User.new(request.env['omniauth.auth'])
         # Update the song that's currently playing
-        TitleExtractorWorker.perform_async(self)
+        # TitleExtractorWorker.perform_async(self)
         redirect_to "/stations/1"
     end
 
@@ -48,7 +48,7 @@ class StationsController < ApplicationController
 
         # Notify the next user that it's their turn to pick a song.
         next_user = station.users.order(:position)[0]
-        notify next_user, :turn_notification
+        notify next_user, :on_my_turn
 
         json_ok
     end
@@ -87,6 +87,7 @@ class StationsController < ApplicationController
 end
 
 ################ Background process to update song title
+## Note: this currently is called from anywhere
 # https://blog.appsignal.com/2019/04/02/background-processing-system-in-ruby.html
 module Magique
     module Worker
