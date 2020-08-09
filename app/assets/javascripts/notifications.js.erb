@@ -1,0 +1,17 @@
+function push(msg) {
+    if (Notification.permission === "granted") {
+        new Notification(msg);
+    } else if (Notification.permission !== "denied") {
+        Notification.requestPermission().then((permission) => {
+            if (permission === "granted") {
+                new Notification(msg);
+            }
+        });
+    }
+}
+
+// Test endpoint
+function notifyme(msg) {
+    console.log("Received LiveRPC test message: " + msg)
+    push(msg)
+}
