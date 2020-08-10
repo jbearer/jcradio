@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20200808065816) do
+ActiveRecord::Schema.define(version: 20200810040332) do
 
   create_table "sessions", force: :cascade do |t|
     t.string   "session_id", null: false
@@ -29,10 +29,11 @@ ActiveRecord::Schema.define(version: 20200808065816) do
     t.string   "title"
     t.string   "artist"
     t.string   "album"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at",   null: false
+    t.datetime "updated_at",   null: false
     t.integer  "duration"
     t.string   "uri"
+    t.string   "first_letter"
   end
 
   create_table "songs_stations", force: :cascade do |t|

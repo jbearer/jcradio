@@ -5,6 +5,9 @@ class Trigram < ActiveRecord::Base
 end
 
 class Song < ActiveRecord::Base
+
+    include SongsHelper
+
     has_and_belongs_to_many :stations
 
     fuzzily_searchable :title, :artist, :album
@@ -32,14 +35,19 @@ class Song < ActiveRecord::Base
         songs = []
 
         spotify_songs.each do |ss|
+
+            # first_letter
             songs.append(Song.new({
-                'title'     => ss.name,
-                'artist'    => ss.artists.first.name,  # TODO: List multiple artists
-                'album'     => ss.album.name,
-                'source'    => "Spotify",
-                'source_id' => ss.id,
-                'duration'  => ss.duration_ms,
-                'uri'       => ss.uri
+                                # TODO: gsub hacks are so '<%=song.artist%>'
+                                # is parsed correctly in songs/index.html.erb
+                'title'         => ss.name.gsub('\'', ''),
+                'artist'        => ss.artists.first.name.gsub('\'', ''),  # Bear's Den hack
+                'album'         => ss.album.name,
+                'source'        => "Spotify",
+                'source_id'     => ss.id,
+                'duration'      => ss.duration_ms,
+                'uri'           => ss.uri,
+                'first_letter'  => SongsHelper.first_letter(ss.name)
             }))
         end
 

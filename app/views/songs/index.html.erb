@@ -25,7 +25,7 @@
         <td> <%= msToMinSec(song.duration) %> </td>
         <td>
             <% if logged_in? and current_user.can_add_to_queue %>
-                <button class="button button6" onclick="confirmSong(<%=ind%>,'<%=song.title%>','<%=song.artist%>')" ><i class="fa fa-plus"></i></button>
+                <button class="button button6" onclick="confirmSong(<%=ind%>,'<%=song.title%>','<%=song.artist%>', '<%=song.first_letter%>', '<%=$the_next_letter%>')" ><i class="fa fa-plus"></i></button>
                 <form id="addSong<%=ind%>" action=<%="/stations/#{current_user.station.id}"%> method="post">
                     <input type="hidden" name="uri" value=<%= song.uri %> >
                     <input type="hidden" name="title" value="<%= song.title %>" >
@@ -50,21 +50,39 @@
 <!-- Confirm Song Popup -->
 <script>
 
-// function confirmSong(title,artist){
-function confirmSong(ind, title, artist) {
-        var $content =  "<div class='dialog-ovelay'>" +
-                        "<div class='dialog'>" +
-                     "<div class='dialog-msg'>" +
-                         // " <p> Add (song name goes here) by (artist goes here) to queue? </p> " +
-                         " <p> Add \"" + title + "\" by " + artist + " to queue? </p> " +
-                     "</div>" +
-                     "<div class='controls'>" +
-                         " <button class='button button2 doAction'>Yes</button> " +
-                         "&nbsp; &nbsp;"+
-                         " <button class='button button2 cancelAction'>No</button> " +
-                     "</div>" +
-                  "</div>" +
-                "</div>";
+function confirmSong(ind, title, artist, song_first_letter, next_letter) {
+
+        var $content = "";
+
+        if (next_letter == "_" || song_first_letter == "_" || song_first_letter == next_letter) {
+
+          $content =  "<div class='dialog-ovelay'>" +
+                          "<div class='dialog'>" +
+                      "<div class='dialog-msg'>" +
+                          " <p> Add \"" + title + "\" by " + artist + " to queue? </p> " +
+                      "</div>" +
+                      "<div class='controls'>" +
+                          " <button class='button button2 doAction'>Yes</button> " +
+                          "&nbsp; &nbsp;"+
+                          " <button class='button button2 cancelAction'>No</button> " +
+                      "</div>" +
+                    "</div>" +
+                  "</div>";
+        } else {
+
+          $content =  "<div class='dialog-ovelay'>" +
+                          "<div class='dialog'>" +
+                      "<div class='dialog-msg'>" +
+                          " <p> Song \"" + title + "\" starts with \"" + song_first_letter + "\" instead of your assigned letter \"" + next_letter + "\"! </p> " +
+                      "</div>" +
+                      "<div class='controls'>" +
+                          " <button class='button button2 doAction'>Nuh-uh</button> " +
+                          "&nbsp; &nbsp;"+
+                          " <button class='button button2 cancelAction'>Oops</button> " +
+                      "</div>" +
+                    "</div>" +
+                  "</div>";
+        }
 
          $('body').prepend($content);
 
