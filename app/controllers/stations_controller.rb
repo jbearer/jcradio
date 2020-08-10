@@ -1,3 +1,4 @@
+$the_next_letter = '_'
 class StationsController < ApplicationController
     before_action :set_station, only: [:show]
 
@@ -44,8 +45,8 @@ class StationsController < ApplicationController
 
         # Notify the next user that it's their turn to pick a song.
         next_user = station.users.order(:position)[0]
-        next_letter = get_next_letter(params[:title])
-        message = "It's your turn! Your letter is: %s" % [next_letter]
+        $the_next_letter = calculate_next_letter(params[:title])
+        message = "It's your turn! Your letter is: %s" % [$the_next_letter]
 
         notify next_user, :on_my_turn, message
 
@@ -88,7 +89,7 @@ class StationsController < ApplicationController
         ## CHOOSING LETTERS
         ######################
 
-        def get_next_letter(title)
+        def calculate_next_letter(title)
             # TODO: would be nice if numbers worked
             begin
               words = normalize_title(title)

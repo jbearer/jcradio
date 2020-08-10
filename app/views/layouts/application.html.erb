@@ -50,6 +50,7 @@
                       Next up...
                     </thead>
                     <tbody>
+                      <%= $the_next_letter %>
                       <% User.where.not(position: nil).each do |user| %>
                         <tr class="<%= user.position == 0 ? "user-active" : "user" %>">
                           <td><%= user.username %></td>
