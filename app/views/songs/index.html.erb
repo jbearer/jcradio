@@ -25,7 +25,7 @@
         <td> <%= msToMinSec(song.duration) %> </td>
         <td>
             <% if logged_in? and current_user.can_add_to_queue %>
-                <button class="button button6" onclick="confirmSong(<%=ind%>)" ><i class="fa fa-plus"></i></button>
+                <button class="button button6" onclick="confirmSong(<%=ind%>,'<%=song.title%>','<%=song.artist%>')" ><i class="fa fa-plus"></i></button>
                 <form id="addSong<%=ind%>" action=<%="/stations/#{current_user.station.id}"%> method="post">
                     <input type="hidden" name="uri" value=<%= song.uri %> >
                     <input type="hidden" name="title" value="<%= song.title %>" >
@@ -51,12 +51,12 @@
 <script>
 
 // function confirmSong(title,artist){
-function confirmSong(ind) {
+function confirmSong(ind, title, artist) {
         var $content =  "<div class='dialog-ovelay'>" +
                         "<div class='dialog'>" +
                      "<div class='dialog-msg'>" +
-                         " <p> Add (song name goes here) by (artist goes here) to queue? </p> " +
-                         // " <p> Add "$title" by "$artist" to queue? </p> " +
+                         // " <p> Add (song name goes here) by (artist goes here) to queue? </p> " +
+                         " <p> Add \"" + title + "\" by " + artist + " to queue? </p> " +
                      "</div>" +
                      "<div class='controls'>" +
                          " <button class='button button2 doAction'>Yes</button> " +
