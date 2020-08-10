@@ -28,6 +28,7 @@
                 <button class="button button6" onclick="confirmSong(<%=ind%>)" ><i class="fa fa-plus"></i></button>
                 <form id="addSong<%=ind%>" action=<%="/stations/#{current_user.station.id}"%> method="post">
                     <input type="hidden" name="uri" value=<%= song.uri %> >
+                    <input type="hidden" name="title" value="<%= song.title %>" >
                 </form>
 
             <% end %>

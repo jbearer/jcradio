@@ -44,7 +44,10 @@ class StationsController < ApplicationController
 
         # Notify the next user that it's their turn to pick a song.
         next_user = station.users.order(:position)[0]
-        notify next_user, :on_my_turn
+        next_letter = get_next_letter(params[:title])
+        message = "It's your turn! Your letter is: %s" % [next_letter]
+
+        notify next_user, :on_my_turn, message
 
         json_ok
     end
@@ -80,6 +83,62 @@ class StationsController < ApplicationController
         def set_station
           @station = Station.find(params[:id])
         end
+
+        ######################
+        ## CHOOSING LETTERS
+        ######################
+
+        def get_next_letter(title)
+            # TODO: would be nice if numbers worked
+            begin
+              words = normalize_title(title)
+
+              if words.count == 0 then
+                return random_letter()
+
+              elsif words.count == 1 then
+                # return the 4th-to-last letter
+                word = words[0].chars
+                idx = (4 % word.count) * -1
+                return word[idx]
+
+              else
+                  # return the first word of the last letter
+                  last_word = words[-1]
+                  return last_word[0]
+              end
+
+            rescue
+              return random_letter()
+            end
+        end
+
+        # return an array of words
+        def normalize_title(title)
+          title = title.upcase
+          title.gsub! /[^A-Z ]/, ""
+          words = title.split
+
+          if words.count == 0 then
+            return []
+          end
+
+          articles = ["THE", "A", "AN", "UN", "UNE", "LE", "LES"]
+          for art in articles do
+            if words[0] == art then
+                words = words.drop(1)
+                break
+            end
+          end
+          return words
+        end
+
+        def random_letter
+          puts "Error calculating next letter. Choosing a random letter"
+          alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".chars
+          return alphabet.sample
+        end
+
 end
 
 ################ Background process to update song title
