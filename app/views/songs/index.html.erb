@@ -25,7 +25,7 @@
         <td> <%= msToMinSec(song.duration) %> </td>
         <td>
             <% if logged_in? and current_user.can_add_to_queue %>
-                <button class="button button6" onclick="confirmSong(<%=ind%>,'<%=song.title%>','<%=song.artist%>', '<%=song.first_letter%>', '<%=$the_next_letter%>')" ><i class="fa fa-plus"></i></button>
+                <button class="button button6" onclick="confirmSong(<%=ind%>,'<%=song.title.gsub("'", "’")%>','<%=song.artist.gsub("'", "’")%>','<%=song.first_letter%>', '<%=$the_next_letter%>')" ><i class="fa fa-plus"></i></button>
                 <form id="addSong<%=ind%>" action=<%="/stations/#{current_user.station.id}"%> method="post">
                     <input type="hidden" name="uri" value=<%= song.uri %> >
                     <input type="hidden" name="title" value="<%= song.title %>" >
