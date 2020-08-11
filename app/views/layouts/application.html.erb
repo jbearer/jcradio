@@ -47,7 +47,11 @@
               <div class="userlist">
                   <table>
                     <thead>
-                      Next up... <%=current_user.station.users.order(:position)[0].username%> with '<%= $the_next_letter %>'
+                      <% if current_user%>
+                        Next up... <%=current_user.station.users.order(:position)[0].username%> with '<%= $the_next_letter %>'
+                      <% else %>
+                        Next up...
+                      <% end %>
                     </thead>
                     <tbody>
                       <% User.where.not(position: nil).each do |user| %>
