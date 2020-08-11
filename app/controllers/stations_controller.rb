@@ -46,6 +46,10 @@ class StationsController < ApplicationController
 
         current_user.update position: station.users.maximum(:position) + 1
 
+        song_input = {title: params[:title], artist: params[:artist], album: params[:album], duration: params[:duration]}
+        current_song = Song.create({source: "Spotify", source_id: "bogus"}.merge(song_input))
+        SongsStations.create station: station, song: current_song, position: station.users.maximum(:position)+1, selector: current_user
+
         # Notify the next user that it's their turn to pick a song.
         next_user = station.users.order(:position)[0]
         $the_next_letter = SongsHelper.calculate_next_letter(params[:title])

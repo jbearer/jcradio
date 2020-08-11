@@ -44,7 +44,8 @@ class Station < ActiveRecord::Base
         else
             # Otherwise, play this song immediately
             # TODO: Causes RestClient::NotFound :( :( :(
-            player.play_track(uri)
+            # player.play_track(uri)
+            return "Spotify not Playing. (Might be logged in as wrong Spotify)"
         end
 
         return ""
