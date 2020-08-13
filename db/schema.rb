@@ -34,6 +34,7 @@ ActiveRecord::Schema.define(version: 20200810040332) do
     t.integer  "duration"
     t.string   "uri"
     t.string   "first_letter"
+    t.string   "next_letter"
   end
 
   create_table "songs_stations", force: :cascade do |t|

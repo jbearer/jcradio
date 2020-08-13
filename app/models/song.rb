@@ -47,7 +47,8 @@ class Song < ActiveRecord::Base
                 'source_id'     => ss.id,
                 'duration'      => ss.duration_ms,
                 'uri'           => ss.uri,
-                'first_letter'  => SongsHelper.first_letter(ss.name)
+                'first_letter'  => SongsHelper.first_letter(ss.name),
+                'next_letter'   => SongsHelper.calculate_next_letter(ss.name)
             }))
         end
 
