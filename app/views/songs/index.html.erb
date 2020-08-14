@@ -7,7 +7,7 @@
 
 
 <table>
- 
+
     <tr>
         <th>Song</th>
         <th>Artist</th>
@@ -28,6 +28,7 @@
                 <button class="button button6" onclick="confirmSong(<%=ind%>,'<%=song.title.gsub("'", "’")%>','<%=song.artist.gsub("'", "’")%>','<%=song.first_letter%>', '<%=$the_next_letter%>', '<%=song.next_letter%>')" ><i class="fa fa-plus"></i></button>
                 <form id="addSong<%=ind%>" action=<%="/stations/#{current_user.station.id}"%> method="post">
                     <input type="hidden" name="uri" value=<%= song.uri %> >
+                    <input type="hidden" name="source_id" value=<%= song.source_id %> >
                     <input type="hidden" name="title" value="<%= song.title %>" >
                     <input type="hidden" name="artist" value="<%= song.artist %>" >
                     <input type="hidden" name="album" value="<%= song.album %>" >
@@ -117,7 +118,7 @@ $('.cancelAction, .fa-close').click(function () {
           $(this).remove();
         });
       });
-      
+
    }
 
 

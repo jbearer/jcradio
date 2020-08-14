@@ -10,22 +10,14 @@ class Station < ActiveRecord::Base
     has_many :users
 
     def queue
-        SongsStations.where(station: self).order(:position)
+        SongsStations.where(station: self).where.not(position: nil).order(:position)
     end
 
     def queue_song(song, selector)
-        if self.now_playing
-            # Queue the song
-            SongsStations.create song: song, station: self,
-                position: (queue.maximum(:position) || 0) + 1,
-                selector: selector
-        else
-            # Play it immediately
-            update now_playing: (SongsStations.create song: song, selector: selector)
+        if song.source != "Spotify"
+            return "Please select a song from Spotify (not #{song.source})"
         end
-    end
 
-    def spotify_queue_song(song, uri)
         if not $spotify_user
             return "Please log into spotify"
         end
@@ -40,7 +32,7 @@ class Station < ActiveRecord::Base
 
         if player.playing?
             # If we are currently playing a song, add this to the queue
-            internal_spotify_add_to_queue(uri)
+            internal_spotify_add_to_queue song.uri
         else
             # Otherwise, play this song immediately
             # TODO: Causes RestClient::NotFound :( :( :(
@@ -48,7 +40,38 @@ class Station < ActiveRecord::Base
             return "Spotify not Playing. (Might be logged in as wrong Spotify)"
         end
 
+
+        if self.now_playing
+            # Queue the song
+            SongsStations.create song: song, station: self,
+                position: (queue.maximum(:position) || 0) + 1,
+                selector: selector
+        else
+            # Play it immediately
+            update now_playing: (SongsStations.create song: song, selector: selector)
+        end
+
         return ""
+    end
+
+    def dequeue_song(song)
+        # Dequeue everything up to and including the given song.
+        # Typically, when this method is called, `song` should be the first song on the queue.
+        # However, this method also serves as a chance to fix the queue in our database if it has
+        # drifted from the Spotify queue (for example, if someone added songs to the queue not using
+        # the JCRadio interface, or if we missed a song change).
+        while queue
+            finished = song == queue[0]
+            queue[0].destroy
+            if finished
+                break
+            end
+        end
+
+        # Dequeue the next song and play it
+        if queue
+            update now_playing: (queue[0].update position: nil)
+        end
     end
 
     def internal_spotify_add_to_queue(uri)

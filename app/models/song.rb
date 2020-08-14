@@ -12,6 +12,14 @@ class Song < ActiveRecord::Base
 
     fuzzily_searchable :title, :artist, :album
 
+    def self.get(source, source_id)
+        if source == "Spotify"
+            get_or_create_from_spotify_record(RSpotify::Track.find(source_id), true)
+        else
+            nil
+        end
+    end
+
     def self.fuzzy_search(keywords)
         counts = {}
         keywords.each do |kw|
@@ -35,25 +43,36 @@ class Song < ActiveRecord::Base
         songs = []
 
         spotify_songs.each do |ss|
-
-            # first_letter
-            songs.append(Song.new({
-                                # TODO: gsub hacks are so '<%=song.artist%>'
-                                # is parsed correctly in songs/index.html.erb
-                'title'         => ss.name.gsub('\'', ''),
-                'artist'        => ss.artists.first.name.gsub('\'', ''),  # Bear's Den hack
-                'album'         => ss.album.name,
-                'source'        => "Spotify",
-                'source_id'     => ss.id,
-                'duration'      => ss.duration_ms,
-                'uri'           => ss.uri,
-                'first_letter'  => SongsHelper.first_letter(ss.name),
-                'next_letter'   => SongsHelper.calculate_next_letter(ss.name)
-            }))
+            songs.append(get_or_create_from_spotify_record ss)
         end
 
         # TODO: "More results" button
         songs
+    end
+
+    def self.get_or_create_from_spotify_record(song, persist=false)
+        result = Song.where(source: "Spotify", source_id: song.id).first
+        if result
+            return result
+        end
+
+        data = {
+            title: song.name.gsub("'", ""),
+            artist: song.artists.first.name.gsub("'", ""),
+            album: song.album.name,
+            source: "Spotify",
+            source_id: song.id,
+            uri: song.uri,
+            duration: song.duration_ms,
+            first_letter: SongsHelper.first_letter(song.name),
+            next_letter: SongsHelper.calculate_next_letter(song.name)
+        }
+
+        if persist then
+            Song.create data
+        else
+            Song.new data
+        end
     end
 
 end

@@ -10,7 +10,7 @@ def spotify_song(song)
     Song.create({source: "Spotify", source_id: "bogus"}.merge(song))
 end
 
-def spotify_station(station, songs)
+def spotify_station(station, songs=[])
 
     station = Station.create name: station
     songs.each_with_index do |song, i|
@@ -27,14 +27,7 @@ if Rails.env.development?
     User.create username: "Jeb"
     User.create username: "Daniel"
 
-    station = spotify_station "Jingle Churro", [
-        {title: "Interlude", artist: "Alt-J", album: "An Awesome Wave", duration: 11},
-        {title: "Down Down the Deep River", artist: "Okkervil River", album: "The Silver Gymnasium", duration: 12}
-    ]
-
-    now_playing = spotify_song title: "Random Jazz Song", artist: "Various Artists", album: "Who Knows"
-    queue_entry = SongsStations.create station: station, song: now_playing, position: 0, selector: User.find(1)
-    station.update now_playing: queue_entry
+    spotify_station "Jingle Churro"
 end
 
 vapid_key = Webpush.generate_key
