@@ -1,16 +1,17 @@
-function receive_chat(message, sender) {
-    console.log("Received chat:", message);
-
-    if (logged_in() && current_user().id === sender.id) {
+function receive_chat(msg) {
+    if (logged_in() && current_user().id === msg.sender.id) {
         msg_class = "chatbox rightChat";
+        sender_tag = msg.created_at;
     } else {
         msg_class = "chatbox";
+        sender_tag = `${msg.sender.username} (${msg.created_at})`;
     }
 
     // Add the new message.
     $("#chat").append(`
         <div class="${msg_class}">
-          <p>${message}</p>
+          ${sender_tag}
+          <p>${msg.message}</p>
         </div>
     `);
 
@@ -19,7 +20,6 @@ function receive_chat(message, sender) {
 }
 
 function send_chat(message) {
-    console.log("Sending message", message);
     $.post("/chat", {message: message});
     return false;
 }

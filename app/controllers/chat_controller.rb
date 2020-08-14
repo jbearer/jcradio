@@ -10,12 +10,13 @@ class ChatController < ApplicationController
             return json_error "You must be logged in to chat"
         end
 
-        ChatMessage.create({
+        msg = ChatMessage.create({
             sender: current_user,
             message: params[:message]
         })
 
-        broadcast :receive_chat, params[:message], current_user
+        broadcast :receive_chat, msg
+
         json_ok
     end
 end

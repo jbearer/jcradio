@@ -1,9 +1,4 @@
 <div class="chatcontainer" id="chat">
-  <% ChatMessage.order(:created_at).each do |msg| %>
-    <div class="chatbox <%= logged_in? and current_user == msg.sender ? "rightChat" : "" %>">
-      <p><%= msg.message %></p>
-    </div>
-  <% end %>
 </div>
 
 <div class="container" style="width: 90%; margin-left: 5%;">
@@ -15,7 +10,9 @@
 
 <script type="text/javascript">
   $(() => {
-    // Scroll chat to the bottom when the page loads.
-    $("#chat")[0].scrollTop = $("#chat")[0].scrollHeight;
+    // Load messages from the database on page load.
+    <% ChatMessage.order(:created_at).each do |msg| %>
+      receive_chat(<%= raw msg.to_json %>)
+    <% end %>
   })
 </script>
