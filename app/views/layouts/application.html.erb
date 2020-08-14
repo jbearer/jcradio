@@ -90,6 +90,7 @@
           <div class = "columnMus leftMus">
                 <p><%= current_user.station.now_playing.song.title %></p>
                    <%= current_user.station.now_playing.song.artist %>
+                <button onclick="toggle_upvote(<%= current_user.station.now_playing.id %>)"><i id="upvote" class="fa fa-thumbs<%= current_user.has_upvoted?(current_user.station.now_playing) ? "" : "-o" %>-up fa-lg"></i></button>
             </div>
 
             <!-- Song Duration -->

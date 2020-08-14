@@ -9,6 +9,8 @@ class Song < ActiveRecord::Base
     include SongsHelper
 
     has_and_belongs_to_many :stations
+    has_many :queue_entries
+    has_many :upvotes, through: :queue_entries
 
     fuzzily_searchable :title, :artist, :album
 

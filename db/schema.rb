@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20200814204047) do
+ActiveRecord::Schema.define(version: 20200814221859) do
 
   create_table "chat_messages", force: :cascade do |t|
     t.text     "message"
@@ -24,6 +24,16 @@ ActiveRecord::Schema.define(version: 20200814204047) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
+
+  create_table "queue_entries", force: :cascade do |t|
+    t.integer "song_id"
+    t.integer "station_id"
+    t.integer "position"
+    t.integer "selector_id"
+  end
+
+  add_index "queue_entries", ["position"], name: "index_queue_entries_on_position"
+  add_index "queue_entries", ["selector_id"], name: "index_queue_entries_on_selector_id"
 
   create_table "sessions", force: :cascade do |t|
     t.string   "session_id", null: false
@@ -49,16 +59,6 @@ ActiveRecord::Schema.define(version: 20200814204047) do
     t.string   "next_letter"
   end
 
-  create_table "songs_stations", force: :cascade do |t|
-    t.integer "song_id"
-    t.integer "station_id"
-    t.integer "position"
-    t.integer "selector_id"
-  end
-
-  add_index "songs_stations", ["position"], name: "index_songs_stations_on_position"
-  add_index "songs_stations", ["selector_id"], name: "index_songs_stations_on_selector_id"
-
   create_table "stations", force: :cascade do |t|
     t.string   "name"
     t.datetime "created_at",     null: false
@@ -78,6 +78,11 @@ ActiveRecord::Schema.define(version: 20200814204047) do
 
   add_index "trigrams", ["owner_id", "owner_type", "fuzzy_field", "trigram", "score"], name: "index_for_match"
   add_index "trigrams", ["owner_id", "owner_type"], name: "index_by_owner"
+
+  create_table "upvotes", force: :cascade do |t|
+    t.integer "queue_entry_id"
+    t.integer "upvoter_id"
+  end
 
   create_table "users", force: :cascade do |t|
     t.string   "username"

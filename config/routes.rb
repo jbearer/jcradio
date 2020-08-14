@@ -16,6 +16,7 @@ Rails.application.routes.draw do
   get "/stations/:id/next", to: 'stations#next'
 
   resources :chat, only: [:index, :create]
+  resources :upvotes, only: [:create]
 
   get '/auth/spotify/callback', to: 'stations#spotify_create_user'
 

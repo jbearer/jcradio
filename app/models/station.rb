@@ -1,16 +1,10 @@
-class SongsStations < ActiveRecord::Base
-    belongs_to :song
-    belongs_to :station
-    belongs_to :selector, class_name: "User"
-end
-
 class Station < ActiveRecord::Base
     has_and_belongs_to_many :songs
-    belongs_to :now_playing, class_name: "SongsStations"
+    belongs_to :now_playing, class_name: "QueueEntry"
     has_many :users
 
     def queue
-        SongsStations.where(station: self).where.not(position: nil).order(:position)
+        QueueEntry.where(station: self).where.not(position: nil).order(:position)
     end
 
     def queue_song(song, selector)
@@ -43,12 +37,12 @@ class Station < ActiveRecord::Base
 
         if self.now_playing
             # Queue the song
-            SongsStations.create song: song, station: self,
+            QueueEntry.create song: song, station: self,
                 position: (queue.maximum(:position) || 0) + 1,
                 selector: selector
         else
             # Play it immediately
-            update now_playing: (SongsStations.create song: song, selector: selector)
+            update now_playing: (QueueEntry.create song: song, selector: selector)
         end
 
         return ""
@@ -62,7 +56,7 @@ class Station < ActiveRecord::Base
         # the JCRadio interface, or if we missed a song change).
         while queue
             finished = song == queue[0]
-            queue[0].destroy
+            queue[0].update position: nil
             if finished
                 break
             end
