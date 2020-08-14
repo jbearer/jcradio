@@ -1,7 +1,21 @@
 class ChatController < ApplicationController
-  # GET /chat
-  def index
-  end
+    # GET /chat
+    def index
+    end
 
- 
+    # POST /chat
+    #   message: string
+    def create
+        if not logged_in?
+            return json_error "You must be logged in to chat"
+        end
+
+        ChatMessage.create({
+            sender: current_user,
+            message: params[:message]
+        })
+
+        broadcast :receive_chat, params[:message], current_user
+        json_ok
+    end
 end

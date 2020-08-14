@@ -1,44 +1,21 @@
-<div class="chatcontainer">
-    <div class="chatbox">
-      <p>Hello. How are you today?</p>
+<div class="chatcontainer" id="chat">
+  <% ChatMessage.order(:created_at).each do |msg| %>
+    <div class="chatbox <%= logged_in? and current_user == msg.sender ? "rightChat" : "" %>">
+      <p><%= msg.message %></p>
     </div>
-
-    <div class="chatbox rightChat">
-      <p>Hey! I'm fine. Thanks for asking!</p>
-    </div>
-
-    <div class="chatbox">
-      <p>Sweet! So, what do you wanna do today?</p>
-    </div>
-
-    <div class="chatbox rightChat">
-      <p>Nah, I dunno. Play soccer.. or learn more coding perhaps?</p>
-    </div>
-
-    <div class="chatbox">
-      <p>Hello. How are you today?</p>
-    </div>
-
-    <div class="chatbox rightChat">
-      <p>Hey! I'm fine. Thanks for asking!</p>
-    </div>
-
-    <div class="chatbox">
-      <p>Sweet! So, what do you wanna do today?</p>
-    </div>
-
-    <div class="chatbox rightChat">
-      <p>Nah, I dunno. Play soccer.. or learn more coding perhaps?</p>
-    </div>
+  <% end %>
 </div>
-
-<!-- <div class="container">
-      <input type="text" placeholder="Type message here...." name="chat">
-</div> -->
-
-<!-- <div class="chatbox emptychat">&nbsp;<br>&nbsp;<br>&nbsp;</div> -->
 
 <div class="container" style="width: 90%; margin-left: 5%;">
-      <input type="text" placeholder="Type message here...." name="chat">
+    <form onsubmit="send_chat(this.elements['message'].value); return false;">
+      <input type="text" placeholder="Type message here...." name="message">
       <button class="button button3" type="submit"><i class="fa fa-send"></i></button>
+    </form>
 </div>
+
+<script type="text/javascript">
+  $(() => {
+    // Scroll chat to the bottom when the page loads.
+    $("#chat")[0].scrollTop = $("#chat")[0].scrollHeight;
+  })
+</script>

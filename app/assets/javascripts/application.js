@@ -44,3 +44,24 @@ function flash(msg, {type, dismissible, selector, timeout} = {}) {
 
   $(selector).append($(error))
 }
+
+function cookie() {
+  return document.cookie.split(';').map(function(c) {
+    return c.trim().split('=').map(decodeURIComponent);
+  }).reduce(function(a, b) {
+    try {
+      a[b[0]] = JSON.parse(b[1]);
+    } catch (e) {
+      a[b[0]] = b[1];
+    }
+    return a;
+  }, {});
+}
+
+function current_user() {
+  return cookie().current_user;
+}
+
+function logged_in() {
+  return current_user() !== null;
+}
