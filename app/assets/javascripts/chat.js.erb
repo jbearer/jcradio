@@ -20,6 +20,10 @@ function receive_chat(msg) {
 }
 
 function send_chat(message) {
-    $.post("/chat", {message: message});
+    $.post("/chat", {message: message}, () => {
+        // Clear the text input once the message has been sent.
+        $("#chat-input").val("");
+    });
+
     return false;
 }
