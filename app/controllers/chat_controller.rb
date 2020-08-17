@@ -19,9 +19,14 @@ class ChatController < ApplicationController
 
         # Search for mentions
         msg.message.scan(/@([^\s@]+)/).each do |mention|
+            mention = mention[0]
+
             user = User.find_by username: mention
+            Rails.logger.error mention
             if user
                 notify user, :mentioned_by, current_user, msg.message
+            elsif mention == "here"
+                broadcast :mentioned_by, current_user, msg.message
             end
         end
 
