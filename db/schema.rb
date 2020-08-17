@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20200817185950) do
+ActiveRecord::Schema.define(version: 20200817192307) do
 
   create_table "chat_messages", force: :cascade do |t|
     t.text     "message"
@@ -30,6 +30,7 @@ ActiveRecord::Schema.define(version: 20200817185950) do
     t.text     "text"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.text     "url"
   end
 
   create_table "queue_entries", force: :cascade do |t|

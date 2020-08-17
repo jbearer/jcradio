@@ -1,5 +1,5 @@
 Rails.application.routes.draw do
-  resources :notifications, only: [:index, :destroy]
+  resources :notifications, only: [:index, :destroy, :show]
   resources :users, only: [:index, :show, :new, :create, :destroy]
   resources :sessions, only: [:index, :create]
   delete "/sessions", to: 'sessions#destroy'  # API
@@ -16,7 +16,7 @@ Rails.application.routes.draw do
   post "/stations/:id", to: 'stations#update'
   get "/stations/:id/next", to: 'stations#next'
 
-  resources :chat, only: [:index, :create]
+  resources :chat, only: [:index, :create, :show]
   resources :upvotes, only: [:create]
 
   get '/auth/spotify/callback', to: 'stations#spotify_create_user'

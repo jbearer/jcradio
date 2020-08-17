@@ -1,6 +1,13 @@
 class ChatController < ApplicationController
     # GET /chat
     def index
+        @message_id = nil
+    end
+
+    # GET /chat/:id
+    def show
+        @message_id = params[:id]
+        render template: "chat/index"
     end
 
     # POST /chat
@@ -28,7 +35,8 @@ class ChatController < ApplicationController
                 else
                     Notification.create({
                         user: user,
-                        text: "#{current_user.username} mentioned you: #{msg.message}"
+                        text: "#{current_user.username} mentioned you: #{msg.message}",
+                        url: "/chat/#{msg.id}"
                     })
                 end
             elsif mention == "here"

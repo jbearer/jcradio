@@ -9,7 +9,7 @@ function receive_chat(msg) {
 
     // Add the new message.
     $("#chat").append(`
-        <div class="${msg_class}">
+        <div class="${msg_class}" id="chat-message-${msg.id}">
           ${sender_tag}
           <p>${msg.message}</p>
         </div>
@@ -30,4 +30,10 @@ function send_chat(message) {
     });
 
     return false;
+}
+
+function focus_message(id) {
+    chat = $("#chat")
+    msg = $(`#chat-message-${id}`);
+    chat.scrollTop(msg.offset().top + chat.scrollTop() - msg.height());
 }

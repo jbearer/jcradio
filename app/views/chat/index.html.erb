@@ -12,7 +12,12 @@
   $(() => {
     // Load messages from the database on page load.
     <% ChatMessage.order(:created_at).each do |msg| %>
-      receive_chat(<%= raw msg.to_json %>)
+      receive_chat(<%= raw msg.to_json %>);
+    <% end %>
+
+    <% if @message_id %>
+      // Scroll to the focused message
+      focus_message(<%= @message_id %>);
     <% end %>
   })
 </script>
