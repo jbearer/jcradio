@@ -82,6 +82,11 @@ class ApplicationController < ActionController::Base
         LiveRPC.call user.id, function, args
     end
 
+    def push(notification)
+        LiveRPC.call notification.user.id, :push,
+            [notification.text, "/notifications/#{notification.id}"]
+    end
+
     # Call a client-side function in every active user's session.
     #
     # Usage: broadcast :my_javascript_function, arg1, arg2, ...

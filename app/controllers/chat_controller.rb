@@ -30,15 +30,11 @@ class ChatController < ApplicationController
 
             user = User.find_by username: mention
             if user
-                if user.subscribed?
-                    notify user, :mentioned_by, current_user, msg.message
-                else
-                    Notification.create({
-                        user: user,
-                        text: "#{current_user.username} mentioned you: #{msg.message}",
-                        url: "/chat/#{msg.id}"
-                    })
-                end
+                push(Notification.create({
+                    user: user,
+                    text: "#{current_user.username} mentioned you: #{msg.message}",
+                    url: "/chat/#{msg.id}"
+                }))
             elsif mention == "here"
                 broadcast :mentioned_by, current_user, msg.message
             end

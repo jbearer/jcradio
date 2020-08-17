@@ -19,8 +19,8 @@ function receive_chat(msg) {
     $("#chat")[0].scrollTop = $("#chat")[0].scrollHeight
 }
 
-function mentioned_by(user, message) {
-    push(`${user.username} mentioned you: ${message}`);
+function mentioned_by(user, msg) {
+    push(`${user.username} mentioned you: ${msg.message}`, msg.url);
 }
 
 function send_chat(message) {
