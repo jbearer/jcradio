@@ -1,6 +1,10 @@
 <div class="search-container">
     <form action="/songs/search">
-      <input type="text" placeholder="Search..." name="query">
+      <input type="text" placeholder="Search..." name="query"
+        <% if @query %>
+          value="<%= @query %>"
+        <% end %>
+      >
       <button class="button button3" type="submit"><i class="fa fa-search"></i></button>
     </form>
  </div>
