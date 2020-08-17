@@ -48,34 +48,32 @@ class Station < ActiveRecord::Base
         return ""
     end
 
-    def dequeue_song(song)
-        if song != now_playing then
-            # If song is not the currently playing song, then we expect it to be somewhere
-            # in the queue.
+    def next_song(song)
+        # We expect the next song to be the first song on the queue; however, the queue may drift
+        # out of sync with what's actually in Spotify (for example, if someone added songs to the
+        # queue not using the JCRadio interface, or if we missed a song change). This is a chance
+        # to resync the initial part of the queue with Spotify, by dequeuing until we reach the
+        # expected song (possibly clearing the queue if the whole thing is invalid).
+        #
+        # Whatever happens, this method will ensure that `song` is now playing.
 
-            # Dequeue everything up to and including the given song.
-            # Typically, when this method is called, `song` should be the first song on the queue.
-            # However, this method also serves as a chance to fix the queue in our database if it has
-            # drifted from the Spotify queue (for example, if someone added songs to the queue not using
-            # the JCRadio interface, or if we missed a song change).
-            while queue.any?
-                finished = song == queue[0]
-
-                queue[0].update position: nil
-                queue.reload
-
-                if finished
-                    break
-                end
+        entry = nil
+        while queue.any?
+            if queue[0].song == song then
+                entry = queue[0]
             end
+
+            queue[0].update position: nil
+            queue.reload
+
+            break unless entry.nil?
         end
 
-        # Dequeue the next song and play it
-        if queue.any?
-            update now_playing: (queue[0].update position: nil)
-        else
-            update now_playing: nil
+        if entry.nil? then
+            entry = QueueEntry.create song: song
         end
+
+        update now_playing: entry
     end
 
     def internal_spotify_add_to_queue(uri)

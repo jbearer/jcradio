@@ -125,7 +125,7 @@
                   <form action="/stations/<%= current_user.station.id %>/next" class="in_place_form">
                     <button class="button button3" type="submit">Next</button>
                   </form>
-                <% else %>
+                <% elsif current_user.station.now_playing.selector %>
                   Chosen by <%= current_user.station.now_playing.selector.username %>
                 <% end %>
               </span>
