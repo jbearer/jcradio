@@ -156,7 +156,7 @@ module Magique
                 curr_song = this_song
 
                 # Pop the next song off the queue.
-                $spotify_user.station.dequeue_song(Song.get("Spotify", curr_song.id))
+                Station.find(1).dequeue_song(Song.get("Spotify", curr_song.id))
 
             end
         end

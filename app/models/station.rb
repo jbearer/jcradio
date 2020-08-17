@@ -49,22 +49,32 @@ class Station < ActiveRecord::Base
     end
 
     def dequeue_song(song)
-        # Dequeue everything up to and including the given song.
-        # Typically, when this method is called, `song` should be the first song on the queue.
-        # However, this method also serves as a chance to fix the queue in our database if it has
-        # drifted from the Spotify queue (for example, if someone added songs to the queue not using
-        # the JCRadio interface, or if we missed a song change).
-        while queue
-            finished = song == queue[0]
-            queue[0].update position: nil
-            if finished
-                break
+        if song != now_playing then
+            # If song is not the currently playing song, then we expect it to be somewhere
+            # in the queue.
+
+            # Dequeue everything up to and including the given song.
+            # Typically, when this method is called, `song` should be the first song on the queue.
+            # However, this method also serves as a chance to fix the queue in our database if it has
+            # drifted from the Spotify queue (for example, if someone added songs to the queue not using
+            # the JCRadio interface, or if we missed a song change).
+            while queue.any?
+                finished = song == queue[0]
+
+                queue[0].update position: nil
+                queue.reload
+
+                if finished
+                    break
+                end
             end
         end
 
         # Dequeue the next song and play it
-        if queue
+        if queue.any?
             update now_playing: (queue[0].update position: nil)
+        else
+            update now_playing: nil
         end
     end
 
