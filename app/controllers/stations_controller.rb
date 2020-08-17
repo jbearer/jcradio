@@ -143,6 +143,11 @@ module Magique
             this_song = $spotify_user.player.currently_playing
 
             if (not curr_song) or (this_song.name != curr_song.name)
+                if curr_song
+                    # Pop the last song off the queue.
+                    Station.find(1).dequeue_song(Song.get("Spotify", curr_song.id))
+                end
+
 
                 puts "@@@@@@@@@@@@@@@@@@@@@@@@@@"
                 puts "@@@ PRINTING SONG INFO @@@"
@@ -154,10 +159,6 @@ module Magique
                 puts this_song.artists.first.name
 
                 curr_song = this_song
-
-                # Pop the next song off the queue.
-                Station.find(1).dequeue_song(Song.get("Spotify", curr_song.id))
-
             end
         end
     end
