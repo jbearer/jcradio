@@ -17,6 +17,14 @@ class ChatController < ApplicationController
 
         broadcast :receive_chat, msg
 
+        # Search for mentions
+        msg.message.scan(/@([^\s@]+)/).each do |mention|
+            user = User.find_by username: mention
+            if user
+                notify user, :mentioned_by, current_user, msg.message
+            end
+        end
+
         json_ok
     end
 end

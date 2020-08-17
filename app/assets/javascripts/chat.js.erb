@@ -19,6 +19,10 @@ function receive_chat(msg) {
     $("#chat")[0].scrollTop = $("#chat")[0].scrollHeight
 }
 
+function mentioned_by(user, message) {
+    push(`${user.username} mentioned you: ${message}`);
+}
+
 function send_chat(message) {
     $.post("/chat", {message: message}, () => {
         // Clear the text input once the message has been sent.
