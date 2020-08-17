@@ -36,7 +36,7 @@ class ChatController < ApplicationController
                     url: "/chat/#{msg.id}"
                 }))
             elsif mention == "here"
-                broadcast :mentioned_by, current_user, msg.message
+                broadcast :mentioned_by, current_user, msg
             end
         end
 
