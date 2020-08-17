@@ -1,6 +1,23 @@
-function on_my_turn(message) {
-    push(message);
-        // TODO make this a push notification.
-    location.reload();
-        // Reload the page to enable the song-choosing controls.
+function next_up(user, letter) {
+    $("#next-up").html(`Next up... ${user.username} with '${letter}'`);
+        // Update the next up indicator.
+
+    // If the current user is the next up user, notify them.
+    if (logged_in() && current_user().id == user.id) {
+        message = `It's your turn! Your letter is: ${letter}`;
+
+        last_two_paths = new URL(window.location.href).pathname.split('/').slice(-2);
+
+
+        if (last_two_paths[0] === "stations" || last_two_paths[1] == "search") {
+            // If we're already on the queue or song page, just reload it to enable the song-choosing controls.
+            location.reload();
+
+            // Display a push notification with no URL, since we're already on the right page.
+            push(message);
+        } else {
+            // Otherwise, display a push notification to take the user to the queue.
+            push(message, "/stations/1");
+        }
+    }
 }

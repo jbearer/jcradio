@@ -4,6 +4,13 @@ function push(msg, url=null) {
         n = new Notification(msg);
         if (url !== null) {
             n.onclick = (event) => {
+                console.log("click");
+                event.preventDefault();
+                window.location.href = url;
+                n.close();
+            }
+            n.onclose = (event) => {
+                console.log("click");
                 event.preventDefault();
                 window.location.href = url;
                 n.close();

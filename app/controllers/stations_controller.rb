@@ -51,9 +51,7 @@ class StationsController < ApplicationController
         next_user = station.users.order(:position)[0]
         $the_next_letter = params[:song_next_letter].capitalize()[0]
         # $the_next_letter = SongsHelper.calculate_next_letter(params[:title])
-        message = "It's your turn! Your letter is: %s" % [$the_next_letter]
-
-        notify next_user, :on_my_turn, message
+        broadcast :next_up, next_user, $the_next_letter
 
         json_ok
     end

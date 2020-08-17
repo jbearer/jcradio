@@ -50,13 +50,13 @@
 
               <div class="userlist">
                   <table>
-                    <thead>
+                    <p id="next-up">
                       <% if current_user%>
                         Next up... <%=current_user.station.users.order(:position)[0].username%> with '<%= $the_next_letter %>'
                       <% else %>
                         Next up...
                       <% end %>
-                    </thead>
+                    </p>
                     <tbody>
                       <% User.where.not(position: nil).each do |user| %>
                         <tr class="<%= user.position == 0 ? "user-active" : "user" %>">
