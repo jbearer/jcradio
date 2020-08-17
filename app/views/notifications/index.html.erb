@@ -1,0 +1,15 @@
+<p id="notice"><%= notice %></p>
+
+<table>
+  <tbody>
+    <% @notifications.each do |n| %>
+      <tr>
+        <td><%= n.created_at %></td>
+        <td><%= n.text %></td>
+        <td><%= link_to "Mark read", "/notifications/#{n.id}", method: :delete %> </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>

@@ -42,6 +42,7 @@ class SessionsController < ApplicationController
   def destroy
     if logged_in?
         current_user.update station: nil, position: nil
+        LiveRPC.close current_user.id
         reset_session
     else
         error "cannot log out (not logged in)"

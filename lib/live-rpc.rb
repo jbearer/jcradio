@@ -56,6 +56,15 @@ module LiveRPC
         end
     end
 
+    def self.close(id)
+        @lock.synchronize do
+            if @servers.key? id
+                @servers[id].close
+                @servers.delete id
+            end
+        end
+    end
+
     at_exit do
         # Close all the active servers so that their livestream requests will
         # finish, and the server can actually shut down.

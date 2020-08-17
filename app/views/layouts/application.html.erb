@@ -32,6 +32,10 @@
              <%= link_to "Selector", "/songs", :class => current_class?("/songs") %>
              <a href="#Plots">Plots</a>
              <%= link_to "Chat", "/chat", :class => current_class?("/chat") %>
+             <% if logged_in? %>
+                <%= link_to "Notifications (#{current_user.pending_notifications.length})",
+                      "/notifications" %>
+             <% end %>
         </div>
 
     <!-- Side Bar -->

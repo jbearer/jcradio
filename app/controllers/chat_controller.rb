@@ -22,9 +22,15 @@ class ChatController < ApplicationController
             mention = mention[0]
 
             user = User.find_by username: mention
-            Rails.logger.error mention
             if user
-                notify user, :mentioned_by, current_user, msg.message
+                if user.subscribed?
+                    notify user, :mentioned_by, current_user, msg.message
+                else
+                    Notification.create({
+                        user: user,
+                        text: "#{current_user.username} mentioned you: #{msg.message}"
+                    })
+                end
             elsif mention == "here"
                 broadcast :mentioned_by, current_user, msg.message
             end

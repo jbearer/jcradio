@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  resources :notifications, only: [:index, :destroy]
   resources :users, only: [:index, :show, :new, :create, :destroy]
   resources :sessions, only: [:index, :create]
   delete "/sessions", to: 'sessions#destroy'  # API
