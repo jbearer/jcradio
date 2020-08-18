@@ -43,7 +43,7 @@ module LiveRPC
     # Make an RPC call to a server with the given ID.
     def self.call(id, function, args)
         @lock.synchronize do
-            @servers[id].call(function, args)
+            @servers[id].call(function, args) if @servers.key? id
         end
     end
 

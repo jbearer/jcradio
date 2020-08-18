@@ -21,3 +21,16 @@ function next_up(user, letter) {
         }
     }
 }
+
+function next_song(queue_entry) {
+    $("#now-playing-title").html(queue_entry.song.title);
+    $("#now-playing-artist").html(queue_entry.song.artist);
+    set_upvote_icon(false);
+
+    // Remove the upvote handler for the old song.
+    $("#now-playing-upvote").unbind("click");
+    // And bind a handler for the new song.
+    $("#now-playing-upvote").click(() => {
+        toggle_upvote(queue_entry.id);
+    });
+}

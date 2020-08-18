@@ -74,6 +74,11 @@ class Station < ActiveRecord::Base
         end
 
         update now_playing: entry
+
+        # Update the clients about the new song.
+        users.each do |user|
+            user.notify :next_song, entry
+        end
     end
 
     def internal_spotify_add_to_queue(uri)

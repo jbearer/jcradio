@@ -1,9 +1,13 @@
 function toggle_upvote(selection_id) {
     $.post("/upvotes", {selection_id:selection_id}, (response) => {
-        if (response.upvoted) {
-            $("#upvote").attr("class", "fa fa-thumbs-up fa-lg");
-        } else {
-            $("#upvote").attr("class", "fa fa-thumbs-o-up fa-lg");
-        }
+        set_upvote_icon(response.upvoted);
     });
+}
+
+function set_upvote_icon(upvoted) {
+    if (upvoted) {
+        $("#upvote").attr("class", "fa fa-thumbs-up fa-lg");
+    } else {
+        $("#upvote").attr("class", "fa fa-thumbs-o-up fa-lg");
+    }
 }

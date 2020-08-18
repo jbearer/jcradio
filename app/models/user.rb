@@ -20,4 +20,8 @@ class User < ActiveRecord::Base
     def subscribed?
         LiveRPC.server? id
     end
+
+    def notify(function, *args)
+        LiveRPC.call id, function, args
+    end
 end
