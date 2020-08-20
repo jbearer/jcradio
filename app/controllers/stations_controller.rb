@@ -124,41 +124,48 @@ module Magique
         while true
             sleep 5
 
-            if not $spotify_user.player
-                puts "@@@@@@@@@@@@@@@@@"
-                puts "@@@ NO PLAYER @@@"
-                puts "@@@@@@@@@@@@@@@@@"
-                next
-            end
+            begin
 
-            if not $spotify_user.player.playing?
-                puts "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
-                puts "@@@ NOT CURRENTLY PLAYING @@@"
-                puts "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
-                next
-            end
-
-            this_song = $spotify_user.player.currently_playing
-
-            if (not curr_song) or (this_song.name != curr_song.name)
-                puts "@@@@@@@@@@@@@@@@@@@@@@@@@@"
-                puts "@@@ PRINTING SONG INFO @@@"
-                puts "@@@@@@@@@@@@@@@@@@@@@@@@@@"
-
-                print "Song: "
-                puts this_song.name
-                print "Artist: "
-                puts this_song.artists.first.name
-
-                curr_song = this_song
-
-                begin
-                    # Update the queue with the new song.
-                    Station.find(1).next_song(Song.get("Spotify", this_song.id))
-                rescue => e
-                    Rails.logger.error e.message
-                    e.backtrace.each { |line| Rails.logger.error line }
+                if not $spotify_user.player
+                    puts "@@@@@@@@@@@@@@@@@"
+                    puts "@@@ NO PLAYER @@@"
+                    puts "@@@@@@@@@@@@@@@@@"
+                    next
                 end
+
+                if not $spotify_user.player.playing?
+                    puts "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+                    puts "@@@ NOT CURRENTLY PLAYING @@@"
+                    puts "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+                    next
+                end
+
+                this_song = $spotify_user.player.currently_playing
+
+                if (not curr_song) or (this_song.name != curr_song.name)
+                    puts "@@@@@@@@@@@@@@@@@@@@@@@@@@"
+                    puts "@@@ PRINTING SONG INFO @@@"
+                    puts "@@@@@@@@@@@@@@@@@@@@@@@@@@"
+
+                    print "Song: "
+                    puts this_song.name
+                    print "Artist: "
+                    puts this_song.artists.first.name
+
+                    curr_song = this_song
+
+                    begin
+                        # Update the queue with the new song.
+                        Station.find(1).next_song(Song.get("Spotify", this_song.id))
+                    rescue => e
+                        Rails.logger.error e.message
+                        e.backtrace.each { |line| Rails.logger.error line }
+                    end
+                end
+            rescue => e
+                puts "!!!!!!!! failed to get song info !!!!!!!!!!!!"
+                Rails.logger.error e.message
+                e.backtrace.each { |line| Rails.logger.error line }
             end
         end
     end
