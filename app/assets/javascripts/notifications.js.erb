@@ -1,7 +1,10 @@
 function push(msg, url=null) {
     console.log(msg, url);
+
+    var options = {requireInteraction: true};
+
     function deliver() {
-        n = new Notification(msg);
+        n = new Notification(msg, options);
         if (url !== null) {
             n.onclick = (event) => {
                 console.log("click");
