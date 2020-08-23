@@ -20,16 +20,18 @@
       <th>Album</th>
       <th>Selector</th>
     </tr>
-  <% @station.queue.each_with_index do |queue_entry, i| %>
-    <% if i > @station.queue.length - 20 %>
-      <tr>
-        <td><%= i + 1 %></td>
-        <td><%= queue_entry.song.title %></td>
-        <td><%= queue_entry.song.artist %></td>
-        <td><%= queue_entry.song.album %></td>
-        <td><%= queue_entry.selector.username %></td>
-      </tr>
-    <% end %>
+  <% @station.queue_before(5).each_with_index do |queue_entry, i| %>
+    <tr>
+      <!-- <td><%= i + 1 %></td> -->
+      <td><%= queue_entry.position - @station.queue_pos%></td>
+      <td><%= queue_entry.song.title %></td>
+      <td><%= queue_entry.song.artist %></td>
+      <td><%= queue_entry.song.album %></td>
+      <td><%= queue_entry.selector.username %></td>
+      <td><%= queue_entry.position%></td>
+      <td><%= @station.queue_max%></td>
+      <td><%= @station.queue_pos%></td>
+    </tr>
   <% end %>
 </table>
 

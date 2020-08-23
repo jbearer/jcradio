@@ -4,24 +4,20 @@ class Station < ActiveRecord::Base
     has_many :users
 
     def queue
-        self.queue_pos
-        QueueEntry.where(station: self).where.not(position: nil).order(:position)
+        if self.queue_pos
+            return QueueEntry.where(station: self).where.not(position: nil).where("position >= ?", self.queue_pos).order(:position)
+        end
     end
 
-    def queue_pos
-        puts "$$$$$$$$$$$$$$$$$$$"
-        puts "$$$$$$$$$$$$$$$$$$$"
-
-        if self.now_playing.position # If now playing was added by us, use that as the index
-            result =  self.now_playing.position || 0
-            puts "  In NowPlaying"
-        else # Is now_playing was added externally (drift), just return max queue pos
-            result = QueueEntry.where(station: self).where.not(position: nil).maximum(:position) || 0
+    def queue_before(before)
+        if self.queue_pos
+            return QueueEntry.where(station: self).where.not(position: nil).where("position >= ?", self.queue_pos-before).order(:position)
         end
+    end
 
-        print "  QueuePos: %d\n" % result
-        print "  QueueMax: %d\n" % QueueEntry.where(station: self).where.not(position: nil).maximum(:position)
 
+    def queue_max
+        return QueueEntry.where(station: self).where.not(position: nil).maximum(:position)
     end
 
     def queue_song(song, selector)
@@ -55,7 +51,7 @@ class Station < ActiveRecord::Base
         if self.now_playing
             # Queue the song
             QueueEntry.create song: song, station: self,
-                position: (queue.maximum(:position) || 0) + 1,
+                position: (self.queue_max || 0) + 1,
                 selector: selector
         else
             # Play it immediately
@@ -76,11 +72,27 @@ class Station < ActiveRecord::Base
 
         entry = nil
         while queue.any?
+
+
+            print "$$$$$$$$$$$$$$$$$$$$$$$44444\n"
+            print "$$$$$$$$$$$$$$$$$$$$$$$44444\n"
+            print "$$$$$$$$$$$$$$$$$$$$$$$44444\n"
+            print "  QueueSize: %d\n" % queue.length
+            print "  QueuePos: %d\n" % queue_pos
+            print "  QueueMax: %d\n" % queue_max
+            print "  QueueSong: %s\n" % queue[0].song.name
+            print "  SongIn: %s\n" % song.name 
+
             if queue[0].song == song then
                 entry = queue[0]
+
+                print "Found song pos: %d\n" % entry.position
+            else
+                update queue_pos: queue_pos+1
             end
 
-            # queue[0].update position: nil
+
+            # queue[0].update position: nil+
             queue.reload
 
             break unless entry.nil?

@@ -73,6 +73,7 @@ ActiveRecord::Schema.define(version: 20200830005529) do
     t.datetime "created_at",     null: false
     t.datetime "updated_at",     null: false
     t.integer  "now_playing_id"
+    t.integer  "queue_pos"
   end
 
   add_index "stations", ["now_playing_id"], name: "index_stations_on_now_playing_id"
