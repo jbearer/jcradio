@@ -7,6 +7,10 @@ class Station < ActiveRecord::Base
         QueueEntry.where(station: self).where.not(position: nil).order(:position)
     end
 
+    def queue_pos
+        return self.now_playing.position
+    end
+
     def queue_song(song, selector)
         if song.source != "Spotify"
             return "Please select a song from Spotify (not #{song.source})"
