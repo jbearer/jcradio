@@ -2,6 +2,20 @@
 
 <html>
 
+  <!-- Auto Logout if cookie puts user in inconsistent state (when server hard resets) -->
+  <% if logged_in? %>
+    <% if current_user %>
+      <% if not current_user.station %>
+        <form action="/logout" method="post" class="in_place_form" id="auto_logout">
+        <script>
+          window.onload = function(){
+            document.forms['auto_logout'].submit()
+          }
+        </script>
+      <% end %>
+    <% end %>
+  <% end %>
+
     <!-- Header -->
         <head>
             <title>Jingle Churro Radio</title>

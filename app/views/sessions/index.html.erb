@@ -5,7 +5,7 @@
 <% if logged_in? %>
     <p>Welcome <%= current_user.username %>!
     <form action="/logout" method="post" class="in_place_form">
-        <button class="button button4" type="submit">Switch Accounts</button>
+        <button class="button button4" type="submit">Logout</button>
     </form>
     </p>
 <% else %>
