@@ -4,11 +4,24 @@ class Station < ActiveRecord::Base
     has_many :users
 
     def queue
+        self.queue_pos
         QueueEntry.where(station: self).where.not(position: nil).order(:position)
     end
 
     def queue_pos
-        return self.now_playing.position
+        puts "$$$$$$$$$$$$$$$$$$$"
+        puts "$$$$$$$$$$$$$$$$$$$"
+
+        if self.now_playing.position # If now playing was added by us, use that as the index
+            result =  self.now_playing.position || 0
+            puts "  In NowPlaying"
+        else # Is now_playing was added externally (drift), just return max queue pos
+            result = QueueEntry.where(station: self).where.not(position: nil).maximum(:position) || 0
+        end
+
+        print "  QueuePos: %d\n" % result
+        print "  QueueMax: %d\n" % QueueEntry.where(station: self).where.not(position: nil).maximum(:position)
+
     end
 
     def queue_song(song, selector)
@@ -67,7 +80,7 @@ class Station < ActiveRecord::Base
                 entry = queue[0]
             end
 
-            queue[0].update position: nil
+            # queue[0].update position: nil
             queue.reload
 
             break unless entry.nil?
