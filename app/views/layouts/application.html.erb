@@ -5,7 +5,7 @@
   <!-- Auto Logout if cookie puts user in inconsistent state (when server hard resets) -->
   <% if logged_in? %>
     <% if current_user %>
-      <% if not current_user.station %>
+      <% if current_user.station.nil? %>
         <form action="/logout" method="post" class="in_place_form" id="auto_logout">
         <script>
           window.onload = function(){
@@ -65,7 +65,7 @@
               <div class="userlist">
                   <table>
                     <p id="next-up">
-                      <% if current_user%>
+                      <% if current_user and current_user.station %>
                         Next up... <%=current_user.station.users.order(:position)[0].username%> with '<%= $the_next_letter %>'
                       <% else %>
                         Next up...
@@ -103,7 +103,7 @@
       </div>
 
     <!-- Music Bar -->
-    <% if logged_in? and current_user.station.now_playing %>
+    <% if logged_in? and current_user.station and current_user.station.now_playing %>
         <div class="musicBar">
           <div class = "columnMus leftMus">
                 <p id="now-playing-title"><%= current_user.station.now_playing.song.title %></p>
