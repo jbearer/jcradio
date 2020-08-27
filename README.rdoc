@@ -28,5 +28,8 @@ TODO
         Music progress bar
         Plots
         SQL query
+        liking a song could save it to spotify liked songs
+        Hide queue option
+        tell you if a song was recently played
 
 
