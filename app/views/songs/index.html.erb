@@ -89,7 +89,7 @@ function confirmSong(ind, song_json) {
 
         var confirm_message = " <p> Add \"" + song.title + "\" by " + song.artist + " to queue? </p> ";
 
-        var $content = "<div class='dialog-ovelay'>" +
+        var content = "<div class='dialog-ovelay'>" +
                           "<div class='dialog'>" +
                       "<div class='dialog-msg'>" +
                           confirm_message +
@@ -107,7 +107,7 @@ function confirmSong(ind, song_json) {
                     "</div>" +
                   "</div>";
 
-         $('body').prepend($content);
+         $('body').prepend(content);
 
          // Add Song To Queue
       $('.doAction').click(function () {

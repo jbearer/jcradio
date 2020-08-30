@@ -21,6 +21,20 @@
     <button class="button button5" type="submit">Sign in with Spotify</button>
     <% end -%>
 <% else %>
+    <p>
         Logged into Spotify account of: <%= $spotify_user.display_name %>.
         You can't log out.
+    </p>
+<% end %>
+
+<% if $spotify_user && current_user %>
+    <% if not $client_spotifies.key?(current_user.username) %>
+        <%= link_to '/auth/spotify' do %>
+        <button class="button button5" type="submit">Link Spotify Account</button>
+        <% end %>
+    <% else %>
+        <p>
+            Linked with the spotify account of: <%= $client_spotifies[current_user.username].display_name %>.
+        </p>
+    <% end %>
 <% end %>

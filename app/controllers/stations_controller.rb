@@ -1,4 +1,5 @@
 $the_next_letter = '_'
+$client_spotifies = {}
 class StationsController < ApplicationController
 
     include SongsHelper
@@ -11,9 +12,18 @@ class StationsController < ApplicationController
     end
 
     def spotify_create_user
-        $spotify_user = RSpotify::User.new(request.env['omniauth.auth'])
-        # Update the song that's currently playing
-        TitleExtractorWorker.perform_async(self)
+        info = RSpotify::User.new(request.env['omniauth.auth'])
+        if not $spotify_user then
+            $spotify_user = info
+            # Update the song that's currently playing
+            TitleExtractorWorker.perform_async(self)
+        else
+            if not current_user then
+                return json_error "user must be logged in to link account"
+            else
+                $client_spotifies[current_user.username] = info
+            end
+        end
         redirect_to "/stations/1"
     end
 
