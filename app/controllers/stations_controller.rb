@@ -41,6 +41,8 @@ class StationsController < ApplicationController
         song = Song.get "Spotify", params[:source_id]
         err_str = station.queue_song(song, current_user)
 
+        song.update last_played: Time.now.to_f * 1000 # ms since 01/01/1970
+
         if err_str != "" then
             return json_error err_str
         end
