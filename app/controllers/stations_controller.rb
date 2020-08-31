@@ -4,7 +4,7 @@ class StationsController < ApplicationController
 
     include SongsHelper
 
-    before_action :set_station, only: [:show]
+    before_action :set_station, only: [:show, :change_queue_pos, :edit_queue_pos]
 
     # GET /stations
     def index
@@ -29,6 +29,39 @@ class StationsController < ApplicationController
 
     # GET /stations/1
     def show
+    end
+
+    def change_queue_pos
+    end
+
+    # POST /stations/1/edit_queue_pos
+    def edit_queue_pos
+        # print "$$$$$$$$$ Arrived Here $$$$$\n"
+        # print "$$$$$$$$$ Arrived Here $$$$$\n"
+        # print "$$$$$$$$$ Arrived Here $$$$$\n"
+        # print "  InParam: %s\n" % params[:new_queue_pos]
+
+
+        if not logged_in?
+            return json_error "must log in to add to the queue"
+        end
+        station = current_user.station
+
+        # print "  CurQueuePos: %s\n" % station.queue_pos
+
+        in_param = Integer(params[:new_queue_pos])
+
+        if in_param <= station.queue_max and in_param >= 0
+            station.update queue_pos: in_param
+        end
+
+        # print "  QueuePos: %s\n" % station.queue_pos
+
+
+        redirect_to "/stations/1"
+
+        # json_ok
+
     end
 
     # PUT /stations/1

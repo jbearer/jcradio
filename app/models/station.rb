@@ -71,34 +71,39 @@ class Station < ActiveRecord::Base
         # Whatever happens, this method will ensure that `song` is now playing.
 
         entry = nil
-        while queue.any?
 
+        tmp_pos = queue_pos
 
-            print "$$$$$$$$$$$$$$$$$$$$$$$44444\n"
-            print "$$$$$$$$$$$$$$$$$$$$$$$44444\n"
-            print "$$$$$$$$$$$$$$$$$$$$$$$44444\n"
-            print "  QueueSize: %d\n" % queue.length
-            print "  QueuePos: %d\n" % queue_pos
-            print "  QueueMax: %d\n" % queue_max
-            print "  QueueSong: %s\n" % queue[0].song.name
-            print "  SongIn: %s\n" % song.name 
+        while queue.any? and tmp_pos <= queue_max
 
-            if queue[0].song == song then
-                entry = queue[0]
+            # print "$$$$$$$$$$$$$$$$$$$$$$$44444\n"
+            # print "$$$$$$$$$$$$$$$$$$$$$$$44444\n"
+            # print "$$$$$$$$$$$$$$$$$$$$$$$44444\n"
+            # print "  QueueSize: %d\n" % queue.length
+            # print "  QueuePos: %d\n" % queue_pos
+            # print "  TmpPos: %d\n" % tmp_pos
+            # print "  QueueMax: %d\n" % queue_max
 
-                print "Found song pos: %d\n" % entry.position
+            if queue[tmp_pos - queue_pos].song == song then
+                entry = queue[tmp_pos - queue_pos]
+
+                # print "Found song pos: %d\n" % entry.position
+
+                update queue_pos: tmp_pos # Update actual queue pos if found the song
+                queue.reload
             else
-                update queue_pos: queue_pos+1
+                tmp_pos = tmp_pos + 1
             end
 
 
             # queue[0].update position: nil+
-            queue.reload
 
             break unless entry.nil?
         end
 
         if entry.nil? then
+            # print "$$$$$$$$$$$$$$$$$$$$$$$44444\n"
+            # print "  Song not found. Creating new QueueEntry\n"
             entry = QueueEntry.create song: song
         end
 
