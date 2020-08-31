@@ -50,6 +50,21 @@ module SongsHelper
     # return an array of words
     def self.normalize_title(title)
       title = title.upcase
+
+      # Delete Parenthesis phrases
+      open_paran_i = title.index("(")
+      close_paran_i = title.index(")")
+      if open_paran_i and close_paran_i
+        title = title[0..open_paran_i]+title[close_paran_i..-1]
+      end
+
+      # Strip after hyphens
+      hyphen_i = title.index("-")
+      if hyphen_i
+        title = title[0..hyphen_i]
+      end
+
+      # Remove all non-letter characters
       title.gsub! /[^A-Z ]/, ""
       words = title.split
 
