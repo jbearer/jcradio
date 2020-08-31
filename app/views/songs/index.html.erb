@@ -29,7 +29,7 @@
         <td> <%= msToMinSec(song.duration) %> </td>
         <td>
             <% if logged_in? and current_user.can_add_to_queue %>
-                <button class="button button6" onclick="confirmSong(<%=ind%>,'<%=song.to_json%>')" >
+                <button class="button button6" onclick="confirmSong(<%=ind%>,<%= song.to_json %>)" >
                     <i class="fa fa-plus"></i>
                 </button>
                 <form id="addSong<%=ind%>" action=<%="/stations/#{current_user.station.id}"%> method="post">
@@ -56,9 +56,7 @@
 <!-- Confirm Song Popup -->
 <script>
 
-function confirmSong(ind, song_json) {
-
-        var song = JSON.parse(song_json);
+function confirmSong(ind, song) {
 
         const next_letter = '<%= $the_next_letter %>';
         const threshold = 1000 * 60 * 60 * 24 * 7; // 1 week

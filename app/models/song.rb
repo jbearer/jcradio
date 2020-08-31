@@ -59,9 +59,9 @@ class Song < ActiveRecord::Base
         end
 
         data = {
-            title: song.name.gsub("'", "’"),
-            artist: song.artists.first.name.gsub("'", "’"),
-            album: song.album.name.gsub("'", "’"),
+            title: song.name,
+            artist: song.artists.first.name,
+            album: song.album.name,
             source: "Spotify",
             source_id: song.id,
             uri: song.uri,
