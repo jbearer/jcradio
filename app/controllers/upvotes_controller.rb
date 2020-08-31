@@ -24,7 +24,13 @@ class UpvotesController < ApplicationController
 
                     user = $client_spotifies[current_user.username]
                     user.save_tracks!(tracks)
+
+                    push(Notification.create({
+                        user: current_user,
+                        text: "Added to library: " + entry.song.title
+                    }))
                     puts "!!!!!!!! saved song to library !!!!!!!!!!!"
+
                 else
                     puts "!!!!!!!! user not associated with spotify acct !!!!!!"
                 end
