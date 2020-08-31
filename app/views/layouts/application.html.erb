@@ -72,7 +72,7 @@
                       <% end %>
                     </p>
                     <tbody>
-                      <% User.where.not(position: nil).each do |user| %>
+                      <% User.where.not(position: nil).order(:position).each do |user| %>
                         <tr class="<%= user.position == 0 ? "user-active" : "user" %>">
                           <td><%= user.username %></td>
                         </tr>
