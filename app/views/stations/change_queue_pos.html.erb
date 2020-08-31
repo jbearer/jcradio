@@ -1,0 +1,10 @@
+<p id="notice"><%= notice %></p>
+
+<form action="/stations/1/edit_queue_pos" method="post">
+    <label for="new_queue_pos">Change queue_pos?</label><br>
+    <input type='text' id='new_queue_pos' name="new_queue_pos" value=<%= @station.queue_pos %> ><br>
+    <!-- <input type='text' id='new_queue_pos' name="new_queue_pos" value=0 ><br> -->
+    <input type="submit" name="Submit">
+
+</form>
+
