@@ -7,12 +7,14 @@ class Station < ActiveRecord::Base
         if self.queue_pos
             return QueueEntry.where(station: self).where.not(position: nil).where("position >= ?", self.queue_pos).order(:position)
         end
+        return []
     end
 
     def queue_before(before)
         if self.queue_pos
             return QueueEntry.where(station: self).where.not(position: nil).where("position >= ?", self.queue_pos-before).order(:position)
         end
+        return []
     end
 
 

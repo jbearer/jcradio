@@ -547,5 +547,15 @@
 
 	}
 
-
-
+	span.audio-feature {
+		display: inline-block;
+		width: 300px;
+		height: 60px;
+		padding: 10px;
+		margin-top: 5px;
+		vertical-align: top;
+		text-align: center;
+		background-color: rgba(13, 155, 131, 0.2);
+		background-clip: padding-box;  /* why no work */
+		border-radius: 15px;
+	}

@@ -50,6 +50,7 @@
                 <%= link_to "Notifications (#{current_user.pending_notifications.length})",
                       "/notifications" %>
              <% end %>
+             <%= link_to "Recommendations", "/recommendations", :class => current_class?("/recommendations") %>
         </div>
 
     <!-- Side Bar -->

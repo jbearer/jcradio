@@ -1,0 +1,77 @@
+<form action="/recommendations", method="get", data-remote="true">
+  <p>
+    <%= text_field_tag :search, params[:search], :placeholder => "First letter..." %>
+    <%= submit_tag "Search", :name => nil %>
+
+    <h2> Audio Features </h2>
+    <div align="left">
+
+        <% features.each do |feature| %>
+
+            <span class="audio-feature">
+                Use <%= feature[:name] %>?
+                <!-- checkbox -->
+                <input type="checkbox"
+                      id="<%= feature[:name] %>_checkbox"
+                      name="use_<%= feature[:name] %>",
+                      onclick="show_slider('<%= feature[:name] %>')">
+
+                <div id="<%= feature[:name] %>_slider_and_value", style="display:none" >
+
+                  <div class="slidecontainer">
+                      <input
+                          type="range"
+                          name=<%= feature[:name] %>
+                          min=<%= feature[:min] %>
+                          max=<%= feature[:max] * feature[:scale] %>
+                          value=<%= feature[:min] %>
+                          class="slider"
+                          id="<%= feature[:name] %>_slider">
+                  </div>
+                  <div id="<%= feature[:name] %>_value" > <%= feature[:min] %> </div>
+                </div> <!-- slider and value -->
+            </span>
+        <% end %>
+    </div>
+  </p>
+</form>
+
+<br>
+Your song is:
+<br>
+
+<div id="products">
+  <%= "hi" %>
+</div>
+
+<script>
+function update_slider(name, scale) {
+
+    var slider = document.getElementById(name + "_slider");
+    var output = document.getElementById(name + "_value");
+    output.innerHTML = slider.value; // Display the default slider value
+
+    // Update the current slider value (each time you drag the slider handle)
+    slider.oninput = function() {
+        output.innerHTML = this.value / scale;
+    }
+}
+
+<% features.each do |feature| %>
+    update_slider("<%= feature[:name] %>", "<%= feature[:scale] %>")
+<% end %>
+
+function show_slider(name) {
+  // get the checkbox
+  var checkbox = document.getElementById(name + "_checkbox");
+  // get the slider + value
+  var slider_and_value = document.getElementById(name + "_slider_and_value");
+
+  if (checkbox.checked) {
+    slider_and_value.style.display = "block";
+  } else {
+    slider_and_value.style.display = "none";
+  }
+}
+
+</script>

@@ -28,6 +28,8 @@ Rails.application.routes.draw do
   get '/stations/:id/change_queue_pos', to: "stations#change_queue_pos"
   post '/stations/:id/edit_queue_pos',  to: "stations#edit_queue_pos"
 
+  resources :recommendations, only: [:index, :create]
+
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 
