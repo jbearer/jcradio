@@ -549,7 +549,7 @@
 
 	span.audio-feature {
 		display: inline-block;
-		width: 300px;
+		width: 250px;
 		height: 60px;
 		padding: 10px;
 		margin-top: 5px;
@@ -559,3 +559,23 @@
 		background-clip: padding-box;  /* why no work */
 		border-radius: 15px;
 	}
+
+	.seeds {
+		background-repeat: no-repeat;
+		background-size: cover;
+		overflow-x: hidden;
+
+		text-align: center;
+		width: 30%;
+  
+	  }
+
+	.search-seeds {
+		width: 70%;
+		/* background-repeat: no-repeat; */
+		text-align: center;
+		/* float: right; */
+		/* color: #92dce5; */
+		/* padding-top: 70px; */
+		/* padding-bottom: 75px; */
+	  }

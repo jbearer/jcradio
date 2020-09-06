@@ -3,7 +3,7 @@ class RecommendationsController < ApplicationController
     include RecommendationsHelper
 
     # GET /recommendations
-    def index
+    def suggest
         options = {}
 
         features.each do |feature|
@@ -14,65 +14,94 @@ class RecommendationsController < ApplicationController
             end
         end
 
-        puts options
-
         symbol_options = options.symbolize_keys
 
+        seed_tracks = []
+        seed_artists = []
+
+        source_ids = params[:source_id]
+        categories = params[:category]
+
+        source_ids.zip(categories) do |id, cat|
+            if cat == "track" then
+                seed_tracks += [id]
+            elsif cat == "artist" then
+                seed_artists += [id]
+            else
+                fail "seed was neither track nor artist"
+            end
+        end
+
         recommendations = RSpotify::Recommendations.generate(
-                limit: 20,
-                seed_tracks: [
-                    "723paR6LrVISFCXFPf5z57", # above the clouds of pompeii
-                    "7mLcjLqiY9rJUA3BQAywiH", # elysium bear's den
-                ],
-                **symbol_options
-            )
+            limit: 20,
+            seed_tracks: seed_tracks,
+            seed_artists: seed_artists,
+            **symbol_options
+        )
 
         puts recommendations.tracks.length
 
         @recommendation = recommendations.tracks[0]
+
+        puts @recommendation.name
+
+        respond_to do |format|
+            format.js
+        end
+    end
+
+    def search
+
+        if params[:category] == "track" then
+            @search_artists = nil
+            @search_songs = Song.spotify_search(params[:query])
+        else
+            @search_artists = RSpotify::Artist.search(params[:query])
+            @search_songs = nil
+        end
+
+        # Runs the code in recommendations/search.js.erb, which updates the partial
+        # in recommendations/_search_results.html.erb
+        respond_to do |format|
+            format.js
+        end
+    end
+
+    def seed_track
+        song = Song.get "Spotify", params[:source_id]
+
+        # Run the code in recommendations/seed_track.js.erb.  This will append
+        respond_to do |format|
+            format.js { render(
+                file: "recommendations/seeds.js.erb",
+                :locals => {
+                    name: song.title,
+                    category: "track",
+                    source_id: song.source_id
+                })
+            }
+        end
+    end
+
+    def seed_artist
+        # Todo: cache the result so we're not redoing the search
+        artist = RSpotify::Artist.find([params[:source_id]]).first
+        # Run the code in recommendations/seed_track.js.erb.  This will append
+        respond_to do |format|
+            format.js { render(
+                file: "recommendations/seeds.js.erb",
+                :locals => {
+                    name: artist.name,
+                    category: "artist",
+                    source_id: params[:source_id]
+                })
+            }
+        end
     end
 
     def new
         #@recommendation = Recommendation.new
     end
 
-    # POST /recommendations
-
-
-    # app/controllers/recommendations_controller.rb
-    # ......
-    def create
-        @recommendation = User.new(params[:recommendation])
-
-        respond_to do |format|
-        if @recommendation.save
-            format.html { redirect_to @recommendation, notice: 'User was successfully created.' }
-            format.js
-            format.json { render json: @recommendation, status: :created, location: @recommendation }
-        else
-            format.html { render action: "new" }
-            format.json { render json: @recommendation.errors, status: :unprocessable_entity }
-        end
-        end
-    end
-
-    # def create
-    #     puts "heyyyyy"
-    #     recommendations = RSpotify::Recommendations.generate(
-    #             limit: 20,
-    #             seed_tracks: [
-    #                 "723paR6LrVISFCXFPf5z57", # above the clouds of pompeii
-    #                 "7mLcjLqiY9rJUA3BQAywiH", # elysium bear's den
-    #             ]
-    #         )
-
-    #     respond_to do |format|
-    #         # format.html { redirect_to @recommendation, notice: 'User was successfully created.' }
-    #         format.js
-    #         # format.json { render json: @recommendation, status: :created, location: @recommendation }
-    #     end
-
-    #     # return render json: {random_param_name: "Hello there"}
-    # end
 
 end

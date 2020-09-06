@@ -1,47 +1,98 @@
-<form action="/recommendations", method="get", data-remote="true">
-  <p>
-    <%= text_field_tag :search, params[:search], :placeholder => "First letter..." %>
-    <%= submit_tag "Search", :name => nil %>
 
-    <h2> Audio Features </h2>
-    <div align="left">
+<form action="/recommendations/suggest", method="get", data-remote="true">
+<%= text_field_tag :search, params[:search], :placeholder => "First letter..." %>
+<%= submit_tag "Search", :name => nil %>
 
-        <% features.each do |feature| %>
+  <h2> Audio Features </h2>
+  <div align="left">
 
-            <span class="audio-feature">
-                Use <%= feature[:name] %>?
-                <!-- checkbox -->
-                <input type="checkbox"
-                      id="<%= feature[:name] %>_checkbox"
-                      name="use_<%= feature[:name] %>",
-                      onclick="show_slider('<%= feature[:name] %>')">
+      <% features.each do |feature| %>
 
-                <div id="<%= feature[:name] %>_slider_and_value", style="display:none" >
+          <span class="audio-feature">
+              Use <%= feature[:name] %>?
+              <!-- checkbox -->
+              <input type="checkbox"
+                    id="<%= feature[:name] %>_checkbox"
+                    name="use_<%= feature[:name] %>",
+                    onclick="show_slider('<%= feature[:name] %>')">
 
-                  <div class="slidecontainer">
-                      <input
-                          type="range"
-                          name=<%= feature[:name] %>
-                          min=<%= feature[:min] %>
-                          max=<%= feature[:max] * feature[:scale] %>
-                          value=<%= feature[:min] %>
-                          class="slider"
-                          id="<%= feature[:name] %>_slider">
-                  </div>
-                  <div id="<%= feature[:name] %>_value" > <%= feature[:min] %> </div>
-                </div> <!-- slider and value -->
-            </span>
-        <% end %>
-    </div>
-  </p>
+              <div id="<%= feature[:name] %>_slider_and_value", style="display:none" >
+
+                <div class="slidecontainer">
+                    <input
+                        type="range"
+                        name=<%= feature[:name] %>
+                        min=<%= feature[:min] %>
+                        max=<%= feature[:max] * feature[:scale] %>
+                        value=<%= feature[:min] %>
+                        class="slider"
+                        id="<%= feature[:name] %>_slider">
+                </div>
+                <div id="<%= feature[:name] %>_value" > <%= feature[:min] %> </div>
+              </div> <!-- slider and value -->
+          </span>
+
+      <% end %>
+
+  </div>
+
+<!-- Sneaky hidden seeds
+  The seed information needs to be part of the final form.
+  However, due to the page layout, the seeds are located next to
+  the song search, which contains another form.  Html doesn't support
+  nested forms.
+-->
+<div id="hidden-seeds"> </div>
+
+
 </form>
 
+<row>
+    <h2> Seeds </h2>
+
+    <div class="column seeds">
+      <div id="current-seeds">
+        <div class="userlist">
+
+          <table>
+              <p> Current seeds </p>
+              <tbody>
+
+              </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="column search-seeds">
+      <form action="/recommendations/search", method="get", data-remote="true">
+        <div class="search-container">
+            <input type="text" placeholder="Search..." name="query"
+               <% if @query %>
+                value="<%= @query %>"
+               <% end %>
+            >
+            <button class="button button2" type="submit", onclick="set_search_category('track')">Track</button>
+            <button class="button button2" type="submit", onclick="set_search_category('artist')">Artist</button>
+      </div>
+        <input type="hidden" id="seed-category" name="category" value="track">
+      </form>
+
+    <div id="search-results">
+      this is where the search results will go
+    </div>
+
+  </div>
+</row>
+
+<div align="center">
+
+<br>
 <br>
 Your song is:
 <br>
 
-<div id="products">
-  <%= "hi" %>
+<div id="suggestion">
+  hi
 </div>
 
 <script>
@@ -72,6 +123,10 @@ function show_slider(name) {
   } else {
     slider_and_value.style.display = "none";
   }
+}
+
+function set_search_category(type) {
+  document.getElementById("seed-category").value = type
 }
 
 </script>

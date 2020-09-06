@@ -1,0 +1,6 @@
+$("#hidden-seeds").append("<%=
+    j render partial: 'seeds',
+             locals: {name: name, source_id: source_id, category: category}
+%>")
+
+$("#current-seeds tbody").append("<tr><td> <%= name %> </td></tr>")

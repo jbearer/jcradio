@@ -1,0 +1,58 @@
+  <table>
+  <%if @search_songs %>
+  <!-- TRACKS -->
+    <tr>
+        <!-- TODO: what is the actual best CSS way to do this? Another th? -->
+        <th style="font-weight:normal;font-size:1.1em">Song</th>
+        <th style="font-weight:normal;font-size:1.1em">Artist</th>
+        <th style="font-weight:normal;font-size:1.1em">Album</th>
+        <th style="font-weight:normal;font-size:1.1em">Duration</th>
+        <th></th>
+    </tr>
+    <% @search_songs.each_with_index do |song, ind| %>
+      <tr>
+          <td> <%= song.title %> </td>
+          <td> <%= song.artist %> </td>
+          <td> <%= song.album %> </td>
+          <td> <%= msToMinSec(song.duration) %> </td>
+          <td>
+              <form id="addSong<%=ind%>" action="/recommendations/seed_track" method="post" data-remote="true">
+                <button class="button button6" type="submit" >
+                    <i class="fa fa-plus"></i>
+                </button>
+                  <input type="hidden" name="source_id" value=<%= song.source_id %> >
+              </form>
+          </td>
+      </tr>
+    <% end %>
+
+
+    <% elsif @search_artists %>
+    <!-- ARTISTS -->
+        <tr>
+          <th style="font-weight:normal;font-size:1.1em">Name</th>
+          <th style="font-weight:normal;font-size:1.1em">Genres</th>
+          <th></th>
+      </tr>
+
+      <% @search_artists.each_with_index do |artist, ind| %>
+        <tr>
+            <td> <%= artist.name %> </td>
+            <td> <%= artist.genres.join(", ") %> </td>
+            <td>
+              <form id="addSong<%=ind%>" action="/recommendations/seed_artist" method="post" data-remote="true">
+                <button class="button button6" type="submit" >
+                    <i class="fa fa-plus"></i>
+                </button>
+                  <input type="hidden" name="source_id" value=<%= artist.id %> >
+              </form>
+            </td>
+        </tr>
+
+      <% end %>
+
+    <% else %>
+        nada
+    <% end %>
+
+  </table>
