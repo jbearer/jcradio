@@ -16,12 +16,9 @@
           <td> <%= song.album %> </td>
           <td> <%= msToMinSec(song.duration) %> </td>
           <td>
-              <form id="addSong<%=ind%>" action="/recommendations/seed_track" method="post" data-remote="true">
-                <button class="button button6" type="submit" >
-                    <i class="fa fa-plus"></i>
-                </button>
-                  <input type="hidden" name="source_id" value=<%= song.source_id %> >
-              </form>
+              <button class="button button6" type="submit", onclick='add_track_to_seeds("<%= song.title %>", "<%= song.source_id %>")' >
+                  <i class="fa fa-plus"></i>
+              </button>
           </td>
       </tr>
     <% end %>
@@ -40,12 +37,9 @@
             <td> <%= artist.name %> </td>
             <td> <%= artist.genres.join(", ") %> </td>
             <td>
-              <form id="addSong<%=ind%>" action="/recommendations/seed_artist" method="post" data-remote="true">
-                <button class="button button6" type="submit" >
+                <button class="button button6" type="submit", onclick='add_artist_to_seeds("<%= artist.name %>", "<%= artist.id %>")' >
                     <i class="fa fa-plus"></i>
                 </button>
-                  <input type="hidden" name="source_id" value=<%= artist.id %> >
-              </form>
             </td>
         </tr>
 

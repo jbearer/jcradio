@@ -67,38 +67,6 @@ class RecommendationsController < ApplicationController
         end
     end
 
-    def seed_track
-        song = Song.get "Spotify", params[:source_id]
-
-        # Run the code in recommendations/seed_track.js.erb.  This will append
-        respond_to do |format|
-            format.js { render(
-                file: "recommendations/seeds.js.erb",
-                :locals => {
-                    name: song.title,
-                    category: "track",
-                    source_id: song.source_id
-                })
-            }
-        end
-    end
-
-    def seed_artist
-        # Todo: cache the result so we're not redoing the search
-        artist = RSpotify::Artist.find([params[:source_id]]).first
-        # Run the code in recommendations/seed_track.js.erb.  This will append
-        respond_to do |format|
-            format.js { render(
-                file: "recommendations/seeds.js.erb",
-                :locals => {
-                    name: artist.name,
-                    category: "artist",
-                    source_id: params[:source_id]
-                })
-            }
-        end
-    end
-
     def new
         #@recommendation = Recommendation.new
     end

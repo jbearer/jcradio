@@ -32,8 +32,6 @@ Rails.application.routes.draw do
 
   get "/recommendations/search", to: "recommendations#search"
   get "/recommendations/suggest", to: "recommendations#suggest"
-  post "/recommendations/seed_track", to: "recommendations#seed_track"
-  post "/recommendations/seed_artist", to: "recommendations#seed_artist"
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

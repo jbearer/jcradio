@@ -42,6 +42,10 @@
   the song search, which contains another form.  Html doesn't support
   nested forms.
 -->
+<template id=seed_form_template>
+<input type="hidden" id="template_source_id" name="source_id[]" >
+<input type="hidden" id="template_category" name="category[]" >
+</template>
 <div id="hidden-seeds"> </div>
 
 
@@ -127,6 +131,27 @@ function show_slider(name) {
 
 function set_search_category(type) {
   document.getElementById("seed-category").value = type
+}
+
+function add_artist_to_seeds(artist, source_id) {
+  add_seed(artist, "artist", source_id);
+}
+
+function add_track_to_seeds(track, source_id) {
+  add_seed(track, "track", source_id);
+}
+
+function add_seed(name, category, source_id) {
+  // Add the seed to the form using the template
+  var temp = document.getElementById("seed_form_template");
+  var clon = temp.content.cloneNode(true);
+
+  clon.getElementById('template_source_id').value = source_id;
+  clon.getElementById('template_category').value = category;
+  $("#hidden-seeds").append(clon);
+
+  // Show the seed in the list of "Current seeds"
+  $("#current-seeds tbody").append("<tr><td> " + name + " </td></tr>")
 }
 
 </script>
