@@ -19,4 +19,16 @@ module RecommendationsHelper
         ]
     end
 
+    def spotify_number_of_tracks(user_id)
+        limit = 1
+        offset = 0
+        url = "me/tracks?limit=#{limit}&offset=#{offset}"
+        response = RSpotify::User.oauth_get(user_id, url)
+        json = RSpotify.raw_response ? JSON.parse(response) : response
+        total = json['total']
+
+        return total
+    end
+
+
 end

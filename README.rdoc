@@ -31,22 +31,19 @@ TODO
         Hide queue option
         ~~ tell you if a song was recently played ~~
         Recommendations
-            Put seeds search in a scrollable window
             Encorporate min and max in audio features
-            Filter by first letter
             Prepoulate text with your next letter
             Add options for
-                Random song from my library
-                Random song I liked
                 Random song I played
-                Last played songs from the queue
-                Last song I chose
             Remove a seed
             Errors if
                 you don't have any seeds
                 you have over five seeds
+                it can't find any results
+                you put a bad first letter in
             Encorporate genre seeds?
             Button to add to queue
             Put final result in some sort of box
+            Show list of final candidates
 
 

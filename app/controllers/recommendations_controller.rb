@@ -1,6 +1,7 @@
 class RecommendationsController < ApplicationController
 
     include RecommendationsHelper
+    include SongsHelper
 
     # GET /recommendations
     def suggest
@@ -32,17 +33,32 @@ class RecommendationsController < ApplicationController
             end
         end
 
+        if not params[:search]
+            # Log a useful message
+            return
+        end
+        target_letter = params[:search][0].upcase
+
         recommendations = RSpotify::Recommendations.generate(
-            limit: 20,
+            limit: 100,
             seed_tracks: seed_tracks,
             seed_artists: seed_artists,
             **symbol_options
         )
 
+        recommendations.tracks.each do |rec|
+            if SongsHelper.first_letter(rec.name) == target_letter then
+                @recommendation = rec
+                break
+            end
+        end
+
+        if not @recommendation
+            # Log useful message
+            return
+        end
+
         puts recommendations.tracks.length
-
-        @recommendation = recommendations.tracks[0]
-
         puts @recommendation.name
 
         respond_to do |format|
@@ -64,6 +80,75 @@ class RecommendationsController < ApplicationController
         # in recommendations/_search_results.html.erb
         respond_to do |format|
             format.js
+        end
+    end
+
+    # Add a seed based on the station or user's history
+    def add_seed
+        recency = params[:recency]
+        category = params[:category]
+        source = params[:source]
+
+        entry = nil
+
+        if source == "my_spotify_library" then
+
+            client_spotify = $client_spotifies[current_user.username]
+            if not client_spotify then
+                fail "Not logged into spotify"
+            end
+
+            # I _think_ that tracks are sorted in order of saved, but it's not in the docs
+            if recency == "last" then
+                offset = 0
+            else
+                total = spotify_number_of_tracks(client_spotify.id)
+                offset = rand(0..total-1)
+            end
+            track = client_spotify.saved_tracks(limit: 1, offset: offset).first
+
+            if category == "track" then
+                name = track.name
+                source_id = track.id
+            else
+                artist = track.artists.first
+                name = artist.name
+                source_id = artist.id
+            end
+
+        else
+            index = nil
+
+            if source == "my_chosen_songs" then
+                index = QueueEntry.where(selector_id: current_user.id)
+            elsif source == "my_upvoted_songs" then
+                index = QueueEntry.select("queue_entries.*, upvotes.*").joins(:upvotes)
+                index = index.where("upvotes.upvoter_id = ?", current_user.id)
+            else # all songs
+                index = QueueEntry.select("*")
+            end
+
+            if recency == "last" then
+                entry = index.order("queue_entries.id DESC").first
+            else
+                entry = index.order('RANDOM()').first
+            end
+
+            if category == "track" then
+                name = entry.song.title
+                source_id = entry.song.source_id
+            else
+                # unfortunately we don't store the artist source_id.  TODO: Add to the index
+                sourceTrack = RSpotify::Track.find(entry.song.source_id)
+                artist = sourceTrack.artists.first
+                name = artist.name
+                source_id = artist.id
+            end
+        end
+
+        respond_to do |format|
+            format.js { render "add_seed", :locals => {
+                                :name => name, :source_id => source_id, :category => category}}
         end
     end
 

@@ -550,8 +550,8 @@
 	span.audio-feature {
 		display: inline-block;
 		width: 250px;
-		height: 60px;
-		padding: 10px;
+		height: 70px;
+		padding: 5px;
 		margin-top: 5px;
 		vertical-align: top;
 		text-align: center;
@@ -573,9 +573,39 @@
 	.search-seeds {
 		width: 70%;
 		/* background-repeat: no-repeat; */
+		background-color: rgba(0, 0, 0, 0.1);
+		background-blend-mode: darken;
+		border-radius: 15px;
 		text-align: center;
 		/* float: right; */
 		/* color: #92dce5; */
 		/* padding-top: 70px; */
-		/* padding-bottom: 75px; */
+		padding-bottom: 75px;
+		background-clip: content-box;
+	  }
+
+	/* Scrollable table */
+	  .fixed_header tbody{
+		display:block;
+		overflow:auto;
+		height:400px;
+		width:100%;
+	  }
+
+
+	/* Copy the same scrollbar as used for the normal body */
+	  .fixed_header tbody::-webkit-scrollbar {
+		width: 0.5em;
+	  }
+
+	  .fixed_header tbody::-webkit-scrollbar-thumb {
+		background: linear-gradient(220deg, #e2f1af 0%, #92dce5 50%);
+		border-style: solid;
+		border-radius: 1em;
+		border-color: black;
+		/*border-width: thin;*/
+	  }
+
+	  .fixed_header tbody::-webkit-scrollbar-track-piece{
+		  background: black;
 	  }

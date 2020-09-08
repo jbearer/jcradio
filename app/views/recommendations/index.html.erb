@@ -1,7 +1,71 @@
 
+<div>
+    <h2> Seeds </h2>
+
+    <div class="column seeds">
+      <div id="current-seeds">
+        <div class="userlist">
+
+          <table>
+              <p> Current seeds </p>
+              <tbody>
+
+              </tbody>
+          </table>
+        </div>
+      </div>
+      <div>
+        <form action="/recommendations/add_seed" method="post" data-remote="true">
+          <p> Category </p>
+          <input type="radio" name="category" value="track">
+            <label for="track">Track</label>
+          <input type="radio" name="category" value="artist">
+            <label for="artist">Artist</label>
+
+          <p> Time </p>
+          <input type="radio" name="recency" value="random">
+            <label for="random">Random</label>
+          <input type="radio" name="recency" value="last">
+            <label for="last">Most Recent</label>
+
+          <p> Source </p>
+          <input type="radio" name="source" value="all_songs">
+            <label for="all_songs">All Chosen Songs</label><br>
+          <input type="radio" name="source" value="my_chosen_songs">
+            <label for="my_chosen_songs">Songs Chosen by Me</label><br>
+          <input type="radio" name="source" value="my_upvoted_songs">
+            <label for="my_upvoted_songs">Songs Upvoted by Me</label><br>
+          <input type="radio" name="source" value="my_spotify_library">
+            <label for="my_spotify_library">My Spotify Library</label><br>
+
+          <button type="submit"> Add Seed </button>
+        </form>
+      </div>
+    </div>
+    <div class="column search-seeds" style="height:500px">
+      <form action="/recommendations/search", method="get", data-remote="true">
+        <div class="search-container">
+            <input type="text" placeholder="Search..." name="query"
+               <% if @query %>
+                value="<%= @query %>"
+               <% end %>
+            >
+            <button class="button button2" type="submit", onclick="set_search_category('track')">Track</button>
+            <button class="button button2" type="submit", onclick="set_search_category('artist')">Artist</button>
+      </div>
+        <input type="hidden" id="seed-category" name="category" value="track">
+      </form>
+
+    <div id="search-results">
+      <!-- This is where search results go -->
+    </div>
+
+  </div>
+</div>
+
+<div align="center">
+
 <form action="/recommendations/suggest", method="get", data-remote="true">
-<%= text_field_tag :search, params[:search], :placeholder => "First letter..." %>
-<%= submit_tag "Search", :name => nil %>
 
   <h2> Audio Features </h2>
   <div align="left">
@@ -48,47 +112,13 @@
 </template>
 <div id="hidden-seeds"> </div>
 
+<br>
+
+<%= text_field_tag :search, params[:search], :placeholder => "First letter..." %>
+<%= submit_tag "Search", :name => nil %>
+
 
 </form>
-
-<row>
-    <h2> Seeds </h2>
-
-    <div class="column seeds">
-      <div id="current-seeds">
-        <div class="userlist">
-
-          <table>
-              <p> Current seeds </p>
-              <tbody>
-
-              </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-    <div class="column search-seeds">
-      <form action="/recommendations/search", method="get", data-remote="true">
-        <div class="search-container">
-            <input type="text" placeholder="Search..." name="query"
-               <% if @query %>
-                value="<%= @query %>"
-               <% end %>
-            >
-            <button class="button button2" type="submit", onclick="set_search_category('track')">Track</button>
-            <button class="button button2" type="submit", onclick="set_search_category('artist')">Artist</button>
-      </div>
-        <input type="hidden" id="seed-category" name="category" value="track">
-      </form>
-
-    <div id="search-results">
-      this is where the search results will go
-    </div>
-
-  </div>
-</row>
-
-<div align="center">
 
 <br>
 <br>
@@ -98,6 +128,8 @@ Your song is:
 <div id="suggestion">
   hi
 </div>
+
+<br><br><br><br>
 
 <script>
 function update_slider(name, scale) {
