@@ -8,8 +8,15 @@
 
           <table>
               <p> Current seeds </p>
+              <template id=seed_name_template>
+                <tr>
+                  <td id=seed_name> </td>
+                  <td> <button id="seed_remove_button" type="submit" class="button button6">
+                    <i class="fa fa-minus"></i>
+                  </td>
+                </tr>
+              </template>
               <tbody>
-
               </tbody>
           </table>
         </div>
@@ -107,8 +114,10 @@
   nested forms.
 -->
 <template id=seed_form_template>
-<input type="hidden" id="template_source_id" name="source_id[]" >
-<input type="hidden" id="template_category" name="category[]" >
+  <div>
+    <input type="hidden" id="template_source_id" name="source_id[]" >
+    <input type="hidden" id="template_category" name="category[]" >
+  </div>
 </template>
 <div id="hidden-seeds"> </div>
 
@@ -174,16 +183,42 @@ function add_track_to_seeds(track, source_id) {
 }
 
 function add_seed(name, category, source_id) {
-  // Add the seed to the form using the template
-  var temp = document.getElementById("seed_form_template");
-  var clon = temp.content.cloneNode(true);
 
-  clon.getElementById('template_source_id').value = source_id;
-  clon.getElementById('template_category').value = category;
-  $("#hidden-seeds").append(clon);
+  // make sure we don't exceed the limit
+  num_seeds = $("#current-seeds tbody").get(0).children.length
+  if (num_seeds >= 5) {
+    alert("Can't have more than 5 seeds")
+    return
+  }
+
+  // Add the seed to the form using the template
+  var form_template = document.getElementById("seed_form_template");
+  var form_clone = form_template.content.cloneNode(true);
+
+  form_clone.children[0].id = source_id + '_form'
+
+  form_clone.getElementById('template_source_id').value = source_id;
+  form_clone.getElementById('template_category').value = category;
+  $("#hidden-seeds").append(form_clone);
+
 
   // Show the seed in the list of "Current seeds"
-  $("#current-seeds tbody").append("<tr><td> " + name + " </td></tr>")
+  var name_template = document.getElementById("seed_name_template");
+  var name_clone = name_template.content.cloneNode(true);
+
+  name_clone.children[0].id = source_id + '_name'
+
+  name_clone.getElementById('seed_name').innerHTML = name;
+  name_clone.getElementById('seed_remove_button').onclick = function(){remove_seed(source_id)};
+
+  $("#current-seeds tbody").append(name_clone)
+}
+
+function remove_seed(source_id) {
+
+  document.getElementById(`${source_id}_name`).remove()
+  document.getElementById(`${source_id}_form`).remove()
+
 }
 
 </script>

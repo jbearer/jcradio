@@ -35,10 +35,8 @@ TODO
             Prepoulate text with your next letter
             Add options for
                 Random song I played
-            Remove a seed
             Errors if
                 you don't have any seeds
-                you have over five seeds
                 it can't find any results
                 you put a bad first letter in
             Encorporate genre seeds?
