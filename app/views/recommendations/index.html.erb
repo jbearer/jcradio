@@ -130,7 +130,7 @@
 <br>
 <h2> Recommendations by First Letter </h2>
 
-    <form action="/songs/search", id="submit-suggestion", method="get", data-remote="true">
+    <form action="/songs/inline_search", id="submit-suggestion", method="get", data-remote="true">
       <input type="text" name="query" value="<%= $the_next_letter %>" style="width:40px">
       <button class="button button3" onclick="validateArgs()">
         <i class="fa fa-search">

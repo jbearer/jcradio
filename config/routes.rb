@@ -11,6 +11,7 @@ Rails.application.routes.draw do
 
   resources :songs, only: [:index]
   get "/songs/search", to: "songs#search"
+  get "/songs/inline_search", to: "songs#inline_search"
 
   resources :stations, only: [:index, :show]
   post "/stations/:id", to: 'stations#update'

@@ -1,10 +1,10 @@
 <div class="search-container">
-    <form action="/songs/search", method="get", data-remote="true">
-      <input type="text" placeholder="Search..." name="query">
+    <form action="/songs/inline_search", method="get", data-remote="true">
+      <input type="text" placeholder="Search..." name="query" value="<%= @query ? @query : '' %> ">
       <button class="button button3" type="submit"><i class="fa fa-search"></i></button>
     </form>
  </div>
 
 <div id="search-results">
-  <!-- This is where search results go -->
+  <%= render partial: 'songs/search_results', :locals => {songs: songs} %>
 </div>
