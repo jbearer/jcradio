@@ -27,21 +27,11 @@ TODO
         Music progress bar
         Plots
         SQL query
-        ~~ liking a song could save it to spotify liked songs ~~
         Hide queue option
-        ~~ tell you if a song was recently played ~~
         Recommendations
             Encorporate min and max in audio features
-            Prepoulate text with your next letter
-            Add options for
-                Random song I played
-            Errors if
-                you don't have any seeds
-                it can't find any results
-                you put a bad first letter in
             Encorporate genre seeds?
-            Button to add to queue
-            Put final result in some sort of box
-            Show list of final candidates
-
+            Add loading icon
+            Increment "last" counter
+            Properly validate results, instead of having the server throw an error
 

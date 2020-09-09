@@ -3,11 +3,12 @@
     <h2> Seeds </h2>
 
     <div class="column seeds">
+
+    <!-- CURRENT SEEDS TABLE -->
       <div id="current-seeds">
         <div class="userlist">
-
           <table>
-              <p> Current seeds </p>
+              <p> Current Seeds </p>
               <template id=seed_name_template>
                 <tr>
                   <td id=seed_name> </td>
@@ -21,6 +22,8 @@
           </table>
         </div>
       </div>
+
+    <!-- SEED BY HISTORY FORM -->
       <div>
         <form action="/recommendations/add_seed" method="post" data-remote="true">
           <p> Category </p>
@@ -49,7 +52,9 @@
         </form>
       </div>
     </div>
-    <div class="column search-seeds" style="height:500px">
+
+  <!-- SEARCH FOR SEEDS -->
+    <div class="column search-seeds" style="height:450px">
       <form action="/recommendations/search", method="get", data-remote="true">
         <div class="search-container">
             <input type="text" placeholder="Search..." name="query"
@@ -72,6 +77,7 @@
 
 <div align="center">
 
+<!-- AUDIO FEATURES -->
 <form action="/recommendations/suggest", method="get", data-remote="true">
 
   <h2> Audio Features </h2>
@@ -122,25 +128,30 @@
 <div id="hidden-seeds"> </div>
 
 <br>
+<h2> Recommendations by First Letter </h2>
 
-<%= text_field_tag :search, params[:search], :placeholder => "First letter..." %>
-<%= submit_tag "Search", :name => nil %>
+    <form action="/songs/search", id="submit-suggestion", method="get", data-remote="true">
+      <input type="text" name="query" value="<%= $the_next_letter %>" style="width:40px">
+      <button class="button button3" onclick="validateArgs()">
+        <i class="fa fa-search">
+      </i></button>
+    </form>
 
 
 </form>
 
 <br>
 <br>
-Your song is:
-<br>
 
-<div id="suggestion">
-  hi
+<div id="suggestions">
+
 </div>
 
 <br><br><br><br>
 
 <script>
+
+
 function update_slider(name, scale) {
 
     var slider = document.getElementById(name + "_slider");
@@ -219,6 +230,22 @@ function remove_seed(source_id) {
   document.getElementById(`${source_id}_name`).remove()
   document.getElementById(`${source_id}_form`).remove()
 
+}
+
+function validateArgs() {
+  num_seeds = $("#current-seeds tbody").get(0).children.length
+  if (num_seeds >= 5) {
+    alert("Can't have more than 5 seeds")
+    return
+  }
+
+  if (num_seeds < 1) {
+    alert("Must have at least 1 seed")
+    return
+  }
+
+  // TODO: Actual submit the form if we succeed,
+  // and don't submit if validation fails
 }
 
 </script>

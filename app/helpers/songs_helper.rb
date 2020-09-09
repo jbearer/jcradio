@@ -88,4 +88,29 @@ module SongsHelper
       return alphabet.sample
     end
 
+    def self.get_or_create_from_spotify_record(song, persist=false)
+      result = Song.where(source: "Spotify", source_id: song.id).first
+      if result
+          return result
+      end
+
+      data = {
+          title: song.name,
+          artist: song.artists.first.name,
+          album: song.album.name,
+          source: "Spotify",
+          source_id: song.id,
+          uri: song.uri,
+          duration: song.duration_ms,
+          first_letter: SongsHelper.first_letter(song.name),
+          next_letter: SongsHelper.calculate_next_letter(song.name)
+      }
+
+      if persist then
+          Song.create data
+      else
+          Song.new data
+      end
+  end
+
 end

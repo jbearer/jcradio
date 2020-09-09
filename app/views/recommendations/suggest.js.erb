@@ -1,1 +1,1 @@
-$("#suggestion").html("<%= 'your recommendation is ' + @recommendation.name + ' by ' +  @recommendation.artists.first.name %>")
+$("#suggestions").html("<%= j render partial: 'songs/search_results', :locals => {songs: songs} %>")

@@ -11,6 +11,11 @@ class RecommendationsController < ApplicationController
             if params["use_" + feature[:name]] then
                 raw_value = params[feature[:name]]
                 value = raw_value.to_f / feature[:scale]
+                # Some spotify values must be integers.
+                # If so, then "value" will be an integer
+                if value.to_i == value then
+                    value = value.to_i
+                end
                 options["target_" + feature[:name]] = value
             end
         end
@@ -33,12 +38,6 @@ class RecommendationsController < ApplicationController
             end
         end
 
-        if not params[:search]
-            # Log a useful message
-            return
-        end
-        target_letter = params[:search][0].upcase
-
         recommendations = RSpotify::Recommendations.generate(
             limit: 100,
             seed_tracks: seed_tracks,
@@ -46,23 +45,17 @@ class RecommendationsController < ApplicationController
             **symbol_options
         )
 
+        songs = []
+
         recommendations.tracks.each do |rec|
-            if SongsHelper.first_letter(rec.name) == target_letter then
-                @recommendation = rec
-                break
+            if params[:query] == "" or params[:query] == SongsHelper.first_letter(rec.name) then
+                songs.append(SongsHelper.get_or_create_from_spotify_record rec)
             end
         end
 
-        if not @recommendation
-            # Log useful message
-            return
-        end
-
-        puts recommendations.tracks.length
-        puts @recommendation.name
-
         respond_to do |format|
-            format.js
+            format.js { render "suggest", :locals => {
+                :songs => songs}}
         end
     end
 

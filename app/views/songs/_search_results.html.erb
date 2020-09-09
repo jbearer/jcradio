@@ -1,0 +1,127 @@
+<table>
+
+    <% if not songs.empty? then %>
+    <tr>
+        <th>Song</th>
+        <th>Artist</th>
+        <th>Album</th>
+        <th>Duration</th>
+        <th></th>
+    </tr>
+
+        <% songs.each_with_index do |song, ind| %>
+
+            <tr>
+                <td> <%= song.title %> </td>
+                <td> <%= song.artist %> </td>
+                <td> <%= song.album %> </td>
+                <td> <%= msToMinSec(song.duration) %> </td>
+                <td>
+                    <% if logged_in? and current_user.can_add_to_queue %>
+                        <button class="button button6" onclick="confirmSong(<%=ind%>,<%= song.to_json %>)" >
+                            <i class="fa fa-plus"></i>
+                        </button>
+                        <form id="addSong<%=ind%>" action=<%="/stations/#{current_user.station.id}"%> method="post">
+                            <input type="hidden" name="source_id" value=<%= song.source_id %> >
+                            <input type="hidden" id="song_next_letter_input_<%=ind%>" name="song_next_letter" >
+                        </form>
+
+                    <% end %>
+                </td>
+            </tr>
+
+        <% end %>
+
+
+</table>
+
+<!-- Show More Songs Button -->
+<br>
+<button class="button button8" type="submit">Show More</button>
+
+<% else %>
+
+  <h2> No results found </h2>
+
+<% end %>
+
+
+
+
+<!-- Confirm Song Popup -->
+<script>
+
+function confirmSong(ind, song) {
+
+        const next_letter = '<%= $the_next_letter %>';
+        const threshold = 1000 * 60 * 60 * 24 * 7; // 1 week
+        const time_diff = song.last_played
+                            ? Date.now() - song.last_played
+                            : Number.MAX_SAFE_INTEGER;
+
+        var time_warning = "";
+        if (time_diff < threshold) {
+          time_warning = ` <p style="color:yellow;"> Warning: Song has been chosen within the last week! </p> `;
+        }
+
+        var letter_warning = "";
+        if (next_letter != "_" && song.first_letter != "_" && song.first_letter != next_letter) {
+          letter_warning = ` <p style=color:yellow;>
+                              Warning: Song "${song.title}" starts with "${song.first_letter}"
+                                instead of your assigned letter "${next_letter}"!
+                             </p> `;
+        }
+
+        var warnings = "";
+        if (time_warning != "" || letter_warning != "") {
+          warnings = "<div class='dialog-msg'>" +
+                          time_warning +
+                          letter_warning +
+                      "</div>";
+        }
+
+        var confirm_message = " <p> Add \"" + song.title + "\" by " + song.artist + " to queue? </p> ";
+
+        var content = `<div class='dialog-ovelay'>
+                          <div class='dialog'>
+                      <div class='dialog-msg'>
+                          ${confirm_message}
+                      </div>
+                      ${warnings}
+                      <div class='dialog-msg'>
+                          <p>Next Letter</p>
+                          <input type='text' id='nextLetterInput' value=${song.next_letter} />
+                      </div>
+                      <div class='controls'>
+                          <button class='button button2 doAction'>Yes</button>
+                          &nbsp; &nbsp;
+                          <button class='button button2 cancelAction'>No</button>
+                      </div>
+                    </div>
+                  </div>; `
+
+         $('body').prepend(content);
+
+         // Add Song To Queue
+      $('.doAction').click(function () {
+        document.getElementById("song_next_letter_input_"+ind).value = document.getElementById("nextLetterInput").value
+        document.getElementById("addSong"+ind).submit();
+        console.log(document.getElementById("nextLetterInput").value)
+        console.log(document.getElementById("song_next_letter_input_"+ind).value)
+
+        $(this).parents('.dialog-ovelay').fadeOut(500, function () {
+          $(this).remove();
+        });
+      });
+
+      // Close Dialog Box
+      $('.cancelAction, .fa-close').click(function () {
+        $(this).parents('.dialog-ovelay').fadeOut(500, function () {
+          $(this).remove();
+        });
+      });
+
+   }
+
+
+</script>
