@@ -3,6 +3,7 @@ $client_spotifies = {}
 class StationsController < ApplicationController
 
     include SongsHelper
+    include StationsHelper
 
     before_action :set_station, only: [:show, :change_queue_pos, :edit_queue_pos]
 
@@ -95,7 +96,6 @@ class StationsController < ApplicationController
         # Notify the next user that it's their turn to pick a song.
         next_user = station.users.order(:position)[0]
         $the_next_letter = params[:song_next_letter].capitalize()[0]
-        # $the_next_letter = SongsHelper.calculate_next_letter(params[:title])
         broadcast :next_up, next_user, $the_next_letter
 
         json_ok
@@ -193,6 +193,7 @@ module Magique
 
   class TitleExtractorWorker
     include Magique::Worker
+    include LiveRPC
 
     def perform(station)
 
@@ -233,7 +234,14 @@ module Magique
 
                     begin
                         # Update the queue with the new song.
-                        Station.find(1).next_song(Song.get("Spotify", this_song.id))
+                        result = Station.find(1).next_song(Song.get("Spotify", this_song.id))
+
+                        song = result[0]
+                        progress_ms = result[1]
+
+                        # TODO: Not sure how to call the broadcast in ApplicationController
+                        LiveRPC.broadcast("on_new_song", [song.duration, progress_ms])
+
                     rescue => e
                         Rails.logger.error e.message
                         e.backtrace.each { |line| Rails.logger.error line }

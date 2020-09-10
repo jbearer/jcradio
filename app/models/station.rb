@@ -3,6 +3,8 @@ class Station < ActiveRecord::Base
     belongs_to :now_playing, class_name: "QueueEntry"
     has_many :users
 
+    include StationsHelper
+
     def queue
         if self.queue_pos
             return QueueEntry.where(station: self).where.not(position: nil).where("position >= ?", self.queue_pos).order(:position)
@@ -115,6 +117,10 @@ class Station < ActiveRecord::Base
         users.each do |user|
             user.notify :next_song, entry
         end
+
+        progress_ms = StationsHelper.get_progress_ms
+
+        return [song, progress_ms]
     end
 
     def internal_spotify_add_to_queue(uri)

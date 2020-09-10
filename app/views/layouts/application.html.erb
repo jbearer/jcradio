@@ -123,8 +123,6 @@
                 <span id="current-time"></span>
                 <canvas id="progress" width="500" height="5"></canvas>
 
-                <audio id="audio" ontimeupdate="updateBar()"
-                </audio>
                 <span id="duration"></span>
                 <br>
             </div>
@@ -158,13 +156,14 @@
             var canvas = document.getElementById("progress").getContext('2d');
             var ctrl = document.getElementById('audioControl');
 
-            audioEl.addEventListener('loadedmetadata', function() {
-              var duration = audioEl.duration;
-              var currentTime = audioEl.currentTime;
-              document.getElementById("duration").innerHTML = convertElapsedTime(duration);
-              document.getElementById("current-time").innerHTML = convertElapsedTime(currentTime);
-              canvas.fillRect(0, 0, canvasWidth, 50);
-            });
+            var songDuration = 0;
+            var endTime = 0;
+
+            function setSongStats(duration_ms, curr_pos_ms) {
+                var curr_time = Date.now();
+                songDuration = duration_ms;
+                endTime = curr_time + duration_ms - curr_pos_ms;
+            }
 
             function togglePlaying() {
 
@@ -185,21 +184,34 @@
 
             }
 
+            window.setInterval(updateBar, 100);
+
+            <% if logged_in? && $spotify_user %>
+
+              setSongStats(<%= current_user.station.now_playing.song.duration %>, <%= StationsHelper.get_progress_ms %> );
+
+            <% end %>
+
+
             function updateBar() {
               canvas.clearRect(0, 0, canvasWidth, 50)
               canvas.fillStyle = "#082739";
               canvas.fillRect(0, 0, canvasWidth, 50)
 
-              var currentTime = audioEl.currentTime
-              var duration = audioEl.duration
+              var currentTime = Date.now()
 
-              if (currentTime === duration) {
-                ctrl.innerHTML = "Play"
+              if (currentTime > endTime) {
+                return
               }
 
-              document.getElementById("current-time").innerHTML = convertElapsedTime(currentTime)
+              // if (currentTime === duration) {
+              //   ctrl.innerHTML = "Play"
+              // }
+              msInSong = songDuration - (endTime - currentTime)
+              secondsInSong = msInSong*1.0 / 1000
+              document.getElementById("current-time").innerHTML = convertElapsedTime(secondsInSong)
 
-              var percentage = currentTime / duration
+              var percentage = msInSong / songDuration
               var progress = (canvasWidth * percentage)
               canvas.fillStyle = "#e2f1af"
               canvas.fillRect(0, 0, progress, 50)
