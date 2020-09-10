@@ -3,6 +3,9 @@ class SongsController < ApplicationController
     def index
         @songs = []
         @query = nil
+        render template: "songs/index", :locals => {
+            :songs => @songs
+        }
     end
 
     # GET /songs/search
@@ -21,7 +24,6 @@ class SongsController < ApplicationController
     #   Returns javascript for inline search
     def inline_search
         @songs = Song.spotify_search(params[:query])
-        @query = params[:query]
 
         respond_to do |format|
             format.js { render "search", :locals => {

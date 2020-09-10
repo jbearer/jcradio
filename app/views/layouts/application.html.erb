@@ -109,7 +109,12 @@
           <div class = "columnMus leftMus">
                 <p id="now-playing-title"><%= current_user.station.now_playing.song.title %></p>
                 <span id="now-playing-artist"><%= current_user.station.now_playing.song.artist %></span>
-                <button id="now-playing-upvote" onclick="toggle_upvote(<%= current_user.station.now_playing.id %>)"><i id="upvote" class="fa fa-thumbs<%= current_user.has_upvoted?(current_user.station.now_playing) ? "" : "-o" %>-up fa-lg"></i></button>
+                <button id="now-playing-upvote" onclick="toggle_upvote(<%= current_user.station.now_playing.id %>)">
+                  <i id="upvote" class="fa fa-thumbs<%= current_user.has_upvoted?(current_user.station.now_playing) ? "" : "-o" %>-up fa-lg"></i>
+                </button>
+                <button id="now-playing-spotify-save" onclick="save_song(<%= current_user.station.id %>)">
+                  <i id="spotify-save" class="fa fa-floppy-o fa-lg"></i>
+                </button>
             </div>
 
             <!-- Song Duration -->

@@ -81,6 +81,7 @@ class RecommendationsController < ApplicationController
         recency = params[:recency]
         category = params[:category]
         source = params[:source]
+        idx = params[:last_counter].to_i
 
         entry = nil
 
@@ -93,7 +94,7 @@ class RecommendationsController < ApplicationController
 
             # I _think_ that tracks are sorted in order of saved, but it's not in the docs
             if recency == "last" then
-                offset = 0
+                offset = idx
             else
                 total = spotify_number_of_tracks(client_spotify.id)
                 offset = rand(0..total-1)
@@ -122,9 +123,9 @@ class RecommendationsController < ApplicationController
             end
 
             if recency == "last" then
-                entry = index.order("queue_entries.id DESC").first
+                entry = index.order("queue_entries.id DESC")[idx]
             else
-                entry = index.order('RANDOM()').first
+                entry = index.order('RANDOM()')[idx]
             end
 
             if category == "track" then

@@ -128,6 +128,38 @@ class StationsController < ApplicationController
         return json_ok
     end
 
+    # POST /stations/1/save
+    # Save the currently playing song
+    def save
+        # Upvote in the user's spotify library
+        begin
+            song = current_user.station.now_playing.song
+
+            if $client_spotifies.key?(current_user.username) then
+                song_id = song.source_id
+                tracks = RSpotify::Track.find([song_id])
+
+                user = $client_spotifies[current_user.username]
+                user.save_tracks!(tracks)
+
+                push(Notification.create({
+                    user: current_user,
+                    text: "Added to library: " + song.title
+                }))
+                puts "!!!!!!!! saved song to library !!!!!!!!!!!"
+                render json: {success: true, saved: true}
+            else
+                puts "!!!!!!!! user not associated with spotify acct !!!!!!"
+            end
+        rescue => e
+            puts "!!!!!!!! failed to save song !!!!!!!!!!!"
+            Rails.logger.error e.message
+            e.backtrace.each { |line| Rails.logger.error line }
+        end
+
+        render json: {success: true, saved: false} # is it successful though?
+    end
+
     private
         def set_station
           @station = Station.find(params[:id])

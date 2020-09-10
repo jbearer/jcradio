@@ -1,0 +1,13 @@
+function save_song(id) {
+    $.post(`/stations/${id}/save`, (response) => {
+        set_save_icon(response.saved);
+    });
+}
+
+function set_save_icon(saved) {
+    if (saved) {
+        $("#spotify-save").attr("class", "fa fa-floppy-o fa-lg");
+    } else {
+        $("#spotify-save").attr("class", "fa fa-floppy-o fa-lg");
+    }
+}

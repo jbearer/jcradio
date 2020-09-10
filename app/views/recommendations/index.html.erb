@@ -25,21 +25,21 @@
 
     <!-- SEED BY HISTORY FORM -->
       <div>
-        <form action="/recommendations/add_seed" method="post" data-remote="true">
+        <form action="/recommendations/add_seed" id="add_seed_form" method="post" data-remote="true">
           <p> Category </p>
-          <input type="radio" name="category" value="track">
+          <input type="radio" name="category" value="track" checked="true">
             <label for="track">Track</label>
           <input type="radio" name="category" value="artist">
             <label for="artist">Artist</label>
 
           <p> Time </p>
-          <input type="radio" name="recency" value="random">
+          <input type="radio" name="recency" value="random" checked="true">
             <label for="random">Random</label>
           <input type="radio" name="recency" value="last">
             <label for="last">Most Recent</label>
 
           <p> Source </p>
-          <input type="radio" name="source" value="all_songs">
+          <input type="radio" name="source" value="all_songs" checked="true">
             <label for="all_songs">All Chosen Songs</label><br>
           <input type="radio" name="source" value="my_chosen_songs">
             <label for="my_chosen_songs">Songs Chosen by Me</label><br>
@@ -48,7 +48,10 @@
           <input type="radio" name="source" value="my_spotify_library">
             <label for="my_spotify_library">My Spotify Library</label><br>
 
-          <button type="submit"> Add Seed </button>
+          <input type="hidden" name="last_counter" id="last_counter">
+            <!-- Value is set by increment_last_counter() -->
+
+          <button onclick="increment_last_counter()"> Add Seed </button>
         </form>
       </div>
     </div>
@@ -130,9 +133,9 @@
 <br>
 <h2> Recommendations by First Letter </h2>
 
-    <form action="/songs/inline_search", id="submit-suggestion", method="get", data-remote="true">
+    <form id="submit-suggestion" action="/songs/inline_search" method="get" data-remote="true">
       <input type="text" name="query" value="<%= $the_next_letter %>" style="width:40px">
-      <button class="button button3" onclick="validateArgs()">
+      <button type="button" class="button button3" onclick="validateArgs()">
         <i class="fa fa-search">
       </i></button>
     </form>
@@ -193,13 +196,51 @@ function add_track_to_seeds(track, source_id) {
   add_seed(track, "track", source_id);
 }
 
-function add_seed(name, category, source_id) {
+// If you add "Most Recent" a bunch of times in a row, it should
+// Add the last, second-to-last, third-to-last, etc
+var last_counter = {
+    "all_songs": 0,
+    "my_chosen_songs": 0,
+    "my_upvoted_songs": 0,
+    "my_spotify_library": 0,
+};
 
-  // make sure we don't exceed the limit
+function check_seed_limit() {
+  // make sure we don't "exseed" the limit
   num_seeds = $("#current-seeds tbody").get(0).children.length
   if (num_seeds >= 5) {
     alert("Can't have more than 5 seeds")
-    return
+    return false;
+  }
+  return true;
+}
+
+function increment_last_counter(source) {
+  if (!check_seed_limit()) {
+    return;
+  }
+  var recency = document.getElementsByName("recency");
+
+  if (recency[1].checked) {
+    // We chose the "Most Recent" option
+
+    var sources = document.getElementsByName("source");
+
+    for (i = 0; i < sources.length; i++) {
+      if (sources[i].checked) {
+        source = sources[i].value;
+        document.getElementById("last_counter").value = last_counter[source];
+        ++last_counter[source];
+      }
+    }
+  }
+  // Submit the event, tagged with data-remote
+  $("add_seed_form").trigger('submit.rails')
+}
+
+function add_seed(name, category, source_id) {
+  if (!check_seed_limit()) {
+    return;
   }
 
   // Add the seed to the form using the template
@@ -236,16 +277,16 @@ function validateArgs() {
   num_seeds = $("#current-seeds tbody").get(0).children.length
   if (num_seeds >= 5) {
     alert("Can't have more than 5 seeds")
-    return
+    return;
   }
 
   if (num_seeds < 1) {
     alert("Must have at least 1 seed")
-    return
+    return;
   }
 
-  // TODO: Actual submit the form if we succeed,
-  // and don't submit if validation fails
+  // Submit the event, tagged with data-remote
+  $("#submit-suggestion").trigger('submit.rails')
 }
 
 </script>

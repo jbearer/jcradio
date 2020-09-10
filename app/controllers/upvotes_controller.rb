@@ -15,31 +15,6 @@ class UpvotesController < ApplicationController
             render json: { success: true, upvoted: false }
         else
             Upvote.create upvoter: current_user, queue_entry: entry
-
-            # Upvote in the user's spotify library
-            begin
-                if $client_spotifies.key?(current_user.username) then
-                    song_id = entry.song.source_id
-                    tracks = RSpotify::Track.find([song_id])
-
-                    user = $client_spotifies[current_user.username]
-                    user.save_tracks!(tracks)
-
-                    push(Notification.create({
-                        user: current_user,
-                        text: "Added to library: " + entry.song.title
-                    }))
-                    puts "!!!!!!!! saved song to library !!!!!!!!!!!"
-
-                else
-                    puts "!!!!!!!! user not associated with spotify acct !!!!!!"
-                end
-            rescue => e
-                puts "!!!!!!!! failed to save song !!!!!!!!!!!"
-                Rails.logger.error e.message
-                e.backtrace.each { |line| Rails.logger.error line }
-            end
-
             render json: { success: true, upvoted: true }
         end
     end

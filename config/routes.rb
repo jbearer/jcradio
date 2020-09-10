@@ -12,10 +12,11 @@ Rails.application.routes.draw do
   resources :songs, only: [:index]
   get "/songs/search", to: "songs#search"
   get "/songs/inline_search", to: "songs#inline_search"
-
+  
   resources :stations, only: [:index, :show]
   post "/stations/:id", to: 'stations#update'
   get "/stations/:id/next", to: 'stations#next'
+  post "/stations/:id/save", to: "stations#save"
 
   resources :chat, only: [:index, :create, :show]
   resources :upvotes, only: [:create]
