@@ -12,6 +12,7 @@ function set_save_icon(saved) {
     }
 }
 
-function on_new_song(duration_ms, curr_pos_ms) {
-    setSongStats(duration_ms, curr_pos_ms);
+function refresh_now_playing(id) {
+    $.post(`/stations/${id}/refresh`, {}, (response) => {
+    });
 }

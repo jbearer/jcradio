@@ -34,3 +34,7 @@ function next_song(queue_entry) {
         toggle_upvote(queue_entry.id);
     });
 }
+
+function update_timing(duration_ms, start_ms) {
+    setSongStats(duration_ms, start_ms);
+}

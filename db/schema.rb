@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20200830005529) do
+ActiveRecord::Schema.define(version: 20200911045223) do
 
   create_table "chat_messages", force: :cascade do |t|
     t.text     "message"
@@ -70,10 +70,11 @@ ActiveRecord::Schema.define(version: 20200830005529) do
 
   create_table "stations", force: :cascade do |t|
     t.string   "name"
-    t.datetime "created_at",     null: false
-    t.datetime "updated_at",     null: false
+    t.datetime "created_at",                     null: false
+    t.datetime "updated_at",                     null: false
     t.integer  "now_playing_id"
     t.integer  "queue_pos"
+    t.integer  "now_playing_start_ms", limit: 8
   end
 
   add_index "stations", ["now_playing_id"], name: "index_stations_on_now_playing_id"

@@ -115,6 +115,9 @@
                 <button id="now-playing-spotify-save" onclick="save_song(<%= current_user.station.id %>)">
                   <i id="spotify-save" class="fa fa-floppy-o fa-lg"></i>
                 </button>
+                <button onclick="refresh_now_playing(<%= current_user.station.id %>)">
+                  <i class="fa fa-refresh fa-lg"></i>
+                </button>
             </div>
 
             <!-- Song Duration -->
@@ -126,6 +129,7 @@
                 <span id="duration"></span>
                 <br>
             </div>
+
 
             <!-- Hidden Audio player, controlled by mute button -->
             <!-- <audio id="iceaudio" autoplay muted src="http://jcradio.ddns.net:8000/rapi.mp3" type="audio/mpeg" hidden></audio> -->
@@ -157,12 +161,11 @@
             var ctrl = document.getElementById('audioControl');
 
             var songDuration = 0;
-            var endTime = 0;
+            var startTime = 0;
 
-            function setSongStats(duration_ms, curr_pos_ms) {
-                var curr_time = Date.now();
+            function setSongStats(duration_ms, start_ms) {
                 songDuration = duration_ms;
-                endTime = curr_time + duration_ms - curr_pos_ms;
+                startTime = start_ms;
             }
 
             function togglePlaying() {
@@ -184,14 +187,13 @@
 
             }
 
-            window.setInterval(updateBar, 100);
+            <% if logged_in? && current_user.station.now_playing %>
 
-            <% if logged_in? && $spotify_user %>
-
-              setSongStats(<%= current_user.station.now_playing.song.duration %>, <%= StationsHelper.get_progress_ms %> );
+              setSongStats(<%= current_user.station.now_playing.song.duration %>, <%= current_user.station.now_playing_start_ms %> );
 
             <% end %>
 
+            window.setInterval(updateBar, 100);
 
             function updateBar() {
               canvas.clearRect(0, 0, canvasWidth, 50)
@@ -200,15 +202,12 @@
 
               var currentTime = Date.now()
 
-              if (currentTime > endTime) {
+              if (currentTime > startTime + songDuration) {
                 return
               }
 
-              // if (currentTime === duration) {
-              //   ctrl.innerHTML = "Play"
-              // }
-              msInSong = songDuration - (endTime - currentTime)
-              secondsInSong = msInSong*1.0 / 1000
+              msInSong = currentTime - startTime;
+              secondsInSong = msInSong*1.0 / 1000;
               document.getElementById("current-time").innerHTML = convertElapsedTime(secondsInSong)
 
               var percentage = msInSong / songDuration

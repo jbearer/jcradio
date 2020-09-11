@@ -117,10 +117,23 @@ class Station < ActiveRecord::Base
         users.each do |user|
             user.notify :next_song, entry
         end
+    end
 
+    # Update now_playing_start_ms
+    # Call javascript to update the now_playing progress bar
+    def update_timing_stats()
         progress_ms = StationsHelper.get_progress_ms
+        update now_playing_start_ms: Time.now.to_f * 1000 - progress_ms
 
-        return [song, progress_ms]
+        # Update the clients about the timing.
+        users.each do |user|
+            user.notify :update_timing, now_playing.song.duration, now_playing_start_ms
+        end
+    end
+
+    def time_till_next_song()
+        end_time = now_playing_start_ms + now_playing.song.duration
+        time_diff = end_time - Time.now.to_f * 1000
     end
 
     def internal_spotify_add_to_queue(uri)

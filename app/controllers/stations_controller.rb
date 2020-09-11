@@ -160,6 +160,20 @@ class StationsController < ApplicationController
         render json: {success: true, saved: false} # is it successful though?
     end
 
+    # POST /stations/1/refresh
+    # Refresh the now_playing window
+    def refresh
+        if $the_background_thread.status == 'sleep' then
+            $the_background_thread.wakeup
+        end
+
+        # call update_timing, in case the song didn't change, but the
+        # end time did change
+        Station.find(1).update_timing_stats
+
+        render json: { success: true }
+    end
+
     private
         def set_station
           @station = Station.find(params[:id])
@@ -168,7 +182,6 @@ class StationsController < ApplicationController
 end
 
 ################ Background process to update song title
-## Note: this currently is called from anywhere
 # https://blog.appsignal.com/2019/04/02/background-processing-system-in-ruby.html
 module Magique
     module Worker
@@ -181,7 +194,7 @@ module Magique
           new.perform(*args)
         end
         def perform_async(*args)
-          Thread.new { new.perform(*args) }
+          $the_background_thread = Thread.new { new.perform(*args) }
         end
       end
 
@@ -193,65 +206,44 @@ module Magique
 
   class TitleExtractorWorker
     include Magique::Worker
-    include LiveRPC
 
+    # Background thread which monitors the current playing song
+
+    # If no song is playing, sleep until woken up
+    # If the current song is different from the last song, update the song,
+    #   Then sleep until you calculate it to be over
+    # If the current song is the same as the last song, sleep until it's over
     def perform(station)
 
-        curr_song = nil
-
+        last_song = nil
         while true
-            sleep 5
-
             begin
-
-                if not $spotify_user.player
-                    puts "@@@@@@@@@@@@@@@@@"
-                    puts "@@@ NO PLAYER @@@"
-                    puts "@@@@@@@@@@@@@@@@@"
+                player = $spotify_user.player
+                if not player or not player.playing?
+                    sleep   # until awoken
                     next
                 end
 
-                if not $spotify_user.player.playing?
-                    puts "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
-                    puts "@@@ NOT CURRENTLY PLAYING @@@"
-                    puts "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
-                    next
+                curr_song = player.currently_playing
+                if (not last_song) or (curr_song.id != last_song.id) then
+                    # We have a new song
+                    last_song = curr_song
+                    # Update the queue with the new song
+                    Station.find(1).next_song(Song.get("Spotify", curr_song.id))
+                    Station.find(1).update_timing_stats()
                 end
 
-                this_song = $spotify_user.player.currently_playing
+                time_diff = Station.find(1).time_till_next_song().to_f / 1000
 
-                if (not curr_song) or (this_song.name != curr_song.name)
-                    puts "@@@@@@@@@@@@@@@@@@@@@@@@@@"
-                    puts "@@@ PRINTING SONG INFO @@@"
-                    puts "@@@@@@@@@@@@@@@@@@@@@@@@@@"
-
-                    print "Song: "
-                    puts this_song.name
-                    print "Artist: "
-                    puts this_song.artists.first.name
-
-                    curr_song = this_song
-
-                    begin
-                        # Update the queue with the new song.
-                        result = Station.find(1).next_song(Song.get("Spotify", this_song.id))
-
-                        song = result[0]
-                        progress_ms = result[1]
-
-                        # TODO: Not sure how to call the broadcast in ApplicationController
-                        LiveRPC.broadcast("on_new_song", [song.duration, progress_ms])
-
-                    rescue => e
-                        Rails.logger.error e.message
-                        e.backtrace.each { |line| Rails.logger.error line }
-                    end
-                end
             rescue => e
-                puts "!!!!!!!! failed to get song info !!!!!!!!!!!!"
                 Rails.logger.error e.message
                 e.backtrace.each { |line| Rails.logger.error line }
+                time_diff = 5
             end
+
+            # Lowerbound at 1 so we don't spam spotify tooo much
+            sleep_time = time_diff > 1 ? time_diff : 1
+            sleep(sleep_time)
         end
     end
   end

@@ -17,6 +17,7 @@ Rails.application.routes.draw do
   post "/stations/:id", to: 'stations#update'
   get "/stations/:id/next", to: 'stations#next'
   post "/stations/:id/save", to: "stations#save"
+  post "/stations/:id/refresh", to: "stations#refresh"
 
   resources :chat, only: [:index, :create, :show]
   resources :upvotes, only: [:create]
