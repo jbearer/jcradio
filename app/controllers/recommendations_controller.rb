@@ -48,7 +48,7 @@ class RecommendationsController < ApplicationController
         songs = []
 
         recommendations.tracks.each do |rec|
-            if params[:query] == "" or params[:query] == SongsHelper.next_letter(rec.name) then
+            if params[:query] == "" or params[:query] == SongsHelper.first_letter(rec.name) then
                 songs.append(SongsHelper.get_or_create_from_spotify_record rec)
             end
         end
