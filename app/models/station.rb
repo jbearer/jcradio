@@ -3,6 +3,8 @@ class Station < ActiveRecord::Base
     belongs_to :now_playing, class_name: "QueueEntry"
     has_many :users
 
+    
+
     include StationsHelper
 
     def queue
@@ -45,21 +47,27 @@ class Station < ActiveRecord::Base
             # If we are currently playing a song, add this to the queue
             internal_spotify_add_to_queue song.uri
         else
-            # Otherwise, play this song immediately
-            # TODO: Causes RestClient::NotFound :( :( :(
-            # player.play_track(uri)
-            return "Spotify not Playing. (Might be logged in as wrong Spotify)"
+            not_playing = true
+            # Otherwise, play this song immediately on spotify
+            if $spotify_user.display_name == "JC Radio" then
+                # If we're using the JC Radio account, play on the pi
+                StationsHelper.set_device($JCRADIO_PI)
+                player.play_track(nil, song.uri)
+            else
+                return "Spotify not Playing, and IDK what device to use"
+            end
         end
 
+        # Mark the song as queued
+        QueueEntry.create song: song, station: self,
+            position: (self.queue_max || 0) + 1,
+            selector: selector
 
-        if self.now_playing
-            # Queue the song
-            QueueEntry.create song: song, station: self,
-                position: (self.queue_max || 0) + 1,
-                selector: selector
-        else
-            # Play it immediately
-            update now_playing: (QueueEntry.create song: song, selector: selector)
+        if not_playing
+             # We're not currently playing a song, so immediately skip to this
+             # one
+            next_song(song)
+            update_timing_stats()
         end
 
         return ""
@@ -142,3 +150,5 @@ class Station < ActiveRecord::Base
         RSpotify::User.oauth_post($spotify_user.id, url, {})
     end
 end
+
+$JCRADIO_PI = "d94494a49582daf871e6a18d955ea69946163d6f"

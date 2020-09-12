@@ -6,4 +6,9 @@ module StationsHelper
         return response["progress_ms"]
     end
 
+    def self.set_device(device_id)
+        url = "me/player"
+        params = {"device_ids": [device_id]}
+        RSpotify::User.oauth_put($spotify_user.id, url, params.to_json)
+    end
 end
