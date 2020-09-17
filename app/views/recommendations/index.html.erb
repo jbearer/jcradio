@@ -133,12 +133,10 @@
 <br>
 <h2> Recommendations by First Letter </h2>
 
-    <form id="submit-suggestion" action="/songs/inline_search" method="get" data-remote="true">
-      <input type="text" name="query" value="<%= $the_next_letter %>" style="width:40px">
-      <button type="button" class="button button3" onclick="validateArgs()">
-        <i class="fa fa-search">
-      </i></button>
-    </form>
+  <input type="text" name="query" value="<%= $the_next_letter %>" style="width:40px">
+  <button type="submit" class="button button3">
+    <i class="fa fa-search">
+  </i></button>
 
 
 </form>
@@ -273,20 +271,21 @@ function remove_seed(source_id) {
 
 }
 
+// Unused because it's being annoying
 function validateArgs() {
   num_seeds = $("#current-seeds tbody").get(0).children.length
   if (num_seeds >= 5) {
     alert("Can't have more than 5 seeds")
-    return;
+    return false;
   }
 
   if (num_seeds < 1) {
     alert("Must have at least 1 seed")
-    return;
+    return false;
   }
 
   // Submit the event, tagged with data-remote
-  $("#submit-suggestion").trigger('submit.rails')
+  // $("#submit-suggestion").trigger('submit.rails')
 }
 
 </script>

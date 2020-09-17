@@ -5,6 +5,26 @@ class RecommendationsController < ApplicationController
 
     # GET /recommendations
     def suggest
+        source_ids = params[:source_id]
+        categories = params[:category]
+
+        ##### UGH I give up on trying to do the error checking from spotify
+        error_song = nil
+        if source_ids == nil or source_ids.length == 0
+            error_song = Song.new(title: "ERROR", artist: "No seeds!", album: "don't add me", duration: "1")
+        elsif source_ids.length > 5 then
+            error_song = Song.new(title: "ERROR", artist: "More than five seeds!", album: "sad", duration: "1")
+        end
+
+        if error_song then
+            respond_to do |format|
+                format.js { render "suggest", :locals => {
+                    :songs => [error_song]}}
+            end
+            return
+        end
+        #####
+
         options = {}
 
         features.each do |feature|
@@ -24,9 +44,6 @@ class RecommendationsController < ApplicationController
 
         seed_tracks = []
         seed_artists = []
-
-        source_ids = params[:source_id]
-        categories = params[:category]
 
         source_ids.zip(categories) do |id, cat|
             if cat == "track" then

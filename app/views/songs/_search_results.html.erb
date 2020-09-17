@@ -1,6 +1,6 @@
-<table>
+<% if not songs.empty? then %>
+  <table>
 
-    <% if not songs.empty? then %>
     <tr>
         <th>Song</th>
         <th>Artist</th>
@@ -33,7 +33,7 @@
         <% end %>
 
 
-</table>
+  </table>
 
 <!-- Show More Songs Button -->
 <br>
@@ -44,9 +44,6 @@
   <h2> No results found </h2>
 
 <% end %>
-
-
-
 
 <!-- Confirm Song Popup -->
 <script>
@@ -122,6 +119,5 @@ function confirmSong(ind, song) {
       });
 
    }
-
 
 </script>

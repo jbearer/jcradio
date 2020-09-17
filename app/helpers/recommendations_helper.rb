@@ -30,5 +30,19 @@ module RecommendationsHelper
         return total
     end
 
+    def spotify_get_all_songs(client_spotify)
+        num_tracks = spotify_number_of_tracks(client_spotify.id)
+        all_tracks = []
+        offset = 1
+        batch_size = 50
+        loop do
+            tracks = client_spotify.saved_tracks(limit: 50, offset: offset)
+            all_tracks.concat(tracks)
+            offset += batch_size
 
+            break if offset >= num_tracks
+        end
+
+        return all_tracks
+    end
 end

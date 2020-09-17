@@ -20,18 +20,19 @@ TODO
     Bugs
         Error if you search empty string
         Sometimes songs fail to be decrypted
+        Batch requests so we're not constantly querying db
 
     Features
         History of songs
         Notify you again if it's almost your turn
-        Music progress bar
         Plots
         SQL query
-        Hide queue option
         Recommendations
             Encorporate min and max in audio features
             Encorporate genre seeds?
             Add loading icon
             Increment "last" counter
             Properly validate results, instead of having the server throw an error
-
+        Settings
+            Number of days warning
+            Hide queue option

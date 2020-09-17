@@ -1,9 +1,29 @@
+<h2> Search Spotify </h2>
 <div class="search-container">
     <form action="/songs/inline_search", method="get", data-remote="true">
       <input type="text" placeholder="Search..." name="query" value="<%= @query ? @query : '' %> ">
       <button class="button button3" type="submit"><i class="fa fa-search"></i></button>
     </form>
- </div>
+</div>
+<h2> or Browse </h2>
+
+<form action="/songs/browse", method="get", data-remote="true">
+
+  <input type="radio" name="source" value="all_songs" checked="true">
+    <label for="all_songs">All Chosen Songs</label>
+  <input type="radio" name="source" value="my_chosen_songs">
+    <label for="my_chosen_songs">Songs Chosen by Me</label>
+  <input type="radio" name="source" value="my_upvoted_songs">
+    <label for="my_upvoted_songs">Songs Upvoted by Me</label>
+  <input type="radio" name="source" value="my_spotify_library">
+    <label for="my_spotify_library">My Spotify Library</label>
+
+  <input type="text" name="query" value="<%= $the_next_letter %>" style="width:40px">
+  <button class="button button3" type="submit">
+    <i class="fa fa-search"></i>
+  </button>
+
+</form>
 
 <div id="search-results">
   <%= render partial: 'songs/search_results', :locals => {songs: songs} %>
