@@ -37,12 +37,11 @@ class SongsController < ApplicationController
     def browse
         source = params[:source]
 
-        client_spotify = $client_spotifies[current_user.username]
-        if not client_spotify then
-            fail "Not logged into spotify"
-        end
-
         if source == "my_spotify_library" then
+            client_spotify = $client_spotifies[current_user.username]
+            if not client_spotify then
+                fail "Not logged into spotify"
+            end
             spotify_songs = spotify_get_all_songs(client_spotify)
             results = spotify_songs.map{|s| SongsHelper.get_or_create_from_spotify_record s}
         else
