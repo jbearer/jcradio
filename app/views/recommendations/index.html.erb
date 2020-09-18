@@ -1,4 +1,26 @@
-
+Spotify's Recommendations API is based on two inputs: "Seeds" and "Audio Features".
+<br>
+Seeds are either tracks or artists that are used as a basis for your recommendations.
+Your current seeds are indicated where is says "Current Seeds".  You must select between
+1 and 5 seeds.  There are two ways of adding seeds.  You can use the search form, select
+either "Track" or "Artist", and then press the "+".  You should now see it in "Current Seeds".
+Alternatively, you can fill out the form of radio buttons and press "Add Seed".  A common option
+is to choose "Track" + "Most Recent" + "All Chosen Songs" -- this will filter for songs that will
+match the current vibe of the radio.  (Note: choosing "Most Recent" several times in a row will
+actually select the last, then second-to-last, then third-to-last, etc).  You must link your
+spotify account to use "My Spotify Library".
+<br>
+Optionally, you can search by audio features.  If you want to include an audio feature, press the
+checkbox, and a slider should appear.  Slide it to your desired level.  For a list of audio feature
+descriptions, see https://developer.spotify.com/documentation/web-api/reference/tracks/get-audio-features/.
+Note that these are merely "target" values
+<br>
+Then press the magnifying glass at the bottom of the page to get a list of recommendations.  It will
+automatically filter results whose first letter matches the search form.  The search
+form should be prepopulated with $the_next_letter.  If you search with an empty form, it will show
+all 100 results.  Recommendations are semi-random, so searching multiple times will probably yield different results.
+Adding more seeds will increase the randomness.  If it's your turn, you can press the "+" button to
+add the song to the queue.
 <div>
     <h2> Seeds </h2>
 
