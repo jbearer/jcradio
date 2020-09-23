@@ -59,7 +59,7 @@ module SongsHelper
       end
 
       # Strip after hyphens
-      hyphen_i = title.index("-")
+      hyphen_i = title.index(/[-–]/)
       if hyphen_i
         title = title[0..hyphen_i]
       end
