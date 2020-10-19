@@ -33,6 +33,7 @@ class SessionsController < ApplicationController
               @user.update subscription: JSON.dump(session[:subscription])
             end
         end
+        broadcast :push, "#{current_user.username} joined the radio."
     end
 
     return_to_page
@@ -41,6 +42,7 @@ class SessionsController < ApplicationController
   # DELETE /sessions
   def destroy
     if logged_in?
+        broadcast :push, "#{current_user.username} left the radio."
         current_user.update station: nil, position: nil
         LiveRPC.close current_user.id
         reset_session
