@@ -15,9 +15,9 @@
     TESTER = document.getElementById('tester');
 
 
-    var queue_arr = <%= QueueEntry.where(station: self).to_json %>;
-    console.log("QueueArr:", queue_arr)
-    console.log("QueuePos:", <%= @station.queue_pos %>);
+    // var queue_arr = <%#QueueEntry.where(station: self).to_json %>;
+    // console.log("QueueArr:", queue_arr)
+    // console.log("QueuePos:", <%#@station.queue_pos %>);
 
     var trace1 = {
       x: [1, 2, 3, 4],
