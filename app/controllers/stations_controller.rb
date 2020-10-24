@@ -5,7 +5,7 @@ class StationsController < ApplicationController
     include SongsHelper
     include StationsHelper
 
-    before_action :set_station, only: [:show, :change_queue_pos, :edit_queue_pos]
+    before_action :set_station, only: [:show, :change_queue_pos, :edit_queue_pos, :plots]
 
     # GET /stations
     def index
@@ -178,6 +178,11 @@ class StationsController < ApplicationController
         def set_station
           @station = Station.find(params[:id])
         end
+
+    # GET /stations/1/plots
+    def plots
+
+    end
 
 end
 

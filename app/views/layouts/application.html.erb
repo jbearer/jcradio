@@ -44,7 +44,7 @@
              <%= link_to "Home", "/sessions", :class => current_class?("/sessions") %>
              <%= link_to "Queue", "/stations", :class => current_class?("/stations") %>
              <%= link_to "Browse", "/songs", :class => current_class?("/songs") %>
-             <a href="#Plots">Plots</a>
+             <%= link_to "Plots", "/stations/1/plots" %>
              <%= link_to "Chat", "/chat", :class => current_class?("/chat") %>
              <% if logged_in? %>
                 <%= link_to "Notifications (#{current_user.pending_notifications.length})",
