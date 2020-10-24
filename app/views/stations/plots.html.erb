@@ -15,7 +15,7 @@
     TESTER = document.getElementById('tester');
 
 
-    var queue_arr = <%= QueueEntry.where(station: self).to_json %>;
+    var queue_arr = <%= QueueEntry.where(station: @station).to_json.html_safe %>;
     console.log("QueueArr:", queue_arr)
     console.log("QueuePos:", <%= @station.queue_pos %>);
 
