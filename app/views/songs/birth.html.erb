@@ -1,0 +1,93 @@
+<div class="slidecontainer">
+    <input
+        type="range"
+        min=0
+        max=150
+        value=75
+        class="slider"
+        id="birthday_slider">
+</div>
+
+<style>
+.image-container {
+    display: table-cell;
+    text-align: center;
+    position: relative;
+    width: 500px;
+    height: 800px;
+}
+
+.image-container img {
+    position: absolute;
+    right: 0;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    margin: auto auto;
+}
+
+.slider {
+    width: 300px;
+}
+</style>
+
+<span>
+</span>
+
+<span class="image-container">
+<img src="https://cdn.shopify.com/s/files/1/1299/1945/products/W19DC369-11_SEL01_500x.jpg?v=1559188048"
+     alt="shirt"
+     id="shirt"
+     width="200"
+     height="350">
+<h2 id="shirt_price"> </h2>
+
+</span>
+<span class="image-container">
+<img src="https://canary.contestimg.wish.com/api/webimage/5c8fbef08f6c8d25e196d254-large.jpg?source=sweeper_model&cache_buster=e86cc214c70c14851624cb03d8668f26"
+    alt="onair"
+    id="onair"
+    width="250"
+    height="250">
+<h2 id="studio_time"> </h2>
+</span>
+
+<script>
+
+
+function update_slider() {
+    const shirt_width = 200
+    const shirt_height = 350
+
+    const onair_width = 250
+    const onair_height = 250
+
+    var slider = document.getElementById("birthday_slider");
+    var shirt = document.getElementById("shirt");
+    var onair = document.getElementById("onair");
+
+    var shirt_price = document.getElementById("shirt_price");
+    var studio_time = document.getElementById("studio_time");
+
+    slider.oninput = function() {
+        var x = slider.value/150;
+
+        shirt.width = (1 - x) * shirt_width * 2
+        shirt.height = (1 - x) * shirt_height * 2
+
+        onair.width = x * onair_width * 2
+        onair.height = x * onair_height * 2
+
+        calc_shirt = Math.floor((1-x)*150);
+        calc_studio = Math.floor(x*120)
+
+        shirt_price.innerHTML = `$${calc_shirt}`
+        studio_time.innerHTML = `${calc_studio} minutes`
+
+    }
+    slider.oninput()
+}
+
+update_slider()
+
+</script>

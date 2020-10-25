@@ -40,6 +40,8 @@ Rails.application.routes.draw do
 
   get "/stations/:id/plots", to: "stations#plots"
 
+  get "/songs/birth", to: "songs#birth"
+
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 

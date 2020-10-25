@@ -72,4 +72,9 @@ class SongsController < ApplicationController
         end
     end
 
+    # GET /songs/birth
+    def birth
+
+    end
+
 end
