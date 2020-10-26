@@ -5,6 +5,6 @@ class QueueEntry < ActiveRecord::Base
     has_many :upvotes
 
     def as_json(options=nil)
-        super include: [:song, :selector]
+        super include: [:song, :selector], only: [:id, :position]
     end
 end

@@ -13,6 +13,10 @@ class User < ActiveRecord::Base
         {name: username, id: id}
     end
 
+    def as_json(options=nil)
+        super only: [:id, :username]
+    end
+
     def has_upvoted?(selection)
         not (given_upvotes.find_by queue_entry: selection).nil?
     end

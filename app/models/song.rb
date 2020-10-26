@@ -14,6 +14,10 @@ class Song < ActiveRecord::Base
 
     fuzzily_searchable :title, :artist, :album
 
+    def as_json(options=nil)
+        super only: [:id, :title, :album, :artist, :first_letter, :next_letter, :uri]
+    end
+
     def self.get(source, source_id)
         if source == "Spotify"
             SongsHelper.get_or_create_from_spotify_record(RSpotify::Track.find(source_id), true)
