@@ -96,7 +96,11 @@
 
         // Count the first-letter/next-letter pairs.
         q.forEach((e) => {
-            ++markov[e.song.first_letter][e.song.next_letter];
+            if (alphabet.includes(e.song.first_letter) &&
+                alphabet.includes(e.song.next_letter))
+            {
+                ++markov[e.song.first_letter][e.song.next_letter];
+            }
         });
 
         // Normalize the counts to probabilities.
