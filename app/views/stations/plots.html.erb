@@ -1,9 +1,11 @@
 <h2> Plots </h2>
 
-<div id="tester" style="width:100%;height:500px;"></div>
+<div id="plots"></div>
 
 <script>
     TESTER = document.getElementById('tester');
+
+    var alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split('');
 
     function normalizeTitle(title) {
 
@@ -61,7 +63,6 @@
     function generateLetterFreqData(queue_arr) {
         // Create map
         let letter_freq = new Map();
-        var alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split('');
         alphabet.forEach(function (letter) {
             letter_freq.set(letter, 0);
         });
@@ -83,14 +84,62 @@
         return [trace];
     }
 
+    function generateMarkovData(q) {
+        // Create an empty dictionary of the form letter1 -> letter2 -> frequency.
+        markov = {};
+        alphabet.forEach((letter1) => {
+            markov[letter1] = {};
+            alphabet.forEach((letter2) => {
+                markov[letter1][letter2] = 0;
+            });
+        });
+
+        // Count the first-letter/next-letter pairs.
+        q.forEach((e) => {
+            ++markov[e.song.first_letter][e.song.next_letter];
+        });
+
+        // Normalize the counts to probabilities.
+        alphabet.forEach((letter1) => {
+            counts = markov[letter1];
+            total = Object.values(counts).reduce((x, y) => x + y, 0);
+            alphabet.forEach((letter2) => {
+                counts[letter2] /= total;
+            });
+        });
+
+        data = [];
+        alphabet.slice().reverse().forEach((letter2) => {
+            p = [];
+            alphabet.forEach((letter1) => {
+                p.push(markov[letter1][letter2])
+            });
+            data.push({
+                x: alphabet,
+                y: p,
+                name: letter2,
+                type: "bar"
+            })
+        });
+
+        return data;
+    }
+
     $.get("/stations/1/plots.json", {}, (queue_arr) => {
         console.log("QueueArr:", queue_arr);
 
-        // Parse the queue, return data to be plotted
-        var data = generateLetterFreqData(queue_arr);
-
         // Actually plot the data
-        Plotly.newPlot(TESTER, data);
+        Plotly.newPlot(
+            $("<div>").appendTo($("#plots"))[0],
+            generateLetterFreqData(queue_arr)
+        );
+        Plotly.newPlot(
+            $("<div>").appendTo($("#plots"))[0],
+            generateMarkovData(queue_arr), {
+                title: "Next Letter Probability by First Letter",
+                barmode: "stack"
+            }
+        );
     });
 
 </script>

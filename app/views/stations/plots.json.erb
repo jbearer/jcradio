@@ -18,7 +18,9 @@ raw_data = ActiveRecord::Base.connection.exec_query(
         "song": {
             "title": "<%= row["title"] %>",
             "album": "<%= row["album"] %>",
-            "artist": "<%= row["artist"] %>"
+            "artist": "<%= row["artist"] %>",
+            "first_letter": "<%= row["first_letter"] %>",
+            "next_letter": "<%= row["next_letter"] %>"
         },
         "selector": {
             "username": "<%= row["username"] %>"
