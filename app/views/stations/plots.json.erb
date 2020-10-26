@@ -1,1 +1,23 @@
-<%= QueueEntry.where(station: @station).to_json.html_safe %>
+<%
+raw_data = ActiveRecord::Base.connection.exec_query(
+%{
+    SELECT queue_entries.id as queue_entry_id, queue_entries.*, songs.*, users.*
+        FROM queue_entries
+        JOIN songs ON queue_entries.song_id = songs.id
+        JOIN users ON queue_entries.selector_id = users.id
+}.gsub(/\s+/, " ").strip)
+%>
+
+[
+<% raw_data.each_with_index do |row, i| %>
+    <% if i > 0 %>
+        ,
+    <% end  %>
+    {
+        "id": "<%= row["queue_entry_id"] %>",
+        "song": {
+            "title": "<%= row["title"] %>"
+        }
+    }
+<% end %>
+]
