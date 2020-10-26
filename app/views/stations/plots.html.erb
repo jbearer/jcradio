@@ -5,12 +5,6 @@
 <script>
     TESTER = document.getElementById('tester');
 
-    // Load the Queue from Ruby
-    // TODO: Wrap this in some dynamic call (AJAX, jQuery, etc) so the page loads faster
-    // TODO: Allow for specified data grab (say last 500 songs only, or filter by selector)
-    var queue_arr = <%= QueueEntry.where(station: @station).to_json.html_safe %>;
-    console.log("QueueArr:", queue_arr);
-
     function normalizeTitle(title) {
 
         // Delete Paren phrases
@@ -89,14 +83,15 @@
         return [trace];
     }
 
-    // Parse the queue, return data to be plotted
-    var data = generateLetterFreqData(queue_arr);
+    $.get("/stations/1/plots.json", {}, (queue_arr) => {
+        console.log("QueueArr:", queue_arr);
 
-    $(() =>{
+        // Parse the queue, return data to be plotted
+        var data = generateLetterFreqData(queue_arr);
+
         // Actually plot the data
         Plotly.newPlot(TESTER, data);
-    })
-
+    });
 
 </script>
 
