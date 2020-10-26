@@ -1,11 +1,22 @@
 <h2> Plots </h2>
 
-<div id="plots"></div>
+<div id="plots">
+    <div>
+        <h3>
+            Expected distribution after
+            <input id="expected_distribution_turns" type=text value="1" style="width: 40px;" onchange="updateExpectedDistribution();">
+            turns starting with
+            <input id="expected_distribution_seed" type=text value="<%= $the_next_letter == "_" ? "A" : $the_next_letter %>" style="width: 40px;" onchange="updateExpectedDistribution()">
+        </h3>
+        <div id="expected_distribution"></div>
+    </div>
+</div>
 
 <script>
     TESTER = document.getElementById('tester');
 
     var alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split('');
+    var markov = undefined;
 
     function normalizeTitle(title) {
 
@@ -84,7 +95,8 @@
         return [trace];
     }
 
-    function generateMarkovData(q) {
+    // Returns an object `m` where `m[l1][l2]` is P(l2|l1).
+    function generateMarkovModel(q) {
         // Create an empty dictionary of the form letter1 -> letter2 -> frequency.
         markov = {};
         alphabet.forEach((letter1) => {
@@ -108,10 +120,35 @@
             counts = markov[letter1];
             total = Object.values(counts).reduce((x, y) => x + y, 0);
             alphabet.forEach((letter2) => {
-                counts[letter2] /= total;
+                if (total) {
+                    counts[letter2] /= total;
+                }
             });
         });
 
+        return markov;
+    }
+
+    function projectedLetterDistribution(markov, seedLetter, turns=1) {
+        Pn_1 = markov[seedLetter]
+        for (var i = 1; i < turns; ++i) {
+            Pn = {};
+
+            // The probability Pn(l) that we get a letter `l` after `n` turns is given by
+            //  P{n-1}(A)P(l|A) + P{n-1}(B)P(l|B) + ...
+            alphabet.forEach((l) => {
+                Pn[l] = alphabet
+                    .map((letter) => Pn_1[letter] * markov[letter][l])
+                    .reduce((p1, p2) => p1 + p2, 0);
+            });
+
+            Pn_1 = Pn;
+        }
+
+        return Pn_1;
+    }
+
+    function generateMarkovData(markov) {
         data = [];
         alphabet.slice().reverse().forEach((letter2) => {
             p = [];
@@ -129,8 +166,29 @@
         return data;
     }
 
+    function generateExpectedDistributionData(markov, seedLetter, turns) {
+        distribution = projectedLetterDistribution(markov, seedLetter, turns);
+        return [{
+            x: alphabet,
+            y: alphabet.map((letter) => distribution[letter]),
+            type: "bar"
+        }];
+    }
+
+    function updateExpectedDistribution() {
+        Plotly.newPlot(
+            $("#expected_distribution")[0],
+            generateExpectedDistributionData(
+                markov,
+                $("#expected_distribution_seed").val(),
+                $("#expected_distribution_turns").val()
+            )
+        );
+    }
+
     $.get("/stations/1/plots.json", {}, (queue_arr) => {
         console.log("QueueArr:", queue_arr);
+        markov = generateMarkovModel(queue_arr);
 
         // Actually plot the data
         Plotly.newPlot(
@@ -139,11 +197,12 @@
         );
         Plotly.newPlot(
             $("<div>").appendTo($("#plots"))[0],
-            generateMarkovData(queue_arr), {
+            generateMarkovData(markov), {
                 title: "Next Letter Probability by First Letter",
                 barmode: "stack"
             }
         );
+        updateExpectedDistribution();
     });
 
 </script>
