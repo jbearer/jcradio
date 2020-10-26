@@ -148,6 +148,20 @@
         return Pn_1;
     }
 
+    function whatLetterShouldIGive(desiredLetter, turns=1) {
+        best_letter = undefined
+        best_probability = undefined
+        alphabet.forEach((letter) => {
+            probability = projectedLetterDistribution(markov, letter, turns)[desiredLetter];
+            if (best_probability === undefined || probability > best_probability) {
+                best_probability = probability;
+                best_letter = letter;
+            }
+        });
+
+        return [best_letter, best_probability];
+    }
+
     function generateMarkovData(markov) {
         data = [];
         alphabet.slice().reverse().forEach((letter2) => {
