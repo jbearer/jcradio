@@ -181,7 +181,7 @@ class StationsController < ApplicationController
 
     # GET /stations/1/plots
     def plots
-        request.env['HTTP_ACCEPT_ENCODING'] = 'gzip'
+
     end
 
 end

@@ -84,7 +84,6 @@
     }
 
     $.get("/stations/1/plots.json", {}, (queue_arr) => {
-        // queue_arr = JSON.parse(queue_arr)
         console.log("QueueArr:", queue_arr);
 
         // Parse the queue, return data to be plotted
