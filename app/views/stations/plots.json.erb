@@ -16,7 +16,12 @@ raw_data = ActiveRecord::Base.connection.exec_query(
     {
         "id": "<%= row["queue_entry_id"] %>",
         "song": {
-            "title": "<%= row["title"] %>"
+            "title": "<%= row["title"] %>",
+            "album": "<%= row["album"] %>",
+            "artist": "<%= row["artist"] %>"
+        },
+        "selector": {
+            "username": "<%= row["username"] %>""
         }
     }
 <% end %>
