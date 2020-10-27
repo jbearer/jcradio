@@ -96,7 +96,10 @@ class StationsController < ApplicationController
         # Notify the next user that it's their turn to pick a song.
         next_user = station.users.order(:position)[0]
         $the_next_letter = params[:song_next_letter].capitalize()[0]
-        broadcast :next_up, next_user, $the_next_letter
+
+        if next_user != current_user then
+            broadcast :next_up, next_user, $the_next_letter
+        end
 
         json_ok
     end

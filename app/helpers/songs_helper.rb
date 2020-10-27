@@ -111,11 +111,13 @@ module SongsHelper
           #       result.update next_letter: SongsHelper.calculate_next_letter(s.name)
           #   end
           # end
-          if (not result.preview_url) then
-            if s.preview_url then
-              result.update preview_url: s.preview_url
-            end
-          end
+
+          # TODO: Why does this take such a stupid amount of time?
+          # if (not result.preview_url) then
+          #   if s.preview_url then
+          #     result.update preview_url: s.preview_url
+          #   end
+          # end
           results.push(matches[s.id])
         else
           data = {
