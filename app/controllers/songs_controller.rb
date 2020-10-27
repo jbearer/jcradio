@@ -43,7 +43,7 @@ class SongsController < ApplicationController
                 fail "Not logged into spotify"
             end
             spotify_songs = spotify_get_all_songs(client_spotify)
-            results = spotify_songs.map{|s| SongsHelper.get_or_create_from_spotify_record s}
+            results = SongsHelper.get_or_create_from_spotify_record(spotify_songs, true)
         else
             if source == "my_chosen_songs" then
                 index = QueueEntry.where(selector_id: current_user.id)

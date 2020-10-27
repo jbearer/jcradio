@@ -20,7 +20,7 @@ class Song < ActiveRecord::Base
 
     def self.get(source, source_id)
         if source == "Spotify"
-            SongsHelper.get_or_create_from_spotify_record(RSpotify::Track.find(source_id), true)
+            SongsHelper.get_or_create_from_spotify_record([RSpotify::Track.find(source_id)], true).first
         else
             nil
         end
@@ -46,11 +46,7 @@ class Song < ActiveRecord::Base
     def self.spotify_search(entry)
         spotify_songs = RSpotify::Track.search(entry)
 
-        songs = []
-
-        spotify_songs.each do |ss|
-            songs.append(SongsHelper.get_or_create_from_spotify_record ss)
-        end
+        songs = SongsHelper.get_or_create_from_spotify_record(spotify_songs)
 
         # TODO: "More results" button
         songs

@@ -28,6 +28,19 @@
 
                     <% end %>
                 </td>
+                <td>
+                  <% if song.preview_url %>
+                    <audio id="myAudio<%=ind%>">
+                      <source src="<%=song.preview_url%>", type="audio/mpeg">
+                    </audio>
+                    <button class="button button6" onclick="playAudio(<%=ind%>)">
+                      <i class="fa fa-bath"></i>
+                    </button>
+                  <% else %>
+                      <i class="fa fa-ban"></i>
+                  <% end %>
+                </td>
+
             </tr>
 
         <% end %>
@@ -47,6 +60,15 @@
 
 <!-- Confirm Song Popup -->
 <script>
+
+function playAudio(ind) {
+  var x = document.getElementById(`myAudio${ind}`)
+  if (x.paused) {
+    x.play();
+  } else {
+    x.pause();
+  }
+}
 
 function confirmSong(ind, song) {
 
