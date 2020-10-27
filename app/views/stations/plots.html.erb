@@ -200,6 +200,34 @@
         );
     }
 
+    function generatePositionalFrequencyData(q) {
+        words = q.flatMap((e) => normalizeTitle(e.song.title));
+        maxLength = words.map((w) => w.length).reduce((x, y) => Math.max(x, y), 0);
+        x = [...Array(maxLength).keys()];
+        return alphabet.slice().reverse().map((letter) => ({
+            x,
+            y: x.map((i) => words
+                .map((w) => w[i % w.length] == letter ? 1 : 0)
+                .reduce((x, y) => x + y, 0) / words.length),
+            type: "bar",
+            name: letter
+        }));
+    }
+
+    function generateInversePositionalFrequencyData(q) {
+        words = q.flatMap((e) => normalizeTitle(e.song.title));
+        maxLength = words.map((w) => w.length).reduce((x, y) => Math.max(x, y), 0);
+        x = [...Array(maxLength).keys()];
+        return alphabet.slice().reverse().map((letter) => ({
+            x,
+            y: x.map((i) => words
+                .map((w) => w[w.length - 1 - (i % w.length)] == letter ? 1 : 0)
+                .reduce((x, y) => x + y, 0) / words.length),
+            type: "bar",
+            name: letter
+        }));
+    }
+
     $.get("/stations/1/plots.json", {}, (queue_arr) => {
         console.log("QueueArr:", queue_arr);
         markov = generateMarkovModel(queue_arr);
@@ -214,6 +242,24 @@
             generateMarkovData(markov), {
                 title: "Next Letter Probability by First Letter",
                 barmode: "stack"
+            }
+        );
+        Plotly.newPlot(
+            $("<div>").appendTo($("#plots"))[0],
+            generatePositionalFrequencyData(queue_arr), {
+                title: "Letter Frequency by Position From Start of Word",
+                barmode: "stack",
+                xaxis: {title: "Distance From Start of Word"},
+                yaxis: {title: "Frequency"}
+            }
+        );
+        Plotly.newPlot(
+            $("<div>").appendTo($("#plots"))[0],
+            generateInversePositionalFrequencyData(queue_arr), {
+                title: "Letter Frequency by Position From End of Word",
+                barmode: "stack",
+                xaxis: {title: "Distance From End of Word"},
+                yaxis: {title: "Frequency"}
             }
         );
         updateExpectedDistribution();
