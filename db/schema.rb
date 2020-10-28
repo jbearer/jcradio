@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20201027061649) do
+ActiveRecord::Schema.define(version: 20201028034432) do
 
   create_table "chat_messages", force: :cascade do |t|
     t.text     "message"
@@ -38,6 +38,7 @@ ActiveRecord::Schema.define(version: 20201027061649) do
     t.integer "station_id"
     t.integer "position"
     t.integer "selector_id"
+    t.boolean "was_recommended"
   end
 
   add_index "queue_entries", ["position"], name: "index_queue_entries_on_position"

@@ -1,1 +1,1 @@
-$("#suggestions").html("<%= j render partial: 'songs/search_results', :locals => {songs: songs} %>")
+$("#suggestions").html("<%= j render partial: 'songs/search_results', :locals => {songs: songs, recommended: true} %>")

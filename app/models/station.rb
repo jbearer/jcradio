@@ -26,7 +26,7 @@ class Station < ActiveRecord::Base
         return QueueEntry.where(station: self).where.not(position: nil).maximum(:position)
     end
 
-    def queue_song(song, selector)
+    def queue_song(song, selector, was_recommended)
         if song.source != "Spotify"
             return "Please select a song from Spotify (not #{song.source})"
         end
@@ -61,7 +61,8 @@ class Station < ActiveRecord::Base
         # Mark the song as queued
         QueueEntry.create song: song, station: self,
             position: (self.queue_max || 0) + 1,
-            selector: selector
+            selector: selector,
+            was_recommended: was_recommended
 
         if not_playing
              # We're not currently playing a song, so immediately skip to this

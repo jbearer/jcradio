@@ -24,6 +24,7 @@
                         <form id="addSong<%=ind%>" action=<%="/stations/#{current_user.station.id}"%> method="post">
                             <input type="hidden" name="source_id" value=<%= song.source_id %> >
                             <input type="hidden" id="song_next_letter_input_<%=ind%>" name="song_next_letter" >
+                            <input type="hidden" name="was_recommended" value=<%=recommended%>>
                         </form>
 
                     <% end %>
@@ -34,7 +35,7 @@
                       <source src="<%=song.preview_url%>", type="audio/mpeg">
                     </audio>
                     <button class="button button6" onclick="playAudio(<%=ind%>)">
-                      <i class="fa fa-bath"></i>
+                      <i class="fa fa-thermometer"></i>
                     </button>
                   <% else %>
                       <i class="fa fa-ban"></i>

@@ -33,6 +33,17 @@ function next_song(queue_entry) {
     $("#now-playing-upvote").click(() => {
         toggle_upvote(queue_entry.id);
     });
+
+    if (queue_entry.selector) {
+        $("#now-playing-selector").html(`Chosen by ${queue_entry.selector.username}`);
+        if (queue_entry.rec) {
+            $("#now-playing-rec").html(
+                `<i class="fa fa-spotify" style="font-size:1.5em;font-wieght:bold"></i>&nbsp;rec`
+            )
+        } else {
+            $("#now-playing-rec").html("")
+        }
+    }
 }
 
 function update_timing(duration_ms, start_ms) {

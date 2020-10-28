@@ -83,7 +83,7 @@ class StationsController < ApplicationController
         end
 
         song = Song.get "Spotify", params[:source_id]
-        err_str = station.queue_song(song, current_user)
+        err_str = station.queue_song(song, current_user, params[:was_recommended])
 
         song.update last_played: Time.now.to_f * 1000 # ms since 01/01/1970
 
