@@ -83,7 +83,7 @@ class StationsController < ApplicationController
         end
 
         song = Song.get "Spotify", params[:source_id]
-        err_str = station.queue_song(song, current_user)
+        err_str = station.queue_song(song, current_user, params[:was_recommended])
 
         song.update last_played: Time.now.to_f * 1000 # ms since 01/01/1970
 
@@ -96,7 +96,10 @@ class StationsController < ApplicationController
         # Notify the next user that it's their turn to pick a song.
         next_user = station.users.order(:position)[0]
         $the_next_letter = params[:song_next_letter].capitalize()[0]
-        broadcast :next_up, next_user, $the_next_letter
+
+        if next_user != current_user then
+            broadcast :next_up, next_user, $the_next_letter
+        end
 
         json_ok
     end

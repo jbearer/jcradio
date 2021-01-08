@@ -88,29 +88,60 @@ module SongsHelper
       return alphabet.sample
     end
 
-    def self.get_or_create_from_spotify_record(song, persist=false)
-      result = Song.where(source: "Spotify", source_id: song.id).first
-      if result
-          return result
+    def self.get_or_create_from_spotify_record(songs, persist=false)
+      # songs is a list of spotify_songs
+
+      # index the spotify songs by their ids
+      spotify_ids = songs.map{|s| [s.id, s]}.to_h
+
+      # a list of Song objects that match the spotify songs
+      matches = Song.all.select{|item| spotify_ids.key? item.source_id}
+                  .map{|s| [s.source_id, s]}.to_h
+
+      results = []
+
+      songs.each do |s|
+
+        if matches.key? s.id then
+          result = matches[s.id]
+          #   if result.first_letter != SongsHelper.first_letter(s.name) then
+          #       result.update first_letter: SongsHelper.first_letter(s.name)
+          #   end
+          #   if result.next_letter != SongsHelper.calculate_next_letter(s.name) then
+          #       result.update next_letter: SongsHelper.calculate_next_letter(s.name)
+          #   end
+          # end
+
+          # TODO: Why does this take such a stupid amount of time?
+          # if (not result.preview_url) then
+          #   if s.preview_url then
+          #     result.update preview_url: s.preview_url
+          #   end
+          # end
+          results.push(matches[s.id])
+        else
+          data = {
+            title: s.name,
+            artist: s.artists.first.name,
+            album: s.album.name,
+            source: "Spotify",
+            source_id: s.id,
+            uri: s.uri,
+            duration: s.duration_ms,
+            first_letter: SongsHelper.first_letter(s.name),
+            next_letter: SongsHelper.calculate_next_letter(s.name),
+            preview_url: s.preview_url,
+          }
+
+          if persist then
+            results.push(Song.create data)
+          else
+            results.push(Song.new data)
+          end
+        end
       end
 
-      data = {
-          title: song.name,
-          artist: song.artists.first.name,
-          album: song.album.name,
-          source: "Spotify",
-          source_id: song.id,
-          uri: song.uri,
-          duration: song.duration_ms,
-          first_letter: SongsHelper.first_letter(song.name),
-          next_letter: SongsHelper.calculate_next_letter(song.name)
-      }
-
-      if persist then
-          Song.create data
-      else
-          Song.new data
-      end
-  end
+      return results
+    end
 
 end

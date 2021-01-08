@@ -138,19 +138,31 @@
 
             <!-- Play/Pause and Selector Name -->
             <div class = "columnMus rightMus">
+
+            <!-- TODO: Do we need these buttons?
             <span style="float: left; width: 32%; text-align: left;">&nbsp;</span>
             <span style="float: left; width: 32%; text-align: center; margin-top: 0.5em;">
               <button class="button button7" id="audioControl" onclick="togglePlaying()"><i class="fa fa-volume-up fa-lg"></i></button>
             </span>
+            -->
 
-              <span style="float: left; width: 32%; text-align: right; margin-top: 1em;">
-                <% if current_user.station.now_playing.selector == current_user %>
+              <span style="float: left; margin-top: 1em;">
+                <!-- TODO: Make next button work
+                if current_user.station.now_playing.selector == current_user
                   <form action="/stations/<%= current_user.station.id %>/next" class="in_place_form">
                     <button class="button button3" type="submit">Next</button>
                   </form>
-                <% elsif current_user.station.now_playing.selector %>
+                -->
+                <p id="now-playing-selector">
+                <% if current_user.station.now_playing.selector %>
                   Chosen by <%= current_user.station.now_playing.selector.username %>
                 <% end %>
+                </p>
+                <span id="now-playing-rec">
+                <% if current_user.station.now_playing.was_recommended %>
+                  <i class="fa fa-spotify" style="font-size:1.5em;font-wieght:bold"></i>&nbsp;rec
+                <% end %>
+                </span>
               </span>
             </div>
 

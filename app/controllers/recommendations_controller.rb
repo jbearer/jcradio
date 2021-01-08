@@ -62,13 +62,13 @@ class RecommendationsController < ApplicationController
             **symbol_options
         )
 
-        songs = []
-
-        recommendations.tracks.each do |rec|
-            if params[:query] == "" or params[:query] == SongsHelper.first_letter(rec.name) then
-                songs.append(SongsHelper.get_or_create_from_spotify_record rec)
-            end
+        matches = []
+        if params[:query] == "" then
+            matches = recommendations.tracks
+        else
+            matches = recommendations.tracks.select{|s| params[:query] == SongsHelper.first_letter(s.name)}
         end
+        songs = SongsHelper.get_or_create_from_spotify_record(matches, false)
 
         respond_to do |format|
             format.js { render "suggest", :locals => {

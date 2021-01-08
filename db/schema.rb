@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20200911045223) do
+ActiveRecord::Schema.define(version: 20201028034432) do
 
   create_table "chat_messages", force: :cascade do |t|
     t.text     "message"
@@ -38,6 +38,7 @@ ActiveRecord::Schema.define(version: 20200911045223) do
     t.integer "station_id"
     t.integer "position"
     t.integer "selector_id"
+    t.boolean "was_recommended"
   end
 
   add_index "queue_entries", ["position"], name: "index_queue_entries_on_position"
@@ -66,6 +67,7 @@ ActiveRecord::Schema.define(version: 20200911045223) do
     t.string   "first_letter"
     t.string   "next_letter"
     t.integer  "last_played",  limit: 8
+    t.string   "preview_url"
   end
 
   create_table "stations", force: :cascade do |t|
@@ -91,8 +93,10 @@ ActiveRecord::Schema.define(version: 20200911045223) do
   add_index "trigrams", ["owner_id", "owner_type"], name: "index_by_owner"
 
   create_table "upvotes", force: :cascade do |t|
-    t.integer "queue_entry_id"
-    t.integer "upvoter_id"
+    t.integer  "queue_entry_id"
+    t.integer  "upvoter_id"
+    t.datetime "created_at",     null: false
+    t.datetime "updated_at",     null: false
   end
 
   create_table "users", force: :cascade do |t|
