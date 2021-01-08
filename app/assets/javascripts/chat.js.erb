@@ -1,10 +1,14 @@
+function format_date(date) {
+    return new Date(date).toLocaleString();
+}
+
 function receive_chat(msg) {
     if (logged_in() && current_user().id === msg.sender.id) {
         msg_class = "chatbox rightChat";
-        sender_tag = msg.created_at;
+        sender_tag = format_date(msg.created_at);
     } else {
         msg_class = "chatbox";
-        sender_tag = `${msg.sender.username} (${msg.created_at})`;
+        sender_tag = `${msg.sender.username} (${format_date(msg.created_at)})`;
     }
 
     // Add the new message.

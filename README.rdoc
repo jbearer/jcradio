@@ -1,5 +1,28 @@
 == README
 
+################################
+# RVM Setup:
+################################
+
+Install rvm (https://www.digitalocean.com/community/tutorials/how-to-use-rvm-to-manage-ruby-installations-and-environments-on-a-vps)
+
+The first time:
+    rvm install ruby-2.4.9
+    rvm use ruby-2.4.9
+    bundle install
+Thereafter:
+    rvm use ruby-2.4.9
+
+You may have to be in a login shell for rvm to work properly:
+    bash --login
+    rvn use ruby-2.4.9
+
+################################
+# Deployment:
+################################
+
+################################
+
 Ruby version: 2.4.9
 Rails version: 4.2.8
 
