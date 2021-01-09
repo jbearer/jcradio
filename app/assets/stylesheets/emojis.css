@@ -1,0 +1,21 @@
+.emoji {
+  position: relative;
+}
+
+/* Tooltip text */
+.emoji .emojiname {
+  visibility: hidden;
+  background-color: black;
+  color: #fff;
+  text-align: center;
+  padding: 5px 2px;
+  border-radius: 6px;
+
+  position: absolute;
+  z-index: 1;
+}
+
+.emoji:hover .emojiname {
+  visibility: visible;
+  transition-delay:1s;
+}

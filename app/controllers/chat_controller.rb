@@ -41,9 +41,9 @@ class ChatController < ApplicationController
                 match
             else
                 <<-HTML
-                    <span class="tooltip">
+                    <span class="emoji">
                         <image src="/emojis/#{emoji.id}" width="30">
-                        <span class="tooltiptext">#{match}</span>
+                        <span class="emojiname">#{match}</span>
                     </span>
                 HTML
             end
