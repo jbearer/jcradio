@@ -10,8 +10,11 @@
 
 <script type="text/javascript">
   $(() => {
+    <% scroll_limit = 10 %>
+    scroll_limit = <%= scroll_limit %>;
+
     // Load messages from the database on page load.
-    <% ChatMessage.order(:created_at).each do |msg| %>
+    <% ChatMessage.order(:created_at).last(scroll_limit).each do |msg| %>
       receive_chat(<%= raw msg.to_json %>);
     <% end %>
 
@@ -19,5 +22,12 @@
       // Scroll to the focused message
       focus_message(<%= @message_id %>);
     <% end %>
+
+    // Lazily load more messages when the user scrolls to the top.
+    $("#chat").scroll((event) => {
+        if (event.target.scrollTop === 0) {
+            load_more();
+        }
+    });
   })
 </script>

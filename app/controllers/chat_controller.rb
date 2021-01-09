@@ -2,6 +2,17 @@ class ChatController < ApplicationController
     # GET /chat
     def index
         @message_id = nil
+
+        respond_to do |format|
+            format.html
+            format.json {
+                render json: ChatMessage
+                    .order(created_at: :desc)
+                    .limit(params[:limit])
+                    .offset(params[:offset])
+                    .to_json
+            }
+        end
     end
 
     # GET /chat/:id

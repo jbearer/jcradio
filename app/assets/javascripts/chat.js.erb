@@ -2,7 +2,7 @@ function format_date(date) {
     return new Date(date).toLocaleString();
 }
 
-function receive_chat(msg) {
+function receive_chat(msg, prepend=false) {
     if (logged_in() && current_user().id === msg.sender.id) {
         msg_class = "chatbox rightChat";
         sender_tag = format_date(msg.created_at);
@@ -17,15 +17,28 @@ function receive_chat(msg) {
           ${sender_tag}
           <p>${msg.message}</p>
         </div>
-    `).appendTo("#chat");
+    `);
+
+    if (prepend) {
+        // Save the scroll distance from the bottom so that we can update our scrollTop to give
+        // the appearance of not scrolling at all.
+        from_bottom = $("#chat")[0].scrollHeight - $("#chat")[0].scrollTop;
+
+        msg_dom.prependTo("#chat");
+
+        // Fix scrollTop to be the same distance from the bottom.
+        $("#chat")[0].scrollTop = $("#chat")[0].scrollHeight - from_bottom;
+    } else {
+        msg_dom.appendTo("#chat");
+
+        // Scroll to the bottom.
+        $("#chat")[0].scrollTop = $("#chat")[0].scrollHeight;
+    }
 
     if (msg.song) {
         msg_dom.addClass("tooltip");
         msg_dom.append(`<span class="tooltiptext">Sent during ${msg.song.title}</span`);
     }
-
-    // Scroll to the bottom.
-    $("#chat")[0].scrollTop = $("#chat")[0].scrollHeight
 }
 
 function mentioned_by(user, msg) {
@@ -42,7 +55,33 @@ function send_chat(message) {
 }
 
 function focus_message(id) {
+    if (!$("#chat").length) {
+        return load_more().then(() => focus_message(id));
+    }
+
     chat = $("#chat")
     msg = $(`#chat-message-${id}`);
     chat.scrollTop(msg.offset().top + chat.scrollTop() - msg.height());
+}
+
+function load_more() {
+    return new Promise((resolve, reject) => {
+        console.log(`loading ${scroll_limit} more messages`);
+
+        $.get("/chat.json",
+            {limit: scroll_limit, offset: $("#chat").children().length},
+            (messages) =>
+        {
+            if (messages) {
+                console.log(`loaded ${messages.length} additional messages`);
+                messages.forEach((msg) => {
+                    receive_chat(msg, prepend=true);
+                });
+                resolve(messages);
+            } else {
+                console.log("no more messages");
+                reject();
+            }
+        });
+    });
 }
