@@ -49,29 +49,42 @@ class ChatController < ApplicationController
             end
         end
 
+        # Search for mentions and replace them with highlighted links
+        mentions = []
+        text = text.gsub(/@[A-Za-z]+/).each do |mention|
+            # Remove the "@".
+            username = mention.slice(1..mention.length)
+
+            user = User.find_by username: username
+            if user
+                mentions.push user
+                "<a href=\"/users/#{user.id}\">#{mention}</a>"
+            elsif username == "here"
+                mentions.push nil
+                "<a href=\"/users\">#{mention}</a>"
+            end
+        end
+
         msg = ChatMessage.create({
             sender: current_user,
             message: text,
             song: current_user.station.now_playing.try(:song),
         })
 
-        broadcast :receive_chat, msg
-
-        # Search for mentions
-        msg.message.scan(/@([A-Za-z]+)/).each do |mention|
-            mention = mention[0]
-
-            user = User.find_by username: mention
+        # Send mention notifications
+        mentions.each do |user|
             if user
                 push(Notification.create({
                     user: user,
                     text: "#{current_user.username} mentioned you: #{msg.message}",
                     url: "/chat/#{msg.id}"
                 }))
-            elsif mention == "here"
+            else
                 broadcast :mentioned_by, current_user, msg
             end
         end
+
+        broadcast :receive_chat, msg
 
         json_ok
     end
