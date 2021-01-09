@@ -29,8 +29,11 @@ Commit and push your changes. Then:
     cd jcradio
     git pull
 
-If necessary, do any rake db operations and restart the server. However, simply changing
-server source code should not require a server restart.
+Simply changing server source code should not require a server restart. If you
+do need to restart the server:
+    jcradio-stop
+    do stuff
+    jcradio-start
 
 ################################
 

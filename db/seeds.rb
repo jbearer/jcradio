@@ -12,7 +12,7 @@ end
 
 def spotify_station(station, songs=[])
 
-    station = Station.create name: station, queue_pos: 0, now_playing: QueueEntry.create({song: spotify_song({title: "test_song"})})
+    station = Station.create name: station, queue_pos: 0
     songs.each_with_index do |song, i|
         user = User.create username: "User#{i}"
         QueueEntry.create station: station, song: spotify_song(song), position: i, selector: user
