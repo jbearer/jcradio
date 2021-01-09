@@ -3,6 +3,10 @@ class ChatController < ApplicationController
     def index
         @message_id = nil
 
+        if logged_in?
+            current_user.update last_viewed_chat: Time.now
+        end
+
         respond_to do |format|
             format.html
             format.json {

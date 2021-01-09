@@ -10,11 +10,15 @@ class User < ActiveRecord::Base
     end
 
     def to_h
-        {name: username, id: id}
+        as_json
     end
 
     def as_json(options=nil)
-        super only: [:id, :username]
+        ret = super only: [:id, :username]
+        if last_viewed_chat
+            ret[:new_chat_messages] = ChatMessage.where(["created_at > ?", last_viewed_chat]).count
+        end
+        ret
     end
 
     def has_upvoted?(selection)

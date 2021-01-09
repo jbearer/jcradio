@@ -46,7 +46,7 @@
              <%= link_to "Queue", "/stations", :class => current_class?("/stations") %>
              <%= link_to "Browse", "/songs", :class => current_class?("/songs") %>
              <%= link_to "Plots", "/stations/1/plots" %>
-             <%= link_to "Chat", "/chat", :class => current_class?("/chat") %>
+             <%= link_to "Chat", "/chat", :class => current_class?("/chat"), id: "chat_link" %>
              <% if logged_in? %>
                 <%= link_to "Notifications (#{current_user.pending_notifications.length})",
                       "/notifications" %>
@@ -254,7 +254,14 @@
         });
 
         <% if logged_in? %>
-          $(() => liverpc_subscribe())
+          $(() => {
+            liverpc_subscribe();
+
+            new_chat_messages = current_user().new_chat_messages || 0;
+            if (new_chat_messages) {
+                $("#chat_link").html(`Chat`);
+            }
+          });
         <% end %>
     </script>
 

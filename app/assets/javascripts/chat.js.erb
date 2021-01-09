@@ -3,6 +3,13 @@ function format_date(date) {
 }
 
 function receive_chat(msg, prepend=false) {
+    if (!$("#chat").length) {
+        // We're not currently looking at the chat. Update the count of unseen messages and return.
+        ++new_chat_messages;
+        $("#chat_link").html(`Chat (${new_chat_messages})`);
+        return;
+    }
+
     if (logged_in() && current_user().id === msg.sender.id) {
         msg_class = "chatbox rightChat";
         sender_tag = format_date(msg.created_at);
