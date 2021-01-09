@@ -11,13 +11,14 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20201028034432) do
+ActiveRecord::Schema.define(version: 20210108234551) do
 
   create_table "chat_messages", force: :cascade do |t|
     t.text     "message"
     t.integer  "sender_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer  "song_id"
   end
 
   create_table "chats", force: :cascade do |t|
@@ -93,10 +94,8 @@ ActiveRecord::Schema.define(version: 20201028034432) do
   add_index "trigrams", ["owner_id", "owner_type"], name: "index_by_owner"
 
   create_table "upvotes", force: :cascade do |t|
-    t.integer  "queue_entry_id"
-    t.integer  "upvoter_id"
-    t.datetime "created_at",     null: false
-    t.datetime "updated_at",     null: false
+    t.integer "queue_entry_id"
+    t.integer "upvoter_id"
   end
 
   create_table "users", force: :cascade do |t|

@@ -12,12 +12,17 @@ function receive_chat(msg) {
     }
 
     // Add the new message.
-    $("#chat").append(`
+    msg_dom = $(`
         <div class="${msg_class}" id="chat-message-${msg.id}">
           ${sender_tag}
           <p>${msg.message}</p>
         </div>
-    `);
+    `).appendTo("#chat");
+
+    if (msg.song) {
+        msg_dom.addClass("tooltip");
+        msg_dom.append(`<span class="tooltiptext">Sent during ${msg.song.title}</span`);
+    }
 
     // Scroll to the bottom.
     $("#chat")[0].scrollTop = $("#chat")[0].scrollHeight

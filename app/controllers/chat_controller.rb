@@ -19,7 +19,8 @@ class ChatController < ApplicationController
 
         msg = ChatMessage.create({
             sender: current_user,
-            message: params[:message]
+            message: params[:message],
+            song: current_user.station.now_playing.try(:song),
         })
 
         broadcast :receive_chat, msg

@@ -21,6 +21,17 @@ You may have to be in a login shell for rvm to work properly:
 # Deployment:
 ################################
 
+First, make sure your public RSA key is in /home/pi/.ssh/authorized_keys.
+
+Commit and push your changes. Then:
+
+    ssh pi@jcradio.ddns.net -p 10110
+    cd jcradio
+    git pull
+
+If necessary, do any rake db operations and restart the server. However, simply changing
+server source code should not require a server restart.
+
 ################################
 
 Ruby version: 2.4.9
