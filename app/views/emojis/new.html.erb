@@ -1,0 +1,6 @@
+
+<%= form_for :emoji, url: "/emojis", method: :post do |f| %>
+    <%= f.text_field :name, placeholder: "Name..." %>
+    <%= f.file_field :file, accept: "image/png, image/jpeg, image/gif" %>
+    <%= f.submit %>
+<% end %>

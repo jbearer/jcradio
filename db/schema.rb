@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20210109011757) do
+ActiveRecord::Schema.define(version: 20210109022855) do
 
   create_table "chat_messages", force: :cascade do |t|
     t.text     "message"
@@ -24,6 +24,14 @@ ActiveRecord::Schema.define(version: 20210109011757) do
   create_table "chats", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "emojis", force: :cascade do |t|
+    t.string   "name"
+    t.string   "content_type"
+    t.binary   "data"
+    t.datetime "created_at",   null: false
+    t.datetime "updated_at",   null: false
   end
 
   create_table "notifications", force: :cascade do |t|
@@ -94,8 +102,10 @@ ActiveRecord::Schema.define(version: 20210109011757) do
   add_index "trigrams", ["owner_id", "owner_type"], name: "index_by_owner"
 
   create_table "upvotes", force: :cascade do |t|
-    t.integer "queue_entry_id"
-    t.integer "upvoter_id"
+    t.integer  "queue_entry_id"
+    t.integer  "upvoter_id"
+    t.datetime "created_at",     null: false
+    t.datetime "updated_at",     null: false
   end
 
   create_table "users", force: :cascade do |t|

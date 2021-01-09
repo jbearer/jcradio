@@ -21,6 +21,7 @@ Rails.application.routes.draw do
   post "/stations/:id/refresh", to: "stations#refresh"
 
   resources :chat, only: [:index, :create, :show]
+  resources :emojis, only: [:new, :create, :show]
   resources :upvotes, only: [:create]
 
   get '/auth/spotify/callback', to: 'stations#spotify_create_user'

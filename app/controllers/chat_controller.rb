@@ -30,9 +30,28 @@ class ChatController < ApplicationController
             return json_error "You must be logged in to chat"
         end
 
+        # Search for emojis
+        text = params[:message].gsub(/:[A-Za-z_]+:/) do |match|
+            # Remove enclosing colons
+            name = match.slice(1..match.length-2)
+            Rails.logger.error name
+
+            emoji = Emoji.find_by name: name
+            if emoji.nil?
+                match
+            else
+                <<-HTML
+                    <span class="tooltip">
+                        <image src="/emojis/#{emoji.id}" width="30">
+                        <span class="tooltiptext">#{match}</span>
+                    </span>
+                HTML
+            end
+        end
+
         msg = ChatMessage.create({
             sender: current_user,
-            message: params[:message],
+            message: text,
             song: current_user.station.now_playing.try(:song),
         })
 
