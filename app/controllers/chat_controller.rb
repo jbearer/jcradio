@@ -1,11 +1,9 @@
 class ChatController < ApplicationController
+    after_action :update_last_viewed_chat
+
     # GET /chat
     def index
         @message_id = nil
-
-        if logged_in?
-            current_user.update last_viewed_chat: Time.now
-        end
 
         respond_to do |format|
             format.html
@@ -58,4 +56,11 @@ class ChatController < ApplicationController
 
         json_ok
     end
+
+    private
+        def update_last_viewed_chat
+            if logged_in?
+                current_user.update last_viewed_chat: Time.now
+            end
+        end
 end
