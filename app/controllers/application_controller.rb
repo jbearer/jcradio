@@ -3,6 +3,8 @@ require "live-rpc"
 class ApplicationController < ActionController::Base
     include ApplicationHelper
 
+    EMOJI_REGEX = /:[A-Za-z_-]+:/
+
     protect_from_forgery with: :exception
     if Rails.env.development?
         skip_before_action :verify_authenticity_token

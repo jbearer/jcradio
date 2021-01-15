@@ -1,4 +1,16 @@
 <table>
+    <tr>
+        <div id="upload_form">
+            <%= form_for :emoji, url: "/emojis", method: :post do |f| %>
+                <%= f.text_field :name, placeholder: "Name..." %>
+                <%= f.file_field :file, accept: "image/png, image/jpeg, image/gif", class: "hidden_file_input" %>
+                <label for="emoji_file" id="emoji_file_label">Browse or Drag</label>
+                <input type="hidden" name="default_name" id="emoji_default_name">
+                <input type="hidden" name="url" id="emoji_url">
+                <%= f.submit %>
+            <% end %>
+        </div>
+    </tr>
     <% @emojis.each do |emoji| %>
         <tr>
             <td>:<%= emoji.name %>:</td>

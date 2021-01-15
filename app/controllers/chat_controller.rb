@@ -31,7 +31,7 @@ class ChatController < ApplicationController
         end
 
         # Search for emojis
-        text = params[:message].gsub(/:[A-Za-z_-]+:/) do |match|
+        text = params[:message].gsub(EMOJI_REGEX) do |match|
             # Remove enclosing colons
             name = match.slice(1..match.length-2)
             Rails.logger.error name

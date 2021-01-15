@@ -1,3 +1,5 @@
+require 'open-uri'
+
 class EmojisController < ApplicationController
     before_action :set_emoji, only: [:show]
 
@@ -8,18 +10,40 @@ class EmojisController < ApplicationController
 
     # GET /emojis/new
     def new
+        @emojis = Emoji.all.order(:name)
+        render template: "emojis/index"
     end
 
     # POST /emojis
     def create
         emoji = params[:emoji]
 
+        if emoji[:file].nil?
+            if params[:url]
+                emoji[:file] = open(params[:url])
+            end
+        end
+        if emoji[:file].nil?
+            return json_error "file is required"
+        end
+
+        if emoji[:name].nil? or emoji[:name].empty?
+            emoji[:name] = params[:default_name]
+            Rails.logger.error params[:default_name]
+        end
+        if emoji[:name].nil?
+            return json_error "name is required"
+        end
+        if not EMOJI_REGEX.match?(":" + emoji[:name] + ":")
+            return json_error "invalid emoji name \"#{emoji[:name]}\""
+        end
+
         if not ["image/png", "image/jpeg", "image/gif"].include? emoji[:file].content_type
             return json_error "Unrecognized file type"
         end
 
         Emoji.create name: emoji[:name], content_type: emoji[:file].content_type, data: emoji[:file].read
-        redirect_to "/chat"
+        redirect_to "/emojis"
     end
 
     # GET /emojis/:id
