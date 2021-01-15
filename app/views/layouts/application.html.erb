@@ -259,7 +259,7 @@
 
             new_chat_messages = current_user().new_chat_messages || 0;
             if (new_chat_messages) {
-                $("#chat_link").html(`Chat ${new_chat_messages}`);
+                $("#chat_link").html(`Chat (${new_chat_messages})`);
             }
           });
         <% end %>
