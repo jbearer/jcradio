@@ -1,0 +1,8 @@
+<table>
+    <% @emojis.each do |emoji| %>
+        <tr>
+            <td>:<%= emoji.name %>:</td>
+            <td><img src="/emojis/<%= emoji.id %>" width=30></td>
+        </tr>
+    <% end %>
+</table>

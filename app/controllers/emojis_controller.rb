@@ -1,6 +1,11 @@
 class EmojisController < ApplicationController
     before_action :set_emoji, only: [:show]
 
+    # GET /emojis
+    def index
+        @emojis = Emoji.all.order(:name)
+    end
+
     # GET /emojis/new
     def new
     end
