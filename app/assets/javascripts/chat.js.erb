@@ -26,6 +26,12 @@ function receive_chat(msg, prepend=false) {
         </div>
     `);
 
+    msg_dom.find(".mention").each(function() {
+        if ($(this).html() === "here" || $(this).html() === current_user().username) {
+          $(this).css("background-color", "#d6d675");
+        }
+    });
+
     if (prepend) {
         // Save the scroll distance from the bottom so that we can update our scrollTop to give
         // the appearance of not scrolling at all.

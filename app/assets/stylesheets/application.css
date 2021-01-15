@@ -18,8 +18,7 @@
 .tooltip {
   position: relative;
   display: inline-block;
-  border-bottom: 1px dotted black; /* If you want dots under the hoverable text */
-}
+}1
 
 /* Tooltip text */
 .tooltip .tooltiptext {
@@ -50,4 +49,9 @@
   z-index: :-1;
   position: absolute;
   opacity: 0;
+}
+
+.mention {
+  color: blue;
+  text-decoration: none;
 }

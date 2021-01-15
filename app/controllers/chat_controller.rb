@@ -58,10 +58,12 @@ class ChatController < ApplicationController
             user = User.find_by username: username
             if user
                 mentions.push user
-                "<a href=\"/users/#{user.id}\">#{mention}</a>"
+                "<a href=\"/users/#{user.id}\" class=\"mention\">#{username}</a>"
             elsif username == "here"
                 mentions.push nil
-                "<a href=\"/users\">#{mention}</a>"
+                "<a href=\"/users\" class=\"mention\">#{username}</a>"
+            else
+                mention
             end
         end
 
