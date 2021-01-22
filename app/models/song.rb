@@ -15,7 +15,7 @@ class Song < ActiveRecord::Base
     fuzzily_searchable :title, :artist, :album
 
     def as_json(options=nil)
-        super only: [:id, :title, :album, :artist, :first_letter, :next_letter, :uri]
+        super only: [:id, :title, :album, :artist, :first_letter, :next_letter, :uri, :last_played]
     end
 
     def self.get(source, source_id)
