@@ -30,8 +30,10 @@ class ChatController < ApplicationController
             return json_error "You must be logged in to chat"
         end
 
+        text = CGI::escapeHTML params[:message]
+
         # Search for emojis
-        text = params[:message].gsub(EMOJI_REGEX) do |match|
+        text = text.gsub(EMOJI_REGEX) do |match|
             # Remove enclosing colons
             name = match.slice(1..match.length-2)
             Rails.logger.error name
@@ -71,6 +73,7 @@ class ChatController < ApplicationController
             sender: current_user,
             message: text,
             song: current_user.station.now_playing.try(:song),
+            version: 1
         })
 
         # Send mention notifications

@@ -11,14 +11,15 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20210109022855) do
+ActiveRecord::Schema.define(version: 20210420184241) do
 
   create_table "chat_messages", force: :cascade do |t|
     t.text     "message"
     t.integer  "sender_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at",               null: false
+    t.datetime "updated_at",               null: false
     t.integer  "song_id"
+    t.decimal  "version",    default: 0.0
   end
 
   create_table "chats", force: :cascade do |t|
