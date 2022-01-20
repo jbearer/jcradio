@@ -82,9 +82,29 @@
                       <% end %>
                     </tbody>
                   </table>
-                </div>
 
-                <br><br><br>
+                  <p id="last-letters">
+                    <% if current_user and current_user.station %>
+                      <!-- Determine next user -->
+                      <% next_user = current_user.station.users.order(:position)[1] %>
+                      <!-- Print header -->
+                      Previous letters... <br>
+                      <!-- Loop, and print out last N first letters (from top of queue)-->
+                      <!-- Bold the letters that correspond to the next selector -->
+                      <% current_user.station.queue.last(10).each do |queue_entry| %>
+                        <% if queue_entry.selector == next_user %>
+                          <strong><%= queue_entry.song.first_letter %></strong>
+                        <% else %>
+                          <font size="-1"><%= queue_entry.song.first_letter %></font>
+                        <% end %>
+                      <% end %>
+                      <!-- Print a nice arrow emoji -->
+                      &nbsp;&nbsp;<font size="+2"><strong>⬅</strong></font>
+                    <% end %>
+                  </p>
+              </div>
+
+              <br><br><br>
         </div>
 
 
