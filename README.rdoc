@@ -15,7 +15,7 @@ Thereafter:
 
 You may have to be in a login shell for rvm to work properly:
     bash --login
-    rvn use ruby-2.4.9
+    rvm use ruby-2.4.9
 
 ################################
 # Deployment:
@@ -34,6 +34,14 @@ do need to restart the server:
     jcradio-stop
     do stuff
     jcradio-start
+
+################################
+
+You might also need to install nodejs... (At least Austin on P1G4 Ubuntu 20.04 had to. Otherwise the rake commands failed)
+
+    sudo apt install nodejs
+
+
 
 ################################
 
