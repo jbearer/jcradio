@@ -69,7 +69,7 @@
                   <table>
                     <p id="next-up">
                       <% if current_user and current_user.station %>
-                        Next up... <%=current_user.station.users.order(:position)[0].username%> with '<%= $the_next_letter %>'
+                        <strong>Next up... <%=current_user.station.users.order(:position)[0].username%> with '<%= $the_next_letter %>'</strong>
                       <% else %>
                         Next up...
                       <% end %>
@@ -91,7 +91,7 @@
                       Previous letters... <br>
                       <!-- Loop, and print out last N first letters (from top of queue)-->
                       <!-- Bold the letters that correspond to the next selector -->
-                      <% current_user.station.queue.last(10).each do |queue_entry| %>
+                      <% current_user.station.queue_before(-(current_user.station.queue_max-current_user.station.queue_pos-10)).each do |queue_entry| %>
                         <% if queue_entry.selector == next_user %>
                           <strong><%= queue_entry.song.first_letter %></strong>
                         <% else %>
