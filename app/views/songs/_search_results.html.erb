@@ -1,4 +1,12 @@
 <% if not songs.empty? then %>
+
+  <!-- Run this script once this "redner partial" is called -->
+  <body>
+    <script type="text/javascript">
+      hide_loading_gif();
+    </script>
+  </body>
+
   <table>
 
     <tr>
@@ -61,6 +69,12 @@
 
 <!-- Confirm Song Popup -->
 <script>
+
+function hide_loading_gif() {
+    // console.log('Hide loading gif please');
+    var loadingspinner = document.getElementById("loadingspinner");
+    loadingspinner.style.display = "none";
+}
 
 function playAudio(ind) {
   var x = document.getElementById(`myAudio${ind}`)
