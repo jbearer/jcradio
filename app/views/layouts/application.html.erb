@@ -285,4 +285,10 @@
         <% end %>
     </script>
 
+    <script type="text/javascript">
+      <% if current_user %>
+        refresh_now_playing(<%= current_user.station.id %>);
+      <%end%>
+    </script>
+
 </html>

@@ -3,6 +3,10 @@ module StationsHelper
         url = "me/player"
         response = RSpotify::User.oauth_get($spotify_user.id, url)
 
+        if not response['is_playing']
+            return 999999999
+        end
+
         return response["progress_ms"]
     end
 

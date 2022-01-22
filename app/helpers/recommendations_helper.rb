@@ -31,6 +31,12 @@ module RecommendationsHelper
     end
 
     def spotify_get_all_songs(client_spotify)
+        # Check if recently polled User songs
+        spotify_library_cache = $spotify_libraries_cached[current_user.username]
+        if Time.now() < (spotify_library_cache[0] + (1 * 24 * 60 * 60).seconds) # Update once a day
+            return spotify_library_cache[1]
+        end
+
         num_tracks = spotify_number_of_tracks(client_spotify.id)
         all_tracks = []
         offset = 1
@@ -42,6 +48,8 @@ module RecommendationsHelper
 
             break if offset >= num_tracks
         end
+
+        $spotify_libraries_cached[current_user.username] = [Time.now(), all_tracks]
 
         return all_tracks
     end

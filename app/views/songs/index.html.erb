@@ -1,7 +1,7 @@
 <h2> Search Spotify </h2>
 <div class="search-container">
     <form action="/songs/inline_search", method="get", data-remote="true", onsubmit="show_loading_gif()">
-      <input type="text" placeholder="Search..." name="query" value="<%= @query ? @query : '' %> ">
+      <input type="text" placeholder="Search..." name="query" value="<%= @query ? @query : '' %> " autocomplete="off">
       <button class="button button3" type="submit"><i class="fa fa-search"></i></button>
     </form>
 </div>
@@ -24,10 +24,16 @@
     <label for="my_chosen_songs">Songs Chosen by Me</label>
   <input type="radio" name="source" value="my_upvoted_songs">
     <label for="my_upvoted_songs">Songs Upvoted by Me</label>
-  <input type="radio" name="source" value="my_spotify_library" <%if not check_all_songs%> checked <%end%> >
+  <input type="radio" name="source" value="my_spotify_library"
+    <%if not check_all_songs%>
+      checked
+    <%else%>
+      disabled
+    <%end%>
+  >
     <label for="my_spotify_library">My Spotify Library</label>
 
-  <input type="text" name="query" value="<%= $the_next_letter %>" style="width:40px">
+  <input type="text" name="query" value="<%= $the_next_letter %>" style="width:40px" autocomplete="off">
   <button class="button button3" type="submit">
     <i class="fa fa-search"></i>
     <div id="loadingspinner" class="loader" ></div>
@@ -40,9 +46,14 @@
 </div>
 
 <script>
+
+  var start_time = 0; // Timer for loading songs
+
   function show_loading_gif() {
     // console.log('Show loading gif please');
     var loadingspinner = document.getElementById("loadingspinner");
     loadingspinner.style.display = "block";
+    start_time = Date.now() / 1000.0;
+    console.log(`Start: ${start_time}`);
   }
 </script>

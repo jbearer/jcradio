@@ -1,5 +1,7 @@
 $the_next_letter = '_'
 $client_spotifies = {}
+$spotify_libraries_cached = {} # Cache spotify library for each user (logging time too, for expiry)
+
 class StationsController < ApplicationController
 
     include SongsHelper
@@ -23,6 +25,7 @@ class StationsController < ApplicationController
                 return json_error "user must be logged in to link account"
             else
                 $client_spotifies[current_user.username] = info
+                $spotify_libraries_cached[current_user.username] = [Time.at(0), []] # Timestamp, and song listS
             end
         end
         redirect_to "/stations/1"
@@ -144,6 +147,8 @@ class StationsController < ApplicationController
 
                 user = $client_spotifies[current_user.username]
                 user.save_tracks!(tracks)
+
+                $spotify_libraries_cached[current_user.username][0] = Time.at(0) # Reset cache
 
                 push(Notification.create({
                     user: current_user,

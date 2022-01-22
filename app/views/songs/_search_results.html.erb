@@ -1,11 +1,9 @@
-<% if not songs.empty? then %>
+<!-- Run this script once this "render partial" is called -->
+<script type="text/javascript">
+  hide_loading_gif();
+</script>
 
-  <!-- Run this script once this "redner partial" is called -->
-  <body>
-    <script type="text/javascript">
-      hide_loading_gif();
-    </script>
-  </body>
+<% if not songs.empty? then %>
 
   <table>
 
@@ -74,6 +72,7 @@ function hide_loading_gif() {
     // console.log('Hide loading gif please');
     var loadingspinner = document.getElementById("loadingspinner");
     loadingspinner.style.display = "none";
+    console.log(`Dur:   ${Date.now()/1000.0 - start_time}`);
 }
 
 function playAudio(ind) {

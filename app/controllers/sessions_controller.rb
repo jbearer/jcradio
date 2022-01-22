@@ -64,7 +64,10 @@ class SessionsController < ApplicationController
   # DELETE /sessions
   def destroy
     if logged_in?
-        broadcast :push, "#{current_user.username} left the radio."
+        # If spotify linked, reset spotify library cache time
+        if $client_spotifies.key?(current_user.username)
+          $spotify_libraries_cached[current_user.username][0] = Time.at(0) # Reset cache
+        end
 
         # Push back all other users
         User.where("position > ?", current_user.position).each do |inc_user|
@@ -75,9 +78,11 @@ class SessionsController < ApplicationController
           puts "\n\n\n&&&&&&&"
         end
 
-
         current_user.update station: nil, position: nil
         LiveRPC.close current_user.id
+
+        broadcast :push, "#{current_user.username} left the radio." # Send a notification to everyone else
+
         reset_session
     else
         error "cannot log out (not logged in)"
