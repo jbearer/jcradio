@@ -56,6 +56,12 @@ class SessionsController < ApplicationController
             end
         end
         broadcast :push, "#{current_user.username} joined the radio."
+
+        # Set the next_letter properly, if currently unset
+        if $the_next_letter == "_"
+          $the_next_letter = @user.station.queue[@user.station.queue_max - @user.station.queue_pos].song.next_letter
+        end
+
     end
 
     return_to_page
