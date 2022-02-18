@@ -3,11 +3,12 @@ module StationsHelper
         url = "me/player"
         response = RSpotify::User.oauth_get($spotify_user.id, url)
 
-        if not response['is_playing']
-            return 999999999
+        if !response.nil? and response['is_playing']
+            return response["progress_ms"]
         end
 
-        return response["progress_ms"]
+        return 999999999
+
     end
 
     def self.set_device(device_id)

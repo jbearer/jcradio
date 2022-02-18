@@ -1,5 +1,6 @@
 require 'yaml'
 
+
 class SessionsController < ApplicationController
   include ActionController::Live
   include StationsHelper

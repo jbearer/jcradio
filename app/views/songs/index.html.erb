@@ -41,9 +41,6 @@
 
 </form>
 
-<div id="search-results">
-  <%= render partial: 'songs/search_results', :locals => {songs: songs, recommended: false} %>
-</div>
 
 <script>
 
@@ -57,3 +54,7 @@
     console.log(`Start: ${start_time}`);
   }
 </script>
+
+<div id="search-results">
+  <%= render partial: 'songs/search_results', :locals => {songs: songs, recommended: false} %>
+</div>

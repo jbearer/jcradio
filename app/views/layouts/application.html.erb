@@ -52,6 +52,7 @@
                       "/notifications" %>
              <% end %>
              <%= link_to "Recommendations", "/recommendations", :class => current_class?("/recommendations") %>
+             <%= link_to "Buddy", "/buddy", :class => current_class?("/buddy") %>
              <%= link_to "Jeb's Birthday", "/songs/birth" %>
         </div>
 
@@ -126,18 +127,20 @@
       </div>
 
     <!-- Music Bar -->
-    <% if logged_in? and current_user.station and current_user.station.now_playing %>
+    <% if @station and @station.now_playing %>
         <div class="musicBar">
           <div class = "columnMus leftMus">
-                <p id="now-playing-title"><%= current_user.station.now_playing.song.title %></p>
-                <span id="now-playing-artist"><%= current_user.station.now_playing.song.artist %></span>
-                <button id="now-playing-upvote" onclick="toggle_upvote(<%= current_user.station.now_playing.id %>)">
-                  <i id="upvote" class="fa fa-thumbs<%= current_user.has_upvoted?(current_user.station.now_playing) ? "" : "-o" %>-up fa-lg"></i>
-                </button>
-                <button id="now-playing-spotify-save" onclick="save_song(<%= current_user.station.id %>)">
-                  <i id="spotify-save" class="fa fa-floppy-o fa-lg"></i>
-                </button>
-                <button onclick="refresh_now_playing(<%= current_user.station.id %>)">
+                <p id="now-playing-title"><%= @station.now_playing.song.title %></p>
+                <span id="now-playing-artist"><%= @station.now_playing.song.artist %></span>
+                <% if logged_in? %>
+                  <button id="now-playing-upvote" onclick="toggle_upvote(<%= @station.now_playing.id %>)">
+                    <i id="upvote" class="fa fa-thumbs<%= current_user.has_upvoted?(@station.now_playing) ? "" : "-o" %>-up fa-lg"></i>
+                  </button>
+                  <button id="now-playing-spotify-save" onclick="save_song(<%= @station.id %>)">
+                    <i id="spotify-save" class="fa fa-floppy-o fa-lg"></i>
+                  </button>
+                <% end %>
+                <button onclick="refresh_now_playing(<%= @station.id %>)">
                   <i class="fa fa-refresh fa-lg"></i>
                 </button>
             </div>
@@ -173,12 +176,12 @@
 
               <span style="float: left; margin-top: 1em;">
                 <p id="now-playing-selector">
-                <% if current_user.station.now_playing.selector %>
-                  Chosen by <%= current_user.station.now_playing.selector.username %>
+                <% if @station.now_playing.selector %>
+                  Chosen by <%= @station.now_playing.selector.username %>
                 <% end %>
                 </p>
                 <span id="now-playing-rec">
-                <% if current_user.station.now_playing.was_recommended %>
+                <% if @station.now_playing.was_recommended %>
                   <i class="fa fa-spotify" style="font-size:1.5em;font-wieght:bold"></i>&nbsp;rec
                 <% end %>
                 </span>
@@ -220,10 +223,8 @@
 
             }
 
-            <% if logged_in? && current_user.station.now_playing %>
-
-              setSongStats(<%= current_user.station.now_playing.song.duration %>, <%= current_user.station.now_playing_start_ms %> );
-
+            <% if @station.now_playing %>
+              setSongStats(<%= @station.now_playing.song.duration %>, <%= @station.now_playing_start_ms %> );
             <% end %>
 
             window.setInterval(updateBar, 100);
@@ -334,9 +335,9 @@
         <% end %>
     </script>
 
-    <script type="text/javascript">
-      <% if current_user %>
-        refresh_now_playing(<%= current_user.station.id %>);
+    <script>
+      <% if @station %>
+        refresh_now_playing(<%= @station.id %>);
       <%end%>
     </script>
 

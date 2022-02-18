@@ -68,10 +68,30 @@ TODO
         Batch requests so we're not constantly querying db
 
     Features
-        History of songs
-        Notify you again if it's almost your turn
-        Plots
+        xHistory of songs
+        xNotify you again if it's almost your turn
+        xPlots
         SQL query
+
+        When adding a song, option "Override the first Letter" vs "I know, I don't care"
+            Will help with anaylsis, and when Buddy just random shuffles your spotify Library
+
+        Buddy
+            different tastes
+            Optional variety, if say there are only 5 Z songs
+
+        Shuffle your N recent liked songs
+            Dependent: option to "I know, I don't care"
+
+        Re-sync whole database of songs to use standardized first_letter calculation
+            eg. "Move Like you want - Live" autopopulates to L
+            
+
+        Skip song ability
+            notify all users who skipped the song
+
+
+
         Recommendations
             Encorporate min and max in audio features
             Encorporate genre seeds?

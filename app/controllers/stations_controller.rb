@@ -1,4 +1,6 @@
 
+$notify_laggard_user = true # flag to notify user once queue is almost empty
+
 require 'yaml'
 
 class StationsController < ApplicationController
@@ -50,6 +52,10 @@ class StationsController < ApplicationController
         if @station and $the_next_letter == "_" or $the_next_letter == ""
             $the_next_letter = @station.queue[@station.queue_max - @station.queue_pos].song.next_letter
         end
+
+        # refresh the now_playing
+        refresh_now_playing_and_stuff
+
     end
 
     def change_queue_pos
@@ -84,6 +90,105 @@ class StationsController < ApplicationController
         # json_ok
 
     end
+
+
+    def buddy_add_song
+
+        if @station.users.order(:position)[0] != User.find_by(username: "Buddy")
+            return
+        end
+
+        puts "****************************"
+        puts "Buddy's turn!"
+        puts "NextLetter = #{$the_next_letter}"
+        puts "****************************"
+
+        # Only Buddy alone
+        if @station.users.length == 1
+            if @station.queue_max - @station.queue_pos >= 1
+                puts "****************************"
+                puts "Buddy is lonely. Buddy will wait for smaller queue"
+                puts "****************************"
+                return
+            end
+        end
+
+        # Queue long, waiting
+        if @station.queue_max - @station.queue_pos > 10
+            puts "****************************"
+            puts "Too many songs in the queue. Buddy will wait!"
+            puts "****************************"
+            return
+        end
+
+        # Get Buddy user
+        @buddy = User.find_by(username: "Buddy")
+
+        ## Add a song
+        if $buddy_taste == "radio_played"
+            index = QueueEntry.where.not(position: nil) # TODO Ask jeb for optimization
+            results = index.order("queue_entries.id DESC").map {|q| q.song}
+
+            songs = []
+            results.each do |s|
+                if s.first_letter == $the_next_letter then
+                    songs.append(s)
+                end
+            end
+
+        # Default to All songs on radio
+        else
+            puts "*******************************************************"
+            puts " Sorry, buddy_taste='#{$buddy_taste}'' isn't supported yet"
+            puts "*******************************************************"
+
+            ## Copy from above, Default to All Songs on Radio
+            index = QueueEntry.where.not(position: nil) # TODO Ask jeb for optimization
+            results = index.order("queue_entries.id DESC").map {|q| q.song}
+            songs = []
+            results.each do |s|
+                if s.first_letter == $the_next_letter then
+                    songs.append(s)
+                end
+            end
+        end
+
+        # Get random number for the song
+        chosen_song = songs[rand(songs.length)]
+        err_str = @station.queue_song(chosen_song, @buddy, false)
+
+        if err_str != "" then
+            puts "\n\n\n\n****************************"
+            puts "err: #{err_str}"
+            puts "****************************"
+            return
+        end
+
+        @buddy.update position: @station.users.maximum(:position) + 1
+
+        # Notify the next user that it's their turn to pick a song.
+        next_user = @station.users.order(:position)[0]
+        $the_next_letter = chosen_song.next_letter.capitalize()[0]
+
+        if next_user != @buddy then
+            broadcast :next_up, next_user, $the_next_letter
+        end
+
+        puts "****************************"
+        puts index.length
+        puts index[0]
+        puts index[0].song
+        puts index[0].song.title
+        puts index[0].song.first_letter
+        puts "****************************"
+        puts songs.length
+        puts chosen_song.title
+        puts "err: #{err_str}"
+        puts "****************************"
+
+
+    end
+
 
     # PUT /stations/1
     #   song_id: string
@@ -200,15 +305,39 @@ class StationsController < ApplicationController
     # POST /stations/1/refresh
     # Refresh the now_playing window
     def refresh
+        refresh_now_playing_and_stuff
+
+        render json: { success: true }
+    end
+
+    def refresh_now_playing_and_stuff
         if $the_background_thread.status == 'sleep' then
             $the_background_thread.wakeup
         end
 
+        # Check if it's Buddy's turn
+        buddy_add_song
+
+        # If one song in queue, notify next user
+        if @station.queue_max - @station.queue_pos == 0 && $notify_laggard_user
+            $notify_laggard_user = false # unset the flag
+            next_user = @station.users.order(:position)[0]
+            if next_user != User.find_by(username: "Buddy")
+                # Notify the next user that it's their turn to pick a song.
+                if next_user != @buddy then
+                    broadcast :next_up, next_user, $the_next_letter
+                    puts "****************************"
+                    puts "****************************"
+                    puts "notify user: #{next_user.username}"
+                    puts "****************************"
+                    puts "****************************"
+                end
+            end
+        end
+
         # call update_timing, in case the song didn't change, but the
         # end time did change
-        Station.find(1).update_timing_stats
-
-        render json: { success: true }
+        @station.update_timing_stats
     end
 
     # GET /stations/1/plots
@@ -217,5 +346,4 @@ class StationsController < ApplicationController
     end
 
 end
-
 

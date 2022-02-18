@@ -1,6 +1,12 @@
 class ChatController < ApplicationController
     after_action :update_last_viewed_chat
 
+    before_action :set_station
+    private
+        def set_station
+            @station = Station.find 1
+        end
+
     # GET /chat
     def index
         @message_id = nil

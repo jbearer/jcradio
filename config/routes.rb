@@ -43,9 +43,17 @@ Rails.application.routes.draw do
   get "/recommendations/suggest", to: "recommendations#suggest"
   post "/recommendations/add_seed", to: "recommendations#add_seed"
 
+  # Buddy
+  resources :buddy, only: [:index, :create, :show]
+
+  post "/buddy/configure", to: "buddy#configure"
+
+
   get "/stations/:id/plots", to: "stations#plots"
 
   get "/songs/birth", to: "songs#birth"
+
+
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

@@ -1,0 +1,54 @@
+<div>
+  <h2> Hello. I am Buddy </h2>
+</div>
+
+<div>
+  <form action="/buddy/configure" id="buddy_cfg_form" method="post">
+    <h3> May I join you? </h3>
+    <input type="radio" name="buddy_on" value=true  <%if @buddy_on%> checked <%end%> >
+      <label for="true"> Yeah! </label>
+    <input type="radio" name="buddy_on" value=false <%if !@buddy_on%> checked <%end%> >
+      <label for="false"> Nah </label>
+    <br>
+
+    <h3> What kind of music do I like? </h3>
+    <input type="radio" name="buddy_taste" value="radio_played" <%if @buddy_taste=="radio_played"%> checked <%end%> >
+      <label for="radio_played">Radio Played</label>
+      <br>
+    <input type="radio" name="buddy_taste" value="radio_liked" <%if @buddy_taste=="radio_liked"%> checked <%end%> >
+      <label for="radio_liked">Radio Liked</label>
+      <br>
+    <input type="radio" name="buddy_taste" value="austin_played" <%if @buddy_taste=="austin_played"%> checked <%end%> >
+      <label for="austin_played">Austin Played</label>
+      <br>
+    <input type="radio" name="buddy_taste" value="aurora_played" <%if @buddy_taste=="aurora_played"%> checked <%end%> >
+      <label for="aurora_played">Aurora Played</label>
+      <br>
+    <input type="radio" name="buddy_taste" value="jeb_played" <%if @buddy_taste=="jeb_played"%> checked <%end%> >
+      <label for="jeb_played">Jeb Played</label>
+      <br>
+    <input type="radio" name="buddy_taste" value="daniel_played" <%if @buddy_taste=="daniel_played"%> checked <%end%> >
+      <label for="daniel_played">Daniel Played</label>
+      <br>
+    <input type="radio" name="buddy_taste" value="recs_from_last_songs" <%if @buddy_taste=="recs_from_last_songs"%> checked <%end%> >
+      <label for="recs_from_last_songs">Recs from last songs</label>
+      <br>
+
+    <button type="submit"> Submit </button>
+
+  </form>
+
+  <%= "buddy_on: #{@buddy_on}" %>
+  <br>
+  <%= "buddy_taste: #{@buddy_taste}" %>
+
+</div>
+
+
+<script>
+
+console.log("hello");
+
+</script>
+
+
