@@ -1,8 +1,28 @@
+require 'yaml'
+
 class SessionsController < ApplicationController
   include ActionController::Live
 
   # GET /sessions
   def index
+    # Auto-login to spotify if possible
+    if not $spotify_user
+      file_path = File.join(Dir.home, "/jcradio/.nothingtoseehere.yml")
+      if File.exist?(file_path)
+        $spotify_user = RSpotify::User.new(YAML.load_file(file_path))
+        # Update the song that's currently playing
+        TitleExtractorWorker.perform_async(@station)
+      end
+    end
+  end
+
+  # POST /sessions/radio_spotify_logout
+  def radio_spotify_logout
+    $spotify_user = nil
+    if File.exist?(File.join(Dir.home, "/jcradio/.nothingtoseehere.yml"))
+      File.delete(File.join(Dir.home, "/jcradio/.nothingtoseehere.yml"))
+    end
+    redirect_to "/sessions"
   end
 
   # POST /sessions
@@ -58,7 +78,7 @@ class SessionsController < ApplicationController
         broadcast :push, "#{current_user.username} joined the radio."
 
         # Set the next_letter properly, if currently unset
-        if $the_next_letter == "_"
+        if @station and $the_next_letter == "_" or $the_next_letter == ""
           $the_next_letter = @user.station.queue[@user.station.queue_max - @user.station.queue_pos].song.next_letter
         end
 

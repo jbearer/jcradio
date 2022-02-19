@@ -242,6 +242,7 @@
 	/*Spotify Button*/
 	.button5 {
 		width: 200px;
+		height: 50px;
 		background-color: rgba(146,220,229,0.5);
 		color: #eae8ff;
 		font-weight: normal;
@@ -261,6 +262,14 @@
 	.button8{
 		font-weight: normal;
 		/*width: 150px;*/
+		font-size: 1em;
+	}
+
+	/*Spotify Logout*/
+	.button9{
+		width: 200px;
+		font-weight: normal;
+		margin: 0 0;
 		font-size: 1em;
 	}
 

@@ -16,7 +16,6 @@ Rails.application.routes.draw do
 
   resources :stations, only: [:index, :show]
   post "/stations/:id", to: 'stations#update'
-  get "/stations/:id/next", to: 'stations#next'
   post "/stations/:id/save", to: "stations#save"
   post "/stations/:id/refresh", to: "stations#refresh"
 
@@ -30,8 +29,13 @@ Rails.application.routes.draw do
 
   get 'sessions/test_webrtc'
 
+  post '/sessions/radio_spotify_logout', to: "sessions#radio_spotify_logout"
+  post '/stations/:id/user_spotify_logout', to: "stations#user_spotify_logout"
+
   get '/stations/:id/change_queue_pos', to: "stations#change_queue_pos"
   post '/stations/:id/edit_queue_pos',  to: "stations#edit_queue_pos"
+
+  post '/stations/:id/skip_song',  to: "stations#skip_song"
 
   resources :recommendations, only: [:index, :create]
 

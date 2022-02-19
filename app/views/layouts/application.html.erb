@@ -149,9 +149,14 @@
                 <canvas id="progress" width="500" height="5"></canvas>
 
                 <span id="duration"></span>
+
+                <button id="skip-song" onclick="skip_are_you_sure()">
+                  <i class="fa fa-step-forward"></i>
+                </button>
+                <form id="skipSong" action="/stations/1/skip_song" method="post">
+
                 <br>
             </div>
-
 
             <!-- Hidden Audio player, controlled by mute button -->
             <!-- <audio id="iceaudio" autoplay muted src="http://jcradio.ddns.net:8000/rapi.mp3" type="audio/mpeg" hidden></audio> -->
@@ -167,12 +172,6 @@
             -->
 
               <span style="float: left; margin-top: 1em;">
-                <!-- TODO: Make next button work
-                if current_user.station.now_playing.selector == current_user
-                  <form action="/stations/<%= current_user.station.id %>/next" class="in_place_form">
-                    <button class="button button3" type="submit">Next</button>
-                  </form>
-                -->
                 <p id="now-playing-selector">
                 <% if current_user.station.now_playing.selector %>
                   Chosen by <%= current_user.station.now_playing.selector.username %>
@@ -257,6 +256,56 @@
               }
               var minutes = Math.floor(inputSeconds / 60)
               return minutes + ":" + seconds
+            }
+
+            function skip_are_you_sure() {
+              console.log("Ask if you are sure?");
+
+              // Check if you were the selector
+              <%# if current_user == @station.now_playing.selector %>
+              <% if true%>
+
+                var confirm_message = " <p> Are you sure you want to skip this song? <p> ";
+                var content = `
+                  <div class='dialog-ovelay'>
+                    <div class='dialog'>
+                      <div class='dialog-msg'>
+                          ${confirm_message}
+                      </div>
+                      <div class='controls'>
+                          <button class='button button2 doAction'>Yes</button>
+                          &nbsp; &nbsp;
+                          <button class='button button2 cancelAction'>No</button>
+                      </div>
+                    </div>
+                  </div>; `
+
+                $('body').prepend(content);
+              <%end%>
+
+              // TODO: If not the selector, notify user
+              <% if false %>
+              <%end%>
+
+
+            // Skip song
+            $('.doAction').click(function () {
+              document.getElementById("skipSong").submit();
+              console.log("Skipping song...");
+
+              $(this).parents('.dialog-ovelay').fadeOut(500, function () {
+                $(this).remove();
+              });
+            });
+
+            // Close Dialog Box
+            $('.cancelAction, .fa-close').click(function () {
+              $(this).parents('.dialog-ovelay').fadeOut(500, function () {
+                $(this).remove();
+              });
+            });
+
+
             }
 
         </script>

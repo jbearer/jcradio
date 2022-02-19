@@ -1,7 +1,20 @@
 require "live-rpc"
 
+# Global Variables, b/c ruby is confusing
+$client_spotifies = {} # Moved location, for loading on home page
+$the_next_letter = '_'
+$spotify_libraries_cached = {} # Cache spotify library for each user (logging time too, for expiry)
+$spotify_user = nil
+
+
 class ApplicationController < ActionController::Base
     include ApplicationHelper
+
+    before_action :set_station
+    private
+        def set_station
+            @station = Station.find 1
+        end
 
     EMOJI_REGEX = /:[A-Za-z_-]+:/
 

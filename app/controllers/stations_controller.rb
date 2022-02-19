@@ -1,13 +1,10 @@
-$the_next_letter = '_'
-$client_spotifies = {}
-$spotify_libraries_cached = {} # Cache spotify library for each user (logging time too, for expiry)
+
+require 'yaml'
 
 class StationsController < ApplicationController
 
     include SongsHelper
     include StationsHelper
-
-    before_action :set_station, only: [:show, :change_queue_pos, :edit_queue_pos, :plots]
 
     # GET /stations
     def index
@@ -18,8 +15,18 @@ class StationsController < ApplicationController
         info = RSpotify::User.new(request.env['omniauth.auth'])
         if not $spotify_user then
             $spotify_user = info
+
+            file_path = File.join(Dir.home, "/jcradio/.nothingtoseehere.yml")
+            logger.info("$$$$$$$$$$$$$$$$$$$$$$$$$$$\n")
+            logger.info(file_path)
+            logger.info("$$$$$$$$$$$$$$$$$$$$$$$$$$$\n")
+
+            # Log user to file (easy login next time, though not secure :3)
+            File.write(file_path, $spotify_user.to_hash.to_yaml)
+
             # Update the song that's currently playing
             TitleExtractorWorker.perform_async(self)
+            redirect_to "/sessions"
         else
             if not current_user then
                 return json_error "user must be logged in to link account"
@@ -27,12 +34,22 @@ class StationsController < ApplicationController
                 $client_spotifies[current_user.username] = info
                 $spotify_libraries_cached[current_user.username] = [Time.at(0), []] # Timestamp, and song listS
             end
+            redirect_to "/stations/1"
         end
-        redirect_to "/stations/1"
+    end
+
+    # POST /stations/1/user_spotify_logout
+    def user_spotify_logout
+        $client_spotifies.delete(current_user.username)
+        redirect_to "/sessions"
     end
 
     # GET /stations/1
     def show
+        # Set the next_letter properly, if currently unset
+        if @station and $the_next_letter == "_" or $the_next_letter == ""
+            $the_next_letter = @station.queue[@station.queue_max - @station.queue_pos].song.next_letter
+        end
     end
 
     def change_queue_pos
@@ -134,6 +151,18 @@ class StationsController < ApplicationController
         return json_ok
     end
 
+    # POST /stations/1/skip_song
+    # Skip to the next song on Spotify
+    def skip_song
+        puts "\n\n************"
+        puts "Skip song on Spotify"
+        puts "************\n\n"
+
+        $spotify_user.player.next
+
+        redirect_to "/stations/1"
+    end
+
     # POST /stations/1/save
     # Save the currently playing song
     def save
@@ -181,11 +210,6 @@ class StationsController < ApplicationController
 
         render json: { success: true }
     end
-
-    private
-        def set_station
-          @station = Station.find(params[:id])
-        end
 
     # GET /stations/1/plots
     def plots

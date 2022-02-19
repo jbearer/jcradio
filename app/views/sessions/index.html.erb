@@ -3,7 +3,7 @@
 <div style ="font-size: 10em; color: rgba(146,220,229,0.3)"><i class="fa fa-user-circle"></i></div>
 
 <% if logged_in? %>
-    <p>Welcome <%= current_user.username %>!
+    <p>Welcome <strong><%= current_user.username %></strong>!
     <form action="/logout" method="post" class="in_place_form">
         <button class="button button4" type="submit">Logout</button>
     </form>
@@ -16,25 +16,42 @@
         </form></p>
 <% end %>
 
-<% if not $spotify_user %>
-    <%= link_to '/auth/spotify' do %>
-    <button class="button button5" type="submit">Sign in with Spotify</button>
-    <% end -%>
-<% else %>
-    <p>
-        Logged into Spotify account of: <%= $spotify_user.display_name %>.
-        You can't log out.
-    </p>
-<% end %>
+<% if $spotify_user && current_user && $client_spotifies %>
+    <!-- Debug prints -->
+    spotify_user = <%=$spotify_user.display_name%> <br>
+    current_user = <%=current_user.username%>  <br>
+    client_spotifies = <%=$client_spotifies.length%><br>
+    <% $client_spotifies.each do |key, value| %>
+        <%=key%> => <%=value.display_name%> <br>
+    <% end %>
 
-<% if $spotify_user && current_user %>
+
     <% if not $client_spotifies.key?(current_user.username) %>
         <%= link_to '/auth/spotify' do %>
-        <button class="button button5" type="submit">Link Spotify Account</button>
+        <button class="button button5" type="submit">Link Your Spotify</button>
         <% end %>
     <% else %>
         <p>
-            Linked with the spotify account of: <%= $client_spotifies[current_user.username].display_name %>.
+            User Spotify: <strong><%= $client_spotifies[current_user.username].display_name %></strong>
+            <form action="/stations/1/user_spotify_logout", method="post" >
+                <button class="button button9" type="submit">Logout of Spotify</button>
+            </form>
         </p>
     <% end %>
 <% end %>
+
+<br>
+
+<% if not $spotify_user %>
+    <%= link_to '/auth/spotify' do %>
+    <button class="button button5" type="submit">Sign in for Radio Spotify Account </button>
+    <% end -%>
+<% else %>
+    <p>
+        Radio Spotify: <%= $spotify_user.display_name %>
+        <form action="/sessions/radio_spotify_logout", method="post" >
+            <button class="button button9" type="submit">Logout of Spotify</button>
+        </form>
+    </p>
+<% end %>
+
