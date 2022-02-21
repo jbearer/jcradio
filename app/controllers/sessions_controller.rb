@@ -2,6 +2,7 @@ require 'yaml'
 
 class SessionsController < ApplicationController
   include ActionController::Live
+  include StationsHelper
 
   # GET /sessions
   def index
@@ -19,8 +20,9 @@ class SessionsController < ApplicationController
   # POST /sessions/radio_spotify_logout
   def radio_spotify_logout
     $spotify_user = nil
-    if File.exist?(File.join(Dir.home, "/jcradio/.nothingtoseehere.yml"))
-      File.delete(File.join(Dir.home, "/jcradio/.nothingtoseehere.yml"))
+    file_path = File.join(Dir.home, "/jcradio/.nothingtoseehere.yml")
+    if File.exist?(file_path)
+      File.delete(file_path)
     end
     redirect_to "/sessions"
   end
