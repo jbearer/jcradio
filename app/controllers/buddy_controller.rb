@@ -1,6 +1,3 @@
-# Global variables, b/c idk how classes work
-$buddy_taste = "radio_played" if $buddy_taste.nil?
-$buddy_on = false if $buddy_on.nil?
 
 class BuddyController < ApplicationController
 

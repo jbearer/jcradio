@@ -55,7 +55,8 @@ class SongsController < ApplicationController
                 index = QueueEntry.all.joins(:song).where.not(position: nil).where(selector: current_user.id)\
                         .where(songs: {first_letter: params[:query]})
             elsif source == "my_upvoted_songs" then
-                index = QueueEntry.all.joins(:upvotes).where.not(position: nil).where(upvotes: {upvoter_id: current_user.id})
+                index = QueueEntry.all.joins(:upvotes).joins(:song).where.not(position: nil)\
+                        .where(upvotes: {upvoter_id: current_user.id}).where(songs: {first_letter: params[:query]})
             else
                 index = QueueEntry.all.joins(:song).where.not(position: nil).where(songs: {first_letter: params[:query]})
             end

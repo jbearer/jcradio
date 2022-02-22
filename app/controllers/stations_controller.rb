@@ -89,7 +89,7 @@ class StationsController < ApplicationController
 
     def buddy_add_song
 
-        if @station.users.order(:position)[0].username != "Buddy"
+        if @station.users.order(:position)[0] != User.find_by(username: "Buddy")
             puts "****************************"
             puts "Not Buddy's turn!"
             puts "****************************"
@@ -334,14 +334,21 @@ class StationsController < ApplicationController
     end
 
     def refresh_now_playing_and_stuff
-        if !$the_background_thread.nil? and $the_background_thread.status == 'sleep' then
-            $the_background_thread.wakeup
+        logger.error("**************")
+        logger.error("refresh_now_playing_and_stuff")
+        if !$the_background_thread.nil?
+            if $the_background_thread.status == 'sleep'
+                $the_background_thread.wakeup
+            end
+        else
+            logger.error("**************")
+            logger.error("the_background_thread is nil!!!")
         end
 
         # Check if it's Buddy's turn
-        ActiveRecord::Base.logger.level = 0
+        # ActiveRecord::Base.logger.level = 0
         buddy_add_song
-        ActiveRecord::Base.logger.level = 1
+        # ActiveRecord::Base.logger.level = 1
 
         # call update_timing, in case the song didn't change, but the
         # end time did change

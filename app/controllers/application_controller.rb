@@ -20,15 +20,16 @@ class ApplicationController < ActionController::Base
     # puts "\n*"*10
 
     # Global Variables, b/c ruby is confusing
-    if $client_spotifies.nil?
-        $client_spotifies = {} # Moved location, for loading on home page
-    end
-    if $the_next_letter.nil?
-        $the_next_letter = '_'
-    end
-    if $spotify_libraries_cached.nil?
-        $spotify_libraries_cached = {} # Cache spotify library for each user (logging time too, for expiry)
-    end
+    $client_spotifies = {} if $client_spotifies.nil?
+    
+    $the_next_letter = '_' if $the_next_letter.nil?
+
+    # Cache spotify library for each user (logging time too, for expiry)
+    $spotify_libraries_cached = {} if $spotify_libraries_cached.nil? 
+
+    $buddy_taste = "radio_played" if $buddy_taste.nil?
+    $buddy_on = false if $buddy_on.nil?
+
 
     # $spotify_user = nil
     # $station = nil

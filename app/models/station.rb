@@ -83,6 +83,11 @@ class Station < ActiveRecord::Base
         #
         # Whatever happens, this method will ensure that `song` is now playing.
 
+        logger.error("**************")
+        logger.error("station.rb: next_song() start")
+        logger.error("**************")
+
+
         entry = nil
 
         tmp_pos = queue_pos
@@ -122,10 +127,32 @@ class Station < ActiveRecord::Base
 
         update now_playing: entry
 
+        logger.error("**************")
+        logger.error("station.rb: next_song() entry")
+        logger.error(entry.inspect)
+        logger.error("**************")
+
         # Update the clients about the new song.
         users.each do |user|
-            user.notify :next_song, entry
+            user.notify :next_song_js, entry
+            logger.error("**************")
+            logger.error("station.rb: next_song().notify")
+            logger.error("**************")
         end
+
+        # Update the clients about the timing.
+        users.each do |user|
+            user.notify :update_timing, 0, 0, entry
+            logger.error("**************")
+            logger.error("station.rb: next_song().notify update_timing")
+            logger.error("**************")
+        end
+
+
+        logger.error("**************")
+        logger.error("station.rb: next_song() end")
+        logger.error("**************")
+
     end
 
     # Update now_playing_start_ms

@@ -22,7 +22,10 @@ function next_up(user, letter) {
     }
 }
 
-function next_song(queue_entry) {
+function next_song_js(queue_entry) {
+
+    console.log(`song.title: ${queue_entry.song.title}`);
+
     $("#now-playing-title").html(queue_entry.song.title);
     $("#now-playing-artist").html(queue_entry.song.artist);
     set_upvote_icon(false);
@@ -44,8 +47,16 @@ function next_song(queue_entry) {
             $("#now-playing-rec").html("")
         }
     }
+    console.log(`song.title2: ${queue_entry.song.title}`);
 }
 
-function update_timing(duration_ms, start_ms) {
-    setSongStats(duration_ms, start_ms);
+function update_timing(duration_ms, start_ms, queue_entry=null) {
+
+    if (queue_entry) {
+        console.log(`calling next_song_js: ${queue_entry}`);
+        next_song_js(queue_entry);
+    } else {
+        console.log(`update_timing: ${duration_ms}, ${start_ms}`);
+        setSongStats(duration_ms, start_ms);
+    }
 }
