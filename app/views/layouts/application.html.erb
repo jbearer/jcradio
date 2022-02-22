@@ -265,36 +265,38 @@
             function skip_are_you_sure() {
               console.log("Ask if you are sure?");
 
-              // Check if you were the selector
-              <%# if current_user == @station.now_playing.selector %>
-              // <%# if true%>
+              // Check if logged in, and provide dialog popup
               <% if logged_in? %>
                 var confirm_message = " <p> Are you sure you want to skip this song? <p> ";
+                var controls = "\
+                  <button class='button button2 doAction'>Yes</button> \
+                  &nbsp; &nbsp; \
+                  <button class='button button2 cancelAction'>No</button> \
+                  ";
               <%else%>
-                var confirm_message = " <p> Sorry, you have to be logged in to skip a song (tsk tsk)<p> ";
+                var confirm_message = " <p> Sorry, you have to be logged in to skip a song (*tsk*tsk*)<p> ";
+                var controls = "\
+                  <button class='button button2 cancelAction'>Close</button> \
+                  ";
               <%end%>
+
               var content = `
                 <div class='dialog-ovelay'>
                   <div class='dialog'>
                     <div class='dialog-msg'>
-                        ${confirm_message}
+                      ${confirm_message}
                     </div>
                     <div class='controls'>
-                        <button class='button button2 doAction'>Yes</button>
-                        &nbsp; &nbsp;
-                        <button class='button button2 cancelAction'>No</button>
+                      ${controls}
                     </div>
                   </div>
                 </div>; `
-
               $('body').prepend(content);
 
 
             // Skip song
             $('.doAction').click(function () {
               document.getElementById("skipSong").submit();
-              console.log("Skipping song...");
-
               $(this).parents('.dialog-ovelay').fadeOut(500, function () {
                 $(this).remove();
               });

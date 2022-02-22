@@ -1,6 +1,6 @@
 # Global variables, b/c idk how classes work
-$buddy_taste = "radio_played"
-$buddy_on = false
+$buddy_taste = "radio_played" if $buddy_taste.nil?
+$buddy_on = false if $buddy_on.nil?
 
 class BuddyController < ApplicationController
 
@@ -11,17 +11,8 @@ class BuddyController < ApplicationController
                 $buddy_on = true
             end
         end
-
         @buddy_taste = $buddy_taste
         @buddy_on = $buddy_on
-        puts "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
-        puts " I AM HERE!"
-        puts "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
-        puts "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
-        puts @buddy_taste
-        puts "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
-        puts @buddy_on
-        puts "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
     end
 
     # POST /buddy/configure
@@ -44,13 +35,12 @@ class BuddyController < ApplicationController
 
     # POST /sessions/buddy_join
     def buddy_join
-        puts "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
+        puts "*******************************"
         puts "Buddy Joined!!!"
-        puts "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
+        puts "*******************************"
 
         @user = User.find_by(username: "Buddy")
         @station = Station.find 1
-
 
         # Push back all other users
         User.where("position > ?", @station.users.minimum(:position) || -1).each do |inc_user|
@@ -59,16 +49,14 @@ class BuddyController < ApplicationController
         @user.update station: @station,
                      position: (@station.users.minimum(:position) || -1) + 1
 
-        # session[:user_id] = @user.id
-
         broadcast :push, "#{@user.username} joined the radio."
 
     end
 
     def buddy_logout
-        puts "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
+        puts "*******************************"
         puts "Buddy Left :("
-        puts "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
+        puts "*******************************"
 
         # Push back all other users
         @user = User.find_by(username: "Buddy")

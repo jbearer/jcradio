@@ -10,27 +10,18 @@
 <form action="/songs/browse", method="get", data-remote="true", onsubmit="show_loading_gif()">
 
   <!-- Determine default 'checked', based on if linked to Spotify -->
-  <%check_all_songs = true %>
-  <% if $spotify_user && current_user %>
-    <% if $client_spotifies.key?(current_user.username) %>
-      <%check_all_songs = false %>
-    <% end %>
-  <% end %>
+  <%
+    check_all_songs = !($spotify_user && current_user && $client_spotifies.key?(current_user.username))
+  %>
 
 
   <input type="radio" name="source" value="all_songs" <%if check_all_songs%> checked <% end %> >
     <label for="all_songs">All Chosen Songs</label>
-  <input type="radio" name="source" value="my_chosen_songs">
-    <label for="my_chosen_songs">Songs Chosen by Me</label>
-  <input type="radio" name="source" value="my_upvoted_songs">
-    <label for="my_upvoted_songs">Songs Upvoted by Me</label>
-  <input type="radio" name="source" value="my_spotify_library"
-    <%if not check_all_songs%>
-      checked
-    <%else%>
-      disabled
-    <%end%>
-  >
+  <input type="radio" name="source" value="my_chosen_songs" <%if !logged_in?%> disabled <%end%> >
+    <label for="my_chosen_songs">Chosen by Me</label>
+  <input type="radio" name="source" value="my_upvoted_songs" <%if !logged_in?%> disabled <%end%> >
+    <label for="my_upvoted_songs">Upvoted by Me</label>
+  <input type="radio" name="source" value="my_spotify_library" <%if !check_all_songs%> checked <%else%> disabled <%end%> >
     <label for="my_spotify_library">My Spotify Library</label>
 
   <input type="text" name="query" value="<%= $the_next_letter %>" style="width:40px" autocomplete="off">

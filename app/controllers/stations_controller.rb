@@ -11,6 +11,7 @@ class StationsController < ApplicationController
 
     include SongsHelper
     include StationsHelper
+    include RecommendationsHelper
     # include Magique
 
     # GET /stations
@@ -93,21 +94,72 @@ class StationsController < ApplicationController
             puts "Not Buddy's turn!"
             puts "****************************"
             return
+        else
+            puts "****************************"
+            puts "Buddy's turn!"
+            puts "NextLetter = #{$the_next_letter}"
+            puts "****************************"
         end
 
+        user, source = $buddy_taste.split("_")
+        user = user.capitalize
+
         puts "****************************"
-        puts "Buddy's turn!"
-        puts "NextLetter = #{$the_next_letter}"
-        puts "****************************"
+        puts "Buddy CfG: User=#{user}, Source=#{source}"
+
+        if source == "played"
+            if user == "Radio"
+                songs = Song.where(first_letter: $the_next_letter).limit(100)
+            else # All other normal users
+                queued = QueueEntry.all.joins(:song).where.not(position: nil).where(selector: User.find_by(username: user))\
+                        .where(songs: {first_letter: $the_next_letter})
+                songs = queued.map {|q| q.song}
+                puts "*******************************************************"
+                puts "Buddy: #{user}'s Played songs len: #{songs.length}"
+                puts "*******************************************************"
+            end
+
+        elsif source == "spotify"
+            if user == "Radio"
+                songs = []
+                puts "Sorry, this isn't implemented yet"
+            else # All other normal users
+                client_spotify = $client_spotifies[user]
+                if not client_spotify then
+                    fail "Not logged into spotify"
+                end
+                spotify_songs = spotify_get_all_songs(client_spotify, "Austin")
+                results = SongsHelper.get_or_create_from_spotify_record(spotify_songs, true)
+                songs = []
+                results.each do |s|
+                    if $the_next_letter == SongsHelper.first_letter(s.title) then
+                        songs.append(s)
+                    end
+                end
+                puts "*******************************************************"
+                puts "Buddy: #{user} Spotify songs len: #{songs.length}"
+                puts "*******************************************************"
+            end
+
+        else
+            puts "*******************************************************"
+            puts " Sorry, buddy_taste='#{$buddy_taste}'' isn't supported yet. Default to 'radio_played'"
+            puts "*******************************************************"
+            songs = []
+        end
+
+        # If no song results, default to radio_played
+        if songs.length == 0
+            songs = Song.where(first_letter: $the_next_letter).limit(100)
+        end
+
 
         # Only Buddy alone
-        if @station.users.length == 1
-            if @station.queue_max - @station.queue_pos >= 1
-                puts "****************************"
-                puts "Buddy is lonely. Buddy will wait for smaller queue"
-                puts "****************************"
-                return
-            end
+        if @station.users.length == 1 and @station.queue_max - @station.queue_pos >= 1
+            puts "****************************"
+            puts "Buddy is lonely. Buddy will wait for smaller queue"
+            puts "****************************"
+            return
         end
 
         # Queue long, waiting
@@ -120,19 +172,8 @@ class StationsController < ApplicationController
 
 
         ## Add a song
-        # if $buddy_taste == "radio_played"
-        if true
-            puts "\n\n\n****************************"
-            songs = Song.where(first_letter: $the_next_letter).limit(100)
-            puts "****************************\n\n"
 
-        # Default to All songs on radio
-        else
-            puts "*******************************************************"
-            puts " Sorry, buddy_taste='#{$buddy_taste}'' isn't supported yet"
-            puts "*******************************************************"
-            return
-        end
+        # TODO move code back here
 
         # Hack to prevent multiple songs added at once
         if Time.now.to_f - $buddy_last_add < 5
@@ -298,7 +339,9 @@ class StationsController < ApplicationController
         end
 
         # Check if it's Buddy's turn
+        ActiveRecord::Base.logger.level = 0
         buddy_add_song
+        ActiveRecord::Base.logger.level = 1
 
         # call update_timing, in case the song didn't change, but the
         # end time did change
