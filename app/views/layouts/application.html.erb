@@ -43,7 +43,7 @@
     <!-- Navigation Bar -->
         <div class="topnav">
              <%= link_to "Home", "/sessions", :class => current_class?("/sessions") %>
-             <%= link_to "Queue", "/stations", :class => current_class?("/stations") %>
+             <%= link_to "Queue", "/stations/1", :class => current_class?("/stations") %>
              <%= link_to "Browse", "/songs", :class => current_class?("/songs") %>
              <%= link_to "Plots", "/stations/1/plots" %>
              <%= link_to "Chat", "/chat", :class => current_class?("/chat"), id: "chat_link" %>
@@ -158,6 +158,9 @@
                 </button>
                 <form id="skipSong" action="/stations/1/skip_song" method="post">
 
+                  <input type="hidden" name="user" value="<%=current_user.username if logged_in?%>">
+                </form>
+
                 <br>
             </div>
 
@@ -264,29 +267,27 @@
 
               // Check if you were the selector
               <%# if current_user == @station.now_playing.selector %>
-              <% if true%>
-
+              // <%# if true%>
+              <% if logged_in? %>
                 var confirm_message = " <p> Are you sure you want to skip this song? <p> ";
-                var content = `
-                  <div class='dialog-ovelay'>
-                    <div class='dialog'>
-                      <div class='dialog-msg'>
-                          ${confirm_message}
-                      </div>
-                      <div class='controls'>
-                          <button class='button button2 doAction'>Yes</button>
-                          &nbsp; &nbsp;
-                          <button class='button button2 cancelAction'>No</button>
-                      </div>
+              <%else%>
+                var confirm_message = " <p> Sorry, you have to be logged in to skip a song (tsk tsk)<p> ";
+              <%end%>
+              var content = `
+                <div class='dialog-ovelay'>
+                  <div class='dialog'>
+                    <div class='dialog-msg'>
+                        ${confirm_message}
                     </div>
-                  </div>; `
+                    <div class='controls'>
+                        <button class='button button2 doAction'>Yes</button>
+                        &nbsp; &nbsp;
+                        <button class='button button2 cancelAction'>No</button>
+                    </div>
+                  </div>
+                </div>; `
 
-                $('body').prepend(content);
-              <%end%>
-
-              // TODO: If not the selector, notify user
-              <% if false %>
-              <%end%>
+              $('body').prepend(content);
 
 
             // Skip song

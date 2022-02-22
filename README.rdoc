@@ -76,6 +76,9 @@ TODO
         When adding a song, option "Override the first Letter" vs "I know, I don't care"
             Will help with anaylsis, and when Buddy just random shuffles your spotify Library
 
+        Better Queue Search (filte rby first letter earlier)
+            ie. Jeb's fix
+
         Buddy
             different tastes
             Optional variety, if say there are only 5 Z songs

@@ -1,5 +1,9 @@
 
-$notify_laggard_user = true # flag to notify user once queue is almost empty
+# Flag to notify user once queue is almost empty
+$notify_laggard_user = true if $notify_laggard_user.nil?
+
+# timing variable
+$buddy_last_add = 0 if $buddy_last_add.nil?
 
 require 'yaml'
 
@@ -7,6 +11,7 @@ class StationsController < ApplicationController
 
     include SongsHelper
     include StationsHelper
+    # include Magique
 
     # GET /stations
     def index
@@ -67,34 +72,26 @@ class StationsController < ApplicationController
         # print "$$$$$$$$$ Arrived Here $$$$$\n"
         # print "$$$$$$$$$ Arrived Here $$$$$\n"
         # print "  InParam: %s\n" % params[:new_queue_pos]
-
-
-        if not logged_in?
-            return json_error "must log in to add to the queue"
-        end
-        station = current_user.station
-
-        # print "  CurQueuePos: %s\n" % station.queue_pos
+        # print "  CurQueuePos: %s\n" % @station.queue_pos
 
         in_param = Integer(params[:new_queue_pos])
-
-        if in_param <= station.queue_max and in_param >= 0
-            station.update queue_pos: in_param
+        if in_param <= @station.queue_max and in_param >= 0
+            @station.update queue_pos: in_param
         end
 
-        # print "  QueuePos: %s\n" % station.queue_pos
+        # print "  QueuePos: %s\n" % @station.queue_pos
 
-
-        redirect_to "/stations/1"
-
-        # json_ok
+        redirect_to "/stations/1/change_queue_pos"
 
     end
 
 
     def buddy_add_song
 
-        if @station.users.order(:position)[0] != User.find_by(username: "Buddy")
+        if @station.users.order(:position)[0].username != "Buddy"
+            puts "****************************"
+            puts "Not Buddy's turn!"
+            puts "****************************"
             return
         end
 
@@ -121,37 +118,33 @@ class StationsController < ApplicationController
             return
         end
 
-        # Get Buddy user
-        @buddy = User.find_by(username: "Buddy")
 
         ## Add a song
-        if $buddy_taste == "radio_played"
-            index = QueueEntry.where.not(position: nil) # TODO Ask jeb for optimization
-            results = index.order("queue_entries.id DESC").map {|q| q.song}
-
-            songs = []
-            results.each do |s|
-                if s.first_letter == $the_next_letter then
-                    songs.append(s)
-                end
-            end
+        # if $buddy_taste == "radio_played"
+        if true
+            puts "\n\n\n****************************"
+            songs = Song.where(first_letter: $the_next_letter).limit(100)
+            puts "****************************\n\n"
 
         # Default to All songs on radio
         else
             puts "*******************************************************"
             puts " Sorry, buddy_taste='#{$buddy_taste}'' isn't supported yet"
             puts "*******************************************************"
-
-            ## Copy from above, Default to All Songs on Radio
-            index = QueueEntry.where.not(position: nil) # TODO Ask jeb for optimization
-            results = index.order("queue_entries.id DESC").map {|q| q.song}
-            songs = []
-            results.each do |s|
-                if s.first_letter == $the_next_letter then
-                    songs.append(s)
-                end
-            end
+            return
         end
+
+        # Hack to prevent multiple songs added at once
+        if Time.now.to_f - $buddy_last_add < 5
+            puts "************************************************"
+            puts "Hey Buddy, don't spam the queue. wait some more"
+            puts "************************************************"
+            return
+        end
+        $buddy_last_add = Time.now.to_f
+
+        # Get Buddy user
+        @buddy = User.find_by(username: "Buddy")
 
         # Get random number for the song
         chosen_song = songs[rand(songs.length)]
@@ -164,6 +157,11 @@ class StationsController < ApplicationController
             return
         end
 
+        puts "****************************"
+        puts "songs.length = #{songs.length}"
+        puts "title = #{chosen_song.title}"
+        puts "****************************"
+
         @buddy.update position: @station.users.maximum(:position) + 1
 
         # Notify the next user that it's their turn to pick a song.
@@ -173,19 +171,6 @@ class StationsController < ApplicationController
         if next_user != @buddy then
             broadcast :next_up, next_user, $the_next_letter
         end
-
-        puts "****************************"
-        puts index.length
-        puts index[0]
-        puts index[0].song
-        puts index[0].song.title
-        puts index[0].song.first_letter
-        puts "****************************"
-        puts songs.length
-        puts chosen_song.title
-        puts "err: #{err_str}"
-        puts "****************************"
-
 
     end
 
@@ -259,12 +244,9 @@ class StationsController < ApplicationController
     # POST /stations/1/skip_song
     # Skip to the next song on Spotify
     def skip_song
-        puts "\n\n************"
-        puts "Skip song on Spotify"
-        puts "************\n\n"
-
         $spotify_user.player.next
 
+        broadcast :push, "#{params[:user]} skipped the song."
         redirect_to "/stations/1"
     end
 
@@ -311,33 +293,17 @@ class StationsController < ApplicationController
     end
 
     def refresh_now_playing_and_stuff
-        if $the_background_thread.status == 'sleep' then
+        if !$the_background_thread.nil? and $the_background_thread.status == 'sleep' then
             $the_background_thread.wakeup
         end
 
         # Check if it's Buddy's turn
         buddy_add_song
 
-        # If one song in queue, notify next user
-        if @station.queue_max - @station.queue_pos == 0 && $notify_laggard_user
-            $notify_laggard_user = false # unset the flag
-            next_user = @station.users.order(:position)[0]
-            if next_user != User.find_by(username: "Buddy")
-                # Notify the next user that it's their turn to pick a song.
-                if next_user != @buddy then
-                    broadcast :next_up, next_user, $the_next_letter
-                    puts "****************************"
-                    puts "****************************"
-                    puts "notify user: #{next_user.username}"
-                    puts "****************************"
-                    puts "****************************"
-                end
-            end
-        end
-
         # call update_timing, in case the song didn't change, but the
         # end time did change
         @station.update_timing_stats
+
     end
 
     # GET /stations/1/plots

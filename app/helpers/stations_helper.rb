@@ -1,5 +1,9 @@
 module StationsHelper
     def self.get_progress_ms
+        if $spotify_user.nil?
+            return 999999999
+        end
+
         url = "me/player"
         response = RSpotify::User.oauth_get($spotify_user.id, url)
 
@@ -41,7 +45,7 @@ module Magique
     end
 end
 
-class TitleExtractorWorker
+class TitleExtractorWorker < ApplicationController
     include Magique::Worker
 
     # Background thread which monitors the current playing song
@@ -70,7 +74,25 @@ class TitleExtractorWorker
                     Station.find(1).update_timing_stats()
                 end
 
-                time_diff = Station.find(1).time_till_next_song().to_f / 1000
+                # If one song in queue, notify next user
+                if Station.find(1).queue_max - Station.find(1).queue_pos == 0
+                    if $notify_laggard_user
+                        $notify_laggard_user = false # unset the flag
+                        next_user = Station.find(1).users.order(:position)[0]
+                        if next_user.username != "Buddy"
+                            # Notify the next user that it's their turn to pick a song.
+                            broadcast :push, "Wake up #{next_user.username}, you have a #{$the_next_letter}"
+                            # puts "****************************"
+                            # puts "notify user: #{next_user.username}"
+                            # puts "****************************"
+                        end
+                    end
+                else
+                    $notify_laggard_user = true
+                end
+
+                time_diff = Station.find(1).time_till_next_song().to_f / 1000 / 10
+                # time_diff = 5
 
             rescue => e
                 Rails.logger.error e.message

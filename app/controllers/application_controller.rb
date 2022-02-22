@@ -1,20 +1,42 @@
 require "live-rpc"
 
-# Global Variables, b/c ruby is confusing
-$client_spotifies = {} # Moved location, for loading on home page
-$the_next_letter = '_'
-$spotify_libraries_cached = {} # Cache spotify library for each user (logging time too, for expiry)
-$spotify_user = nil
+# # Global Variables, b/c ruby is confusing
+# $client_spotifies = {} # Moved location, for loading on home page
+# $the_next_letter = '_'
+# $spotify_libraries_cached = {} # Cache spotify library for each user (logging time too, for expiry)
+# $spotify_user = nil
 
+# $station = nil
+
+# Disable SQL logging
+ActiveRecord::Base.logger.level = 1
 
 class ApplicationController < ActionController::Base
     include ApplicationHelper
 
+    # puts "\n\n\n\n********************$$$$$$$$$$$$$**************@@@@@@@@@@@@@***********"
+    # puts " Global defined again..."
+    # puts "********************$$$$$$$$$$$$$**************@@@@@@@@@@@@@***********\n\n\n\n"
+    # puts "\n*"*10
+
+    # Global Variables, b/c ruby is confusing
+    if $client_spotifies.nil?
+        $client_spotifies = {} # Moved location, for loading on home page
+    end
+    if $the_next_letter.nil?
+        $the_next_letter = '_'
+    end
+    if $spotify_libraries_cached.nil?
+        $spotify_libraries_cached = {} # Cache spotify library for each user (logging time too, for expiry)
+    end
+
+    # $spotify_user = nil
+    # $station = nil
+
     before_action :set_station
-    private
-        def set_station
-            @station = Station.find 1
-        end
+    def set_station
+        @station = Station.find 1
+    end
 
     EMOJI_REGEX = /:[A-Za-z_-]+:/
 
