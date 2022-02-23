@@ -9,8 +9,8 @@ begin
             scope: 'playlist-modify-public user-modify-playback-state user-read-playback-state user-library-modify user-library-read'
   end
 rescue RestClient::BadRequest => e
-  puts "=======\n" \
+  logger.info("=======\n" \
        "Missing Spotify client credentials. Please enter SPOTIFY_CLIENT_ID\n" \
        "and SPOTIFY_CLIENT_SECRET in config/env.yml.\n" \
-       "======="
+       "=======")
 end

@@ -90,15 +90,15 @@ class StationsController < ApplicationController
     def buddy_add_song
 
         if @station.users.order(:position)[0] != User.find_by(username: "Buddy")
-            puts "****************************"
-            puts "Not Buddy's turn!"
-            puts "****************************"
+            logger.info("****************************")
+            logger.info("Not Buddy's turn!")
+            logger.info("****************************")
             return
         else
-            puts "****************************"
-            puts "Buddy's turn!"
-            puts "NextLetter = #{$the_next_letter}"
-            puts "****************************"
+            logger.info("****************************")
+            logger.info("Buddy's turn!")
+            logger.info("NextLetter = #{$the_next_letter}")
+            logger.info("****************************")
         end
 
         # Loop through all tastes checked
@@ -108,8 +108,8 @@ class StationsController < ApplicationController
             user, source = taste.split("_")
             user = user.capitalize
 
-            puts "****************************"
-            puts "Buddy Tase: taste"
+            logger.info("****************************")
+            logger.info("Buddy Tase: taste")
 
             if source == "played"
                 if user == "Radio"
@@ -120,9 +120,9 @@ class StationsController < ApplicationController
                             .where(songs: {first_letter: $the_next_letter})
                 end
                 songs = queued.map {|q| q.song}
-                puts "*******************************************************"
-                puts "Buddy: #{user}'s Played songs len: #{songs.length}"
-                puts "*******************************************************"
+                logger.info("*******************************************************")
+                logger.info("Buddy: #{user}'s Played songs len: #{songs.length}")
+                logger.info("*******************************************************")
 
             elsif source == "upvoted"
                 if user == "Radio"
@@ -135,19 +135,19 @@ class StationsController < ApplicationController
                             .where(songs: {first_letter: $the_next_letter})
                 end
                 songs = queued.map {|q| q.song}
-                puts "*******************************************************"
-                puts "Buddy: #{user}'s Upvoted songs len: #{songs.length}"
-                puts "*******************************************************"
+                logger.info("*******************************************************")
+                logger.info("Buddy: #{user}'s Upvoted songs len: #{songs.length}")
+                logger.info("*******************************************************")
 
             elsif source == "spotify"
                 if user == "Radio"
                     songs = []
-                    puts "Sorry, this isn't implemented yet"
+                    logger.info("Sorry, this isn't implemented yet")
                 else # All other normal users
                     client_spotify = $client_spotifies[user]
                     if not client_spotify then
                         songs = []
-                        puts "Not logged into Spotify"
+                        logger.info("Not logged into Spotify")
 
                     end
                     spotify_songs = spotify_get_all_songs(client_spotify, "Austin")
@@ -159,14 +159,14 @@ class StationsController < ApplicationController
                         end
                     end
                 end
-                puts "*******************************************************"
-                puts "Buddy: #{user} Spotify songs len: #{songs.length}"
-                puts "*******************************************************"
+                logger.info("*******************************************************")
+                logger.info("Buddy: #{user} Spotify songs len: #{songs.length}")
+                logger.info("*******************************************************")
 
             else
-                puts "*******************************************************"
-                puts " Sorry, buddy_taste='#{$buddy_taste}'' isn't supported yet. Default to 'radio_played'"
-                puts "*******************************************************"
+                logger.info("*******************************************************")
+                logger.info(" Sorry, buddy_taste='#{$buddy_taste}'' isn't supported yet. Default to 'radio_played'")
+                logger.info("*******************************************************")
                 songs = []
             end
 
@@ -174,10 +174,10 @@ class StationsController < ApplicationController
             total_songs.concat(songs).uniq
         end
 
-        puts "**********************************"
-        puts "total_songs:"
-        puts total_songs.inspect
-        puts "**********************************"
+        logger.info("**********************************")
+        logger.info("total_songs:")
+        logger.info(total_songs.inspect)
+        logger.info("**********************************")
 
         # If no song results, default to radio_played
         if total_songs.length == 0
@@ -186,17 +186,17 @@ class StationsController < ApplicationController
 
         # Only Buddy alone
         if @station.users.length == 1 and @station.queue_max - @station.queue_pos >= 1
-            puts "****************************"
-            puts "Buddy is lonely. Buddy will wait for smaller queue"
-            puts "****************************"
+            logger.info("****************************")
+            logger.info("Buddy is lonely. Buddy will wait for smaller queue")
+            logger.info("****************************")
             return
         end
 
         # Queue long, waiting
         if @station.queue_max - @station.queue_pos > 10
-            puts "****************************"
-            puts "Too many songs in the queue. Buddy will wait!"
-            puts "****************************"
+            logger.info("****************************")
+            logger.info("Too many songs in the queue. Buddy will wait!")
+            logger.info("****************************")
             return
         end
 
@@ -207,9 +207,9 @@ class StationsController < ApplicationController
 
         # Hack to prevent multiple songs added at once
         if Time.now.to_f - $buddy_last_add < 5
-            puts "************************************************"
-            puts "Hey Buddy, don't spam the queue. wait some more"
-            puts "************************************************"
+            logger.info("************************************************")
+            logger.info("Hey Buddy, don't spam the queue. wait some more")
+            logger.info("************************************************")
             return
         end
         $buddy_last_add = Time.now.to_f
@@ -222,16 +222,16 @@ class StationsController < ApplicationController
         err_str = @station.queue_song(chosen_song, @buddy, false)
 
         if err_str != "" then
-            puts "\n\n\n\n****************************"
-            puts "err: #{err_str}"
-            puts "****************************"
+            logger.info("\n\n\n\n****************************")
+            logger.info("err: #{err_str}")
+            logger.info("****************************")
             return
         end
 
-        puts "****************************"
-        puts "total_songs.length = #{total_songs.length}"
-        puts "title = #{chosen_song.title}"
-        puts "****************************"
+        logger.info("****************************")
+        logger.info("total_songs.length = #{total_songs.length}")
+        logger.info("title = #{chosen_song.title}")
+        logger.info("****************************")
 
         @buddy.update position: @station.users.maximum(:position) + 1
 
@@ -341,13 +341,13 @@ class StationsController < ApplicationController
                     user: current_user,
                     text: "Added to library: " + song.title
                 }))
-                puts "!!!!!!!! saved song to library !!!!!!!!!!!"
+                logger.info("!!!!!!!! saved song to library !!!!!!!!!!!")
                 render json: {success: true, saved: true}
             else
-                puts "!!!!!!!! user not associated with spotify acct !!!!!!"
+                logger.info("!!!!!!!! user not associated with spotify acct !!!!!!")
             end
         rescue => e
-            puts "!!!!!!!! failed to save song !!!!!!!!!!!"
+            logger.info("!!!!!!!! failed to save song !!!!!!!!!!!")
             Rails.logger.error e.message
             e.backtrace.each { |line| Rails.logger.error line }
         end

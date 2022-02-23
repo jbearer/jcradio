@@ -40,32 +40,32 @@ class SessionsController < ApplicationController
 
                 # Push back all other users
                 User.where("position > ?", station.users.minimum(:position) || -1).each do |inc_user|
-                  puts "\n\n\n&&&&&&&"
-                  puts inc_user.username, inc_user.position
+                  logger.info("\n\n\n&&&&&&&")
+                  logger.info("#{inc_user.username}, #{inc_user.position}")
                   inc_user.update position: inc_user.position + 1
-                  puts inc_user.username, inc_user.position
-                  puts "\n\n\n&&&&&&&"
+                  logger.info("#{inc_user.username}, #{inc_user.position}")
+                  logger.info("\n\n\n&&&&&&&")
                 end
 
                 @user.update station: station,
                              position: (station.users.minimum(:position) || -1) + 1
-                puts "\n\n\n&&&&&&&"
-                puts @user.username, @user.position
+                logger.info("\n\n\n&&&&&&&")
+                logger.info("#{@user.username}, #{@user.position}")
             else
               if @user.position.nil?
                 # Push back all other users
                 User.where("position > ?", @user.station.users.minimum(:position) || -1).each do |inc_user|
-                  puts "\n\n\n&&&&&&&"
-                  puts inc_user.username, inc_user.position
+                  logger.info("\n\n\n&&&&&&&")
+                  logger.info("#{inc_user.username}, #{inc_user.position}")
                   inc_user.update position:  inc_user.position + 1
-                  puts inc_user.username, inc_user.position
-                  puts "\n\n\n&&&&&&&"
+                  logger.info("#{inc_user.username}, #{inc_user.position}")
+                  logger.info("\n\n\n&&&&&&&")
                 end
                 # If we're already a member of a station, but we're not in line to add
                 # songs to that station, join the back of the line.
                 @user.update position: (@user.station.users.minimum(:position) || -1) + 1
-                puts "\n\n\n&&&&&&&"
-                puts @user.username, @user.position
+                logger.info("\n\n\n&&&&&&&")
+                logger.info("#{inc_user.username}, #{inc_user.position}")
               end
             end
             session[:user_id] = @user.id
@@ -97,11 +97,11 @@ class SessionsController < ApplicationController
 
         # Push back all other users
         User.where("position > ?", current_user.position).each do |inc_user|
-          puts "\n\n\n&&&&&&&"
-          puts inc_user.username, inc_user.position
+          logger.info("\n\n\n&&&&&&&")
+          logger.info("#{inc_user.username}, #{inc_user.position}")
           inc_user.update position: inc_user.position-1
-          puts inc_user.username, inc_user.position
-          puts "\n\n\n&&&&&&&"
+          logger.info("#{inc_user.username}, #{inc_user.position}")
+          logger.info("\n\n\n&&&&&&&")
         end
 
         current_user.update station: nil, position: nil

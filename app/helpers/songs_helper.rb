@@ -83,7 +83,7 @@ module SongsHelper
     end
 
     def self.random_letter
-      puts "Error calculating next letter. Choosing a random letter"
+      logger.info("Error calculating next letter. Choosing a random letter")
       alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".chars
       return alphabet.sample
     end

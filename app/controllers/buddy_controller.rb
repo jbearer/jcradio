@@ -33,19 +33,19 @@ class BuddyController < ApplicationController
         $buddy_on = buddy_on
 
         # Debug printing
-        puts "\n\n**********************"
-        puts "buddy_taste:"
-        puts $buddy_taste.inspect
-        puts "**********************\n\n"
+        logger.info("\n\n**********************")
+        logger.info("buddy_taste:")
+        logger.info($buddy_taste.inspect)
+        logger.info("**********************\n\n")
 
         redirect_to "/buddy"
     end
 
     # POST /sessions/buddy_join
     def buddy_join
-        puts "*******************************"
-        puts "Buddy Joined!!!"
-        puts "*******************************"
+        logger.info("*******************************")
+        logger.info("Buddy Joined!!!")
+        logger.info("*******************************")
 
         @user = User.find_by(username: "Buddy")
         @station = Station.find 1
@@ -62,9 +62,9 @@ class BuddyController < ApplicationController
     end
 
     def buddy_logout
-        puts "*******************************"
-        puts "Buddy Left :("
-        puts "*******************************"
+        logger.info("*******************************")
+        logger.info("Buddy Left :(")
+        logger.info("*******************************")
 
         # Push back all other users
         @user = User.find_by(username: "Buddy")

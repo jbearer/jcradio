@@ -14,10 +14,10 @@ ActiveRecord::Base.logger.level = 1
 class ApplicationController < ActionController::Base
     include ApplicationHelper
 
-    # puts "\n\n\n\n********************$$$$$$$$$$$$$**************@@@@@@@@@@@@@***********"
-    # puts " Global defined again..."
-    # puts "********************$$$$$$$$$$$$$**************@@@@@@@@@@@@@***********\n\n\n\n"
-    # puts "\n*"*10
+    # logger.info("\n\n\n\n********************$$$$$$$$$$$$$**************@@@@@@@@@@@@@***********")
+    # logger.info(" Global defined again...")
+    # logger.info("********************$$$$$$$$$$$$$**************@@@@@@@@@@@@@***********\n\n\n\n")
+    # logger.info("\n*"*10)
 
     # Global Variables, b/c ruby is confusing
     $client_spotifies = {} if $client_spotifies.nil?

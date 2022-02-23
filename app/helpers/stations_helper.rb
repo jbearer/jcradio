@@ -90,9 +90,9 @@ class TitleExtractorWorker < ApplicationController
                         if next_user.username != "Buddy"
                             # Notify the next user that it's their turn to pick a song.
                             broadcast :push, "Wake up #{next_user.username}, you have a #{$the_next_letter}"
-                            # puts "****************************"
-                            # puts "notify user: #{next_user.username}"
-                            # puts "****************************"
+                            # logger.info("****************************")
+                            # logger.info("notify user: #{next_user.username}")
+                            # logger.info("****************************")
                         end
                     end
                 else
