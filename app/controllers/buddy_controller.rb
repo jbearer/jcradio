@@ -10,6 +10,13 @@ class BuddyController < ApplicationController
         end
         @buddy_taste = $buddy_taste
         @buddy_on = $buddy_on
+
+        # Send the array from Ruby side
+        @buddy_users = ["Radio", "Aurora", "Austin", "Daniel", "Jeb", "Lilly"]
+
+        # Specify who has linked their spotify
+        @spotify_users = $client_spotifies.keys
+
     end
 
     # POST /buddy/configure
@@ -25,7 +32,11 @@ class BuddyController < ApplicationController
         end
         $buddy_on = buddy_on
 
-        # Update preferences
+        # Debug printing
+        puts "\n\n**********************"
+        puts "buddy_taste:"
+        puts $buddy_taste.inspect
+        puts "**********************\n\n"
 
         redirect_to "/buddy"
     end

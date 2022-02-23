@@ -101,58 +101,88 @@ class StationsController < ApplicationController
             puts "****************************"
         end
 
-        user, source = $buddy_taste.split("_")
-        user = user.capitalize
+        # Loop through all tastes checked
+        total_songs = []
+        $buddy_taste.each do |taste|
 
-        puts "****************************"
-        puts "Buddy CfG: User=#{user}, Source=#{source}"
+            user, source = taste.split("_")
+            user = user.capitalize
 
-        if source == "played"
-            if user == "Radio"
-                songs = Song.where(first_letter: $the_next_letter).limit(100)
-            else # All other normal users
-                queued = QueueEntry.all.joins(:song).where.not(position: nil).where(selector: User.find_by(username: user))\
-                        .where(songs: {first_letter: $the_next_letter})
+            puts "****************************"
+            puts "Buddy Tase: taste"
+
+            if source == "played"
+                if user == "Radio"
+                    queued = QueueEntry.all.joins(:song).where.not(position: nil)\
+                            .where(songs: {first_letter: $the_next_letter})
+                else # All other normal users
+                    queued = QueueEntry.all.joins(:song).where.not(position: nil).where(selector: User.find_by(username: user))\
+                            .where(songs: {first_letter: $the_next_letter})
+                end
                 songs = queued.map {|q| q.song}
                 puts "*******************************************************"
                 puts "Buddy: #{user}'s Played songs len: #{songs.length}"
                 puts "*******************************************************"
-            end
 
-        elsif source == "spotify"
-            if user == "Radio"
-                songs = []
-                puts "Sorry, this isn't implemented yet"
-            else # All other normal users
-                client_spotify = $client_spotifies[user]
-                if not client_spotify then
-                    fail "Not logged into spotify"
+            elsif source == "upvoted"
+                if user == "Radio"
+                    queued = QueueEntry.all.joins(:upvotes).joins(:song).where.not(position: nil)\
+                            .where.not(upvotes: {upvoter_id: nil})\
+                            .where(songs: {first_letter: $the_next_letter})
+                else # All other users
+                    queued = QueueEntry.all.joins(:upvotes).joins(:song).where.not(position: nil)\
+                            .where(upvotes: {upvoter_id: User.find_by(username: user).id})\
+                            .where(songs: {first_letter: $the_next_letter})
                 end
-                spotify_songs = spotify_get_all_songs(client_spotify, "Austin")
-                results = SongsHelper.get_or_create_from_spotify_record(spotify_songs, true)
-                songs = []
-                results.each do |s|
-                    if $the_next_letter == SongsHelper.first_letter(s.title) then
-                        songs.append(s)
+                songs = queued.map {|q| q.song}
+                puts "*******************************************************"
+                puts "Buddy: #{user}'s Upvoted songs len: #{songs.length}"
+                puts "*******************************************************"
+
+            elsif source == "spotify"
+                if user == "Radio"
+                    songs = []
+                    puts "Sorry, this isn't implemented yet"
+                else # All other normal users
+                    client_spotify = $client_spotifies[user]
+                    if not client_spotify then
+                        songs = []
+                        puts "Not logged into Spotify"
+
+                    end
+                    spotify_songs = spotify_get_all_songs(client_spotify, "Austin")
+                    results = SongsHelper.get_or_create_from_spotify_record(spotify_songs, true)
+                    songs = []
+                    results.each do |s|
+                        if $the_next_letter == SongsHelper.first_letter(s.title) then
+                            songs.append(s)
+                        end
                     end
                 end
                 puts "*******************************************************"
                 puts "Buddy: #{user} Spotify songs len: #{songs.length}"
                 puts "*******************************************************"
+
+            else
+                puts "*******************************************************"
+                puts " Sorry, buddy_taste='#{$buddy_taste}'' isn't supported yet. Default to 'radio_played'"
+                puts "*******************************************************"
+                songs = []
             end
 
-        else
-            puts "*******************************************************"
-            puts " Sorry, buddy_taste='#{$buddy_taste}'' isn't supported yet. Default to 'radio_played'"
-            puts "*******************************************************"
-            songs = []
+            # Append songs to total songs (and filter for unique)
+            total_songs.concat(songs).uniq
         end
+
+        puts "**********************************"
+        puts "total_songs:"
+        puts total_songs.inspect
+        puts "**********************************"
 
         # If no song results, default to radio_played
-        if songs.length == 0
-            songs = Song.where(first_letter: $the_next_letter).limit(100)
+        if total_songs.length == 0
+            total_songs = Song.where(first_letter: $the_next_letter).limit(100)
         end
-
 
         # Only Buddy alone
         if @station.users.length == 1 and @station.queue_max - @station.queue_pos >= 1
@@ -188,7 +218,7 @@ class StationsController < ApplicationController
         @buddy = User.find_by(username: "Buddy")
 
         # Get random number for the song
-        chosen_song = songs[rand(songs.length)]
+        chosen_song = total_songs[rand(total_songs.length)]
         err_str = @station.queue_song(chosen_song, @buddy, false)
 
         if err_str != "" then
@@ -199,7 +229,7 @@ class StationsController < ApplicationController
         end
 
         puts "****************************"
-        puts "songs.length = #{songs.length}"
+        puts "total_songs.length = #{total_songs.length}"
         puts "title = #{chosen_song.title}"
         puts "****************************"
 

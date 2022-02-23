@@ -27,7 +27,7 @@ class ApplicationController < ActionController::Base
     # Cache spotify library for each user (logging time too, for expiry)
     $spotify_libraries_cached = {} if $spotify_libraries_cached.nil? 
 
-    $buddy_taste = "radio_played" if $buddy_taste.nil?
+    $buddy_taste = ["Radio_played"] if $buddy_taste.nil?
     $buddy_on = false if $buddy_on.nil?
 
 

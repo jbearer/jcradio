@@ -40,7 +40,7 @@ class SongsController < ApplicationController
         if source == "my_spotify_library" then
             client_spotify = $client_spotifies[current_user.username]
             if not client_spotify then
-                fail "Not logged into spotify"
+                raise IndexError "Not logged into spotify"
             end
             spotify_songs = spotify_get_all_songs(client_spotify)
             results = SongsHelper.get_or_create_from_spotify_record(spotify_songs, true)

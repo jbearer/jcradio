@@ -12,35 +12,43 @@
     <br>
 
     <h3> What kind of music do I like? </h3>
-    <input type="radio" name="buddy_taste" value="radio_played" <%if @buddy_taste=="radio_played"%> checked <%end%> >
-      <label for="radio_played">Radio Played</label>
-      <br>
-    <input type="radio" name="buddy_taste" value="radio_liked" <%if @buddy_taste=="radio_liked"%> checked <%end%> >
-      <label for="radio_liked">Radio Liked</label>
-      <br>
-    <input type="radio" name="buddy_taste" value="austin_played" <%if @buddy_taste=="austin_played"%> checked <%end%> >
-      <label for="austin_played">Austin Played</label>
-      <br>
-    <input type="radio" name="buddy_taste" value="austin_spotify" <%if @buddy_taste=="austin_spotify"%> checked <%end%> >
-      <label for="austin_spotify">Austin Spotify</label>
-      <br>
-    <input type="radio" name="buddy_taste" value="aurora_played" <%if @buddy_taste=="aurora_played"%> checked <%end%> >
-      <label for="aurora_played">Aurora Played</label>
-      <br>
-    <input type="radio" name="buddy_taste" value="jeb_played" <%if @buddy_taste=="jeb_played"%> checked <%end%> >
-      <label for="jeb_played">Jeb Played</label>
-      <br>
-    <input type="radio" name="buddy_taste" value="daniel_played" <%if @buddy_taste=="daniel_played"%> checked <%end%> >
-      <label for="daniel_played">Daniel Played</label>
-      <br>
-    <input type="radio" name="buddy_taste" value="recs_from_last_songs" <%if @buddy_taste=="recs_from_last_songs"%> checked <%end%> >
-      <label for="recs_from_last_songs">Recs from last songs</label>
-      <br>
+
+
+    <!-- Create Checkbox grid of potential "Tastes in Music" -->
+    <table>
+      <% if @buddy_taste %>
+        <tr>
+          <th>  </th>
+          <th> Played </th>
+          <th> Upvoted </th>
+          <th> Spotify </th>
+        </tr>
+        <% @buddy_users.each do |user| %>
+          <tr>
+            <th> <%=user%> </th>
+            <th> <input type="checkbox" name="buddy_taste[]" value="<%=user%>_played"
+              <%if @buddy_taste.include?("#{user}_played")%>  checked <%end%> /> </th>
+            <th> <input type="checkbox" name="buddy_taste[]" value="<%=user%>_upvoted"
+              <%if @buddy_taste.include?("#{user}_upvoted")%> checked <%end%> /> </th>
+            <th> <input type="checkbox" name="buddy_taste[]" value="<%=user%>_spotify"
+              <%if not @spotify_users.include?(user)%>
+                disabled
+              <%else%>
+                <%if @buddy_taste.include?("#{user}_spotify")%> checked <%end%> /> </th>
+              <%end%>
+          </tr>
+        <%end%>
+      <%end%>
+    </table>
+
+    <!-- TODO: Option for Recommended songs (maybe based on last N (non-buddy) songs -->
 
     <button type="submit"> Submit </button>
 
   </form>
 
+  Current Settings:
+  <br>
   <%= "buddy_on: #{@buddy_on}" %>
   <br>
   <%= "buddy_taste: #{@buddy_taste}" %>
