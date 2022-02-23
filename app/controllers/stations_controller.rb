@@ -101,6 +101,33 @@ class StationsController < ApplicationController
             logger.info("****************************")
         end
 
+        # Only Buddy alone
+        if @station.users.length == 1 and @station.queue_max - @station.queue_pos >= 1
+            logger.info("****************************")
+            logger.info("Buddy is lonely. Buddy will wait for smaller queue")
+            logger.info("****************************")
+            return
+        end
+
+        # Queue long, waiting
+        if @station.queue_max - @station.queue_pos > 10
+            logger.info("****************************")
+            logger.info("Too many songs in the queue. Buddy will wait!")
+            logger.info("****************************")
+            return
+        end
+
+        # Hack to prevent multiple songs added at once
+        if Time.now.to_f - $buddy_last_add < 5
+            logger.info("************************************************")
+            logger.info("Hey Buddy, don't spam the queue. wait some more")
+            logger.info("************************************************")
+            return
+        end
+        $buddy_last_add = Time.now.to_f
+
+        ###########################################################################################
+        ## Add a song
         # Loop through all tastes checked
         total_songs = []
         $buddy_taste.each do |taste|
@@ -175,44 +202,15 @@ class StationsController < ApplicationController
         end
 
         logger.info("**********************************")
-        logger.info("total_songs:")
-        logger.info(total_songs.inspect)
+        logger.info("total_songs.length: #{total_songs.length}")
         logger.info("**********************************")
 
         # If no song results, default to radio_played
         if total_songs.length == 0
             total_songs = Song.where(first_letter: $the_next_letter).limit(100)
+            logger.info("0 songs, so defaulted to radio_played")
+            logger.info("**********************************")
         end
-
-        # Only Buddy alone
-        if @station.users.length == 1 and @station.queue_max - @station.queue_pos >= 1
-            logger.info("****************************")
-            logger.info("Buddy is lonely. Buddy will wait for smaller queue")
-            logger.info("****************************")
-            return
-        end
-
-        # Queue long, waiting
-        if @station.queue_max - @station.queue_pos > 10
-            logger.info("****************************")
-            logger.info("Too many songs in the queue. Buddy will wait!")
-            logger.info("****************************")
-            return
-        end
-
-
-        ## Add a song
-
-        # TODO move code back here
-
-        # Hack to prevent multiple songs added at once
-        if Time.now.to_f - $buddy_last_add < 5
-            logger.info("************************************************")
-            logger.info("Hey Buddy, don't spam the queue. wait some more")
-            logger.info("************************************************")
-            return
-        end
-        $buddy_last_add = Time.now.to_f
 
         # Get Buddy user
         @buddy = User.find_by(username: "Buddy")
@@ -229,8 +227,7 @@ class StationsController < ApplicationController
         end
 
         logger.info("****************************")
-        logger.info("total_songs.length = #{total_songs.length}")
-        logger.info("title = #{chosen_song.title}")
+        logger.info("Buddy chose... #{chosen_song.title}")
         logger.info("****************************")
 
         @buddy.update position: @station.users.maximum(:position) + 1
