@@ -28,7 +28,7 @@
       <td><%= queue_entry.song.title %></td>
       <td><%= queue_entry.song.artist %></td>
       <td><%= queue_entry.song.album %></td>
-      <td><%= queue_entry.selector.username %></td>
+      <td><%= queue_entry.selector.nil? ? "" : queue_entry.selector.username %></td>
       <td><%= queue_entry.position%></td>
     </tr>
   <% end %>

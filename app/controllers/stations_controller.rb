@@ -96,8 +96,12 @@ class StationsController < ApplicationController
 
     def buddy_add_song
 
-        # if @station.users.order(:position)[0] != User.find_by(username: "Buddy")
-        if @station.users.order(:position)[0].username != "Buddy"
+        if @station.nil? or @station.users.nil?
+            return
+        end
+
+        if @station.users.order(:position)[0] != User.find_by(username: "Buddy")
+        # if @station.users.order(:position)[0].username != "Buddy"
             logger.info("****************************")
             logger.info("Not Buddy's turn!")
             logger.info("****************************")

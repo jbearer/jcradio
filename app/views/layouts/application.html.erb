@@ -75,7 +75,11 @@
       <div class="userlist">
         <table>
           <p id="next-up">
-            <strong>Next up... <%=@station.users.order(:position)[0].username%> with '<%= $the_next_letter %>'</strong>
+            <% if @station.users.nil? or @station.users.order(:position)[0].nil? %>
+              Next letter.. '<%= $the_next_letter %>'
+            <% else %>
+              <strong>Next up... <%= @station.users.order(:position)[0].username %> with '<%= $the_next_letter %>'</strong>
+            <% end %>
           </p>
           <tbody>
             <% User.where.not(position: nil).order(:position).each do |user| %>
