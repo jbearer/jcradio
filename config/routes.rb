@@ -31,6 +31,9 @@ Rails.application.routes.draw do
 
   post '/sessions/radio_spotify_logout', to: "sessions#radio_spotify_logout"
   post '/stations/:id/user_spotify_logout', to: "stations#user_spotify_logout"
+  post '/stations/:id/user_spotify_reload_library', to: "stations#user_spotify_reload_library"
+
+
 
   get '/stations/:id/change_queue_pos', to: "stations#change_queue_pos"
   post '/stations/:id/edit_queue_pos',  to: "stations#edit_queue_pos"

@@ -90,10 +90,10 @@ class SessionsController < ApplicationController
   # DELETE /sessions
   def destroy
     if logged_in?
-        # If spotify linked, reset spotify library cache time
-        if $client_spotifies.key?(current_user.username)
-          $spotify_libraries_cached[current_user.username][0] = Time.at(0) # Reset cache
-        end
+        # # If spotify linked, reset spotify library cache time
+        # if $client_spotifies.key?(current_user.username)
+        #   $spotify_libraries_cached[current_user.username][0] = Time.at(0) # Reset cache
+        # end
 
         # Push back all other users
         User.where("position > ?", current_user.position).each do |inc_user|

@@ -52,6 +52,13 @@ class StationsController < ApplicationController
         redirect_to "/sessions"
     end
 
+    # POST /stations/1/user_spotify_reload_library
+    def user_spotify_reload_library
+        $spotify_libraries_cached[current_user.username][0] = Time.at(0) # Reset cache timer
+        spotify_get_all_songs($client_spotifies[current_user.username]) # Call function to poll all songs again
+        redirect_to "/stations/1"
+    end
+
     # GET /stations/1
     def show
         # Set the next_letter properly, if currently unset
@@ -89,7 +96,8 @@ class StationsController < ApplicationController
 
     def buddy_add_song
 
-        if @station.users.order(:position)[0] != User.find_by(username: "Buddy")
+        # if @station.users.order(:position)[0] != User.find_by(username: "Buddy")
+        if @station.users.order(:position)[0].username != "Buddy"
             logger.info("****************************")
             logger.info("Not Buddy's turn!")
             logger.info("****************************")
@@ -136,7 +144,7 @@ class StationsController < ApplicationController
             user = user.capitalize
 
             logger.info("****************************")
-            logger.info("Buddy Tase: taste")
+            logger.info("Buddy Taste: taste")
 
             if source == "played"
                 if user == "Radio"
@@ -177,7 +185,7 @@ class StationsController < ApplicationController
                         logger.info("Not logged into Spotify")
 
                     end
-                    spotify_songs = spotify_get_all_songs(client_spotify, "Austin")
+                    spotify_songs = spotify_get_all_songs(client_spotify, user)
                     results = SongsHelper.get_or_create_from_spotify_record(spotify_songs, true)
                     songs = []
                     results.each do |s|

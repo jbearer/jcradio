@@ -10,6 +10,7 @@ class BuddyController < ApplicationController
         end
         @buddy_taste = $buddy_taste
         @buddy_on = $buddy_on
+        @buddy_max_songs = $buddy_max_songs
 
         # Send the array from Ruby side
         @buddy_users = ["Radio", "Aurora", "Austin", "Daniel", "Jeb", "Lilly"]

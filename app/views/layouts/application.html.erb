@@ -2,346 +2,346 @@
 
 <html>
 
-  <!-- Auto Logout if cookie puts user in inconsistent state (when server hard resets) -->)
-  <% if logged_in? %>
-    <% if current_user %>
-      <% if current_user.station.nil? %>
-        <form action="/logout" method="post" class="in_place_form" id="auto_logout">
-        <script>
-          window.onload = function(){
-            document.forms['auto_logout'].submit()
-          }
-        </script>
-      <% end %>
+<!-- Auto Logout if cookie puts user in inconsistent state (when server hard resets) -->)
+<% if logged_in? %>
+  <% if current_user %>
+    <% if current_user.station.nil? %>
+      <form action="/logout" method="post" class="in_place_form" id="auto_logout">
+      <script>
+        window.onload = function(){
+          document.forms['auto_logout'].submit()
+        }
+      </script>
     <% end %>
   <% end %>
+<% end %>
 
-    <!-- Header -->
-        <head>
-            <title>Jingle Churro Radio</title>
-            <meta charset="utf-8" />
-            <meta name="viewport" content="width=device-width, initial-scale=1" />
-            <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"/>
-            <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track' => true %>
-          <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
-          <%= csrf_meta_tags %>
+<!-- Header -->
+<head>
+  <title>Jingle Churro Radio</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"/>
+  <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
+  <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track' => true %>
+  <%= csrf_meta_tags %>
 
-          <script type="text/javascript">
-            $(document).ready(function() {
-              <% flash.each do |status, message| %>
-                // flash('<%= message %>', { type: '<%= status %>', dismissible: true })
-                console.log('<%= message %>')
-                flash('<%= message %>', { type: '<%= status %>', dismissible: true })
-              <% end %>
-            })
-          </script>
-          <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-        </head>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      <% flash.each do |status, message| %>
+        // flash('<%= message %>', { type: '<%= status %>', dismissible: true })
+        console.log('<%= message %>')
+        flash('<%= message %>', { type: '<%= status %>', dismissible: true })
+      <% end %>
+    })
+  </script>
 
-    <body style="height: 100%;">
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 
-    <!-- Navigation Bar -->
-        <div class="topnav">
-             <%= link_to "Home", "/sessions", :class => current_class?("/sessions") %>
-             <%= link_to "Queue", "/stations/1", :class => current_class?("/stations") %>
-             <%= link_to "Browse", "/songs", :class => current_class?("/songs") %>
-             <%= link_to "Plots", "/stations/1/plots" %>
-             <%= link_to "Chat", "/chat", :class => current_class?("/chat"), id: "chat_link" %>
-             <% if logged_in? %>
-                <%= link_to "Notifications (#{current_user.pending_notifications.length})",
-                      "/notifications" %>
-             <% end %>
-             <%= link_to "Recommendations", "/recommendations", :class => current_class?("/recommendations") %>
-             <%= link_to "Buddy", "/buddy", :class => current_class?("/buddy") %>
-             <%= link_to "Jeb's Birthday", "/songs/birth" %>
-        </div>
+</head>
+
+<!-- BODY -->
+
+<body style="height: 100%;">
+
+
+  <!-- Navigation Bar -->
+  <div class="topnav">
+    <%= link_to "Home", "/sessions", :class => current_class?("/sessions") %>
+    <%= link_to "Queue", "/stations/1", :class => current_class?("/stations") %>
+    <%= link_to "Browse", "/songs", :class => current_class?("/songs") %>
+    <%= link_to "Plots", "/stations/1/plots" %>
+    <%= link_to "Chat", "/chat", :class => current_class?("/chat"), id: "chat_link" %>
+    <% if logged_in? %>
+      <%= link_to "Notifications (#{current_user.pending_notifications.length})", "/notifications" %>
+    <% end %>
+    <%= link_to "Recommendations", "/recommendations", :class => current_class?("/recommendations") %>
+    <%= link_to "Buddy", "/buddy", :class => current_class?("/buddy") %>
+    <%= link_to "Jeb's Birthday", "/songs/birth" %>
+  </div>
+
+
+  <!-- Middle Section -->
+  <div class = "row">
+
 
     <!-- Side Bar -->
-        <div class = "row">
-          <div class = "column sidebar">
+    <div class = "column sidebar">
 
-                <br><br><br>
-                  <span><h2>JINGLE CHURRO</h2></span>
-                  <span><h4>R A D I O</h4></span>
+      <br><br><br>
+      <span><h2>JINGLE CHURRO</h2></span>
+      <span><h4>R A D I O</h4></span>
 
+      <div class="userlist">
+        <table>
+          <p id="next-up">
+            <strong>Next up... <%=@station.users.order(:position)[0].username%> with '<%= $the_next_letter %>'</strong>
+          </p>
+          <tbody>
+            <% User.where.not(position: nil).order(:position).each do |user| %>
+              <tr class="<%= user.position == 0 ? "user-active" : "user" %>">
+                <td><%= user.username %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
 
+        <p id="last-letters">
+          <% if current_user and current_user.station %>
+            <!-- Determine next user -->
+            <% next_user = current_user.station.users.order(:position)[1] %>
+            <!-- Print header -->
+            Previous letters... <br>
+            <!-- Loop, and print out last N first letters (from top of queue)-->
+            <!-- Bold the letters that correspond to the next selector -->
+            <% current_user.station.queue_before(-(current_user.station.queue_max-current_user.station.queue_pos-10)).each do |queue_entry| %>
+              <% if queue_entry.selector == next_user %>
+                <strong><%= queue_entry.song.first_letter %></strong>
+              <% else %>
+                <font size="-1"><%= queue_entry.song.first_letter %></font>
+              <% end %>
+            <% end %>
+            <!-- Print a nice arrow emoji -->
+            &nbsp;&nbsp;<font size="+2"><strong>⬅</strong></font>
+          <% end %>
+        </p>
+      </div>
 
-              <div class="userlist">
-                  <table>
-                    <p id="next-up">
-                      <% if current_user and current_user.station %>
-                        <strong>Next up... <%=current_user.station.users.order(:position)[0].username%> with '<%= $the_next_letter %>'</strong>
-                      <% else %>
-                        Next up...
-                      <% end %>
-                    </p>
-                    <tbody>
-                      <% User.where.not(position: nil).order(:position).each do |user| %>
-                        <tr class="<%= user.position == 0 ? "user-active" : "user" %>">
-                          <td><%= user.username %></td>
-                        </tr>
-                      <% end %>
-                    </tbody>
-                  </table>
-
-                  <p id="last-letters">
-                    <% if current_user and current_user.station %>
-                      <!-- Determine next user -->
-                      <% next_user = current_user.station.users.order(:position)[1] %>
-                      <!-- Print header -->
-                      Previous letters... <br>
-                      <!-- Loop, and print out last N first letters (from top of queue)-->
-                      <!-- Bold the letters that correspond to the next selector -->
-                      <% current_user.station.queue_before(-(current_user.station.queue_max-current_user.station.queue_pos-10)).each do |queue_entry| %>
-                        <% if queue_entry.selector == next_user %>
-                          <strong><%= queue_entry.song.first_letter %></strong>
-                        <% else %>
-                          <font size="-1"><%= queue_entry.song.first_letter %></font>
-                        <% end %>
-                      <% end %>
-                      <!-- Print a nice arrow emoji -->
-                      &nbsp;&nbsp;<font size="+2"><strong>⬅</strong></font>
-                    <% end %>
-                  </p>
-              </div>
-
-              <br><br><br>
-        </div>
+      <br><br><br>
+    </div>
 
 
     <!-- Page Content -->
-        <div class="column main">
-            <div class="row" id="flash_row">
-              <div class="col-xs-12 text-center">
-                <div id="flash">
-                </div>
-              </div>
+    <div class="column main">
+        <div class="row" id="flash_row">
+          <div class="col-xs-12 text-center">
+            <div id="flash">
             </div>
-
-
-
-            <%= yield %>
-
-
+          </div>
         </div>
+        <!-- Load the meat and potatoes -->
+        <%= yield %>
+        <!-- Load the meat and potatoes -->
+    </div>
+
+
+  </div>
+
+
+  <!-- Music Bar -->
+  <% if @station and @station.now_playing %>
+    <div class="musicBar">
+      <div class = "columnMus leftMus">
+        <p id="now-playing-title"><%= @station.now_playing.song.title %></p>
+        <span id="now-playing-artist"><%= @station.now_playing.song.artist %></span>
+        <% if logged_in? %>
+          <button id="now-playing-upvote" onclick="toggle_upvote(<%= @station.now_playing.id %>)">
+            <i id="upvote" class="fa fa-thumbs<%= current_user.has_upvoted?(@station.now_playing) ? "" : "-o" %>-up fa-lg"></i>
+          </button>
+          <button id="now-playing-spotify-save" onclick="save_song(<%= @station.id %>)">
+            <i id="spotify-save" class="fa fa-floppy-o fa-lg"></i>
+          </button>
+        <% end %>
+        <button onclick="refresh_now_playing(<%= @station.id %>)">
+          <i class="fa fa-refresh fa-lg"></i>
+        </button>
       </div>
 
-    <!-- Music Bar -->
-    <% if @station and @station.now_playing %>
-        <div class="musicBar">
-          <div class = "columnMus leftMus">
-                <p id="now-playing-title"><%= @station.now_playing.song.title %></p>
-                <span id="now-playing-artist"><%= @station.now_playing.song.artist %></span>
-                <% if logged_in? %>
-                  <button id="now-playing-upvote" onclick="toggle_upvote(<%= @station.now_playing.id %>)">
-                    <i id="upvote" class="fa fa-thumbs<%= current_user.has_upvoted?(@station.now_playing) ? "" : "-o" %>-up fa-lg"></i>
-                  </button>
-                  <button id="now-playing-spotify-save" onclick="save_song(<%= @station.id %>)">
-                    <i id="spotify-save" class="fa fa-floppy-o fa-lg"></i>
-                  </button>
-                <% end %>
-                <button onclick="refresh_now_playing(<%= @station.id %>)">
-                  <i class="fa fa-refresh fa-lg"></i>
-                </button>
-            </div>
+      <!-- Song Duration -->
+      <div class = "columnMus middleMus">
+          <br>
+          <span id="current-time"></span>
+          <canvas id="progress" width="500" height="5"></canvas>
 
-            <!-- Song Duration -->
-            <div class = "columnMus middleMus">
-                <br>
-                <span id="current-time"></span>
-                <canvas id="progress" width="500" height="5"></canvas>
+          <span id="duration"></span>
 
-                <span id="duration"></span>
+          <button id="skip-song" onclick="skip_are_you_sure()">
+            <i class="fa fa-step-forward"></i>
+          </button>
+          <form id="skipSong" action="/stations/1/skip_song" method="post">
 
-                <button id="skip-song" onclick="skip_are_you_sure()">
-                  <i class="fa fa-step-forward"></i>
-                </button>
-                <form id="skipSong" action="/stations/1/skip_song" method="post">
+            <input type="hidden" name="user" value="<%=current_user.username if logged_in?%>">
+          </form>
 
-                  <input type="hidden" name="user" value="<%=current_user.username if logged_in?%>">
-                </form>
+          <br>
+      </div>
 
-                <br>
-            </div>
+      <!-- Hidden Audio player, controlled by mute button -->
+      <!-- <audio id="iceaudio" autoplay muted src="http://jcradio.ddns.net:8000/rapi.mp3" type="audio/mpeg" hidden></audio> -->
 
-            <!-- Hidden Audio player, controlled by mute button -->
-            <!-- <audio id="iceaudio" autoplay muted src="http://jcradio.ddns.net:8000/rapi.mp3" type="audio/mpeg" hidden></audio> -->
+      <!-- Play/Pause and Selector Name -->
+      <div class = "columnMus rightMus">
 
-            <!-- Play/Pause and Selector Name -->
-            <div class = "columnMus rightMus">
+        <!-- TODO: Do we need these buttons?
+        <span style="float: left; width: 32%; text-align: left;">&nbsp;</span>
+        <span style="float: left; width: 32%; text-align: center; margin-top: 0.5em;">
+          <button class="button button7" id="audioControl" onclick="togglePlaying()"><i class="fa fa-volume-up fa-lg"></i></button>
+        </span>
+        -->
 
-            <!-- TODO: Do we need these buttons?
-            <span style="float: left; width: 32%; text-align: left;">&nbsp;</span>
-            <span style="float: left; width: 32%; text-align: center; margin-top: 0.5em;">
-              <button class="button button7" id="audioControl" onclick="togglePlaying()"><i class="fa fa-volume-up fa-lg"></i></button>
-            </span>
-            -->
+        <span style="float: left; margin-top: 1em;">
+          <p id="now-playing-selector">
+          <% if @station.now_playing.selector %>
+            Chosen by <%= @station.now_playing.selector.username %>
+          <% end %>
+          </p>
+          <span id="now-playing-rec">
+          <% if @station.now_playing.was_recommended %>
+            <i class="fa fa-spotify" style="font-size:1.5em;font-wieght:bold"></i>&nbsp;rec
+          <% end %>
+          </span>
+        </span>
+      </div>
 
-              <span style="float: left; margin-top: 1em;">
-                <p id="now-playing-selector">
-                <% if @station.now_playing.selector %>
-                  Chosen by <%= @station.now_playing.selector.username %>
-                <% end %>
-                </p>
-                <span id="now-playing-rec">
-                <% if @station.now_playing.was_recommended %>
-                  <i class="fa fa-spotify" style="font-size:1.5em;font-wieght:bold"></i>&nbsp;rec
-                <% end %>
-                </span>
-              </span>
-            </div>
+    </div>
+  <% end %>
 
-        </div>
+</body>
 
-        <script>
-            var canvasWidth = 500 ;
-            var audioEl = document.getElementById("audio");
-            var canvas = document.getElementById("progress").getContext('2d');
-            var ctrl = document.getElementById('audioControl');
-
-            var songDuration = 0;
-            var startTime = 0;
-
-            function setSongStats(duration_ms, start_ms) {
-                songDuration = duration_ms;
-                startTime = start_ms;
-            }
-
-            function togglePlaying() {
-
-              document.getElementById('iceaudio').muted = !document.getElementById('iceaudio').muted
-
-              var play = ctrl.innerHTML === '<i class="fa fa-volume-up fa-lg"></i>'
-              var method
-
-              if (play) {
-                ctrl.innerHTML = '<i class="fa fa-volume-off fa-lg"></i><i class="fa fa-remove" style="font-size: 0.8em;"></i>'
-                method = 'play'
-              } else {
-                ctrl.innerHTML = '<i class="fa fa-volume-up fa-lg"></i>'
-                method = 'pause'
-              }
-
-              // audioEl[method]()
-
-            }
-
-            <% if @station.now_playing %>
-              setSongStats(<%= @station.now_playing.song.duration %>, <%= @station.now_playing_start_ms %> );
-            <% end %>
-
-            window.setInterval(updateBar, 100);
-
-            function updateBar() {
-              canvas.clearRect(0, 0, canvasWidth, 50)
-              canvas.fillStyle = "#082739";
-              canvas.fillRect(0, 0, canvasWidth, 50)
-
-              var currentTime = Date.now()
-
-              if (currentTime > startTime + songDuration) {
-                return
-              }
-
-              msInSong = currentTime - startTime;
-              secondsInSong = msInSong*1.0 / 1000;
-              document.getElementById("current-time").innerHTML = convertElapsedTime(secondsInSong)
-
-              var percentage = msInSong / songDuration
-              var progress = (canvasWidth * percentage)
-              canvas.fillStyle = "#e2f1af"
-              canvas.fillRect(0, 0, progress, 50)
-            }
-
-            function convertElapsedTime(inputSeconds) {
-              var seconds = Math.floor(inputSeconds % 60)
-              if (seconds < 10) {
-                seconds = "0" + seconds
-              }
-              var minutes = Math.floor(inputSeconds / 60)
-              return minutes + ":" + seconds
-            }
-
-            function skip_are_you_sure() {
-              console.log("Ask if you are sure?");
-
-              // Check if logged in, and provide dialog popup
-              <% if logged_in? %>
-                var confirm_message = " <p> Are you sure you want to skip this song? <p> ";
-                var controls = "\
-                  <button class='button button2 doAction'>Yes</button> \
-                  &nbsp; &nbsp; \
-                  <button class='button button2 cancelAction'>No</button> \
-                  ";
-              <%else%>
-                var confirm_message = " <p> Sorry, you have to be logged in to skip a song (*tsk*tsk*)<p> ";
-                var controls = "\
-                  <button class='button button2 cancelAction'>Close</button> \
-                  ";
-              <%end%>
-
-              var content = `
-                <div class='dialog-ovelay'>
-                  <div class='dialog'>
-                    <div class='dialog-msg'>
-                      ${confirm_message}
-                    </div>
-                    <div class='controls'>
-                      ${controls}
-                    </div>
-                  </div>
-                </div>; `
-              $('body').prepend(content);
-
-
-            // Skip song
-            $('.doAction').click(function () {
-              document.getElementById("skipSong").submit();
-              $(this).parents('.dialog-ovelay').fadeOut(500, function () {
-                $(this).remove();
-              });
-            });
-
-            // Close Dialog Box
-            $('.cancelAction, .fa-close').click(function () {
-              $(this).parents('.dialog-ovelay').fadeOut(500, function () {
-                $(this).remove();
-              });
-            });
-
-
-            }
-
-        </script>
-    <% end %>
-
-    </body>
 
 <!-- Javascript -->
-    <script>
 
-        // Add a hidden input to all .in_place_form objects to tell the server where to redirect.
-        $(document).ready(function() {
-            redirect = window.location.href
-            $(".in_place_form").append('<input type="hidden" name="redirect" value="' + redirect + '">')
-        });
+<script>
 
-        <% if logged_in? %>
-          $(() => {
-            liverpc_subscribe();
+  var canvasWidth = 500 ;
+  var audioEl = document.getElementById("audio");
+  var canvas = document.getElementById("progress").getContext('2d');
+  var ctrl = document.getElementById('audioControl');
 
-            new_chat_messages = current_user().new_chat_messages || 0;
-            if (new_chat_messages) {
-                $("#chat_link").html(`Chat (${new_chat_messages})`);
-            }
-          });
-        <% end %>
-    </script>
+  var songDuration = 0;
+  var startTime = 0;
 
-    <script>
-      <% if @station %>
-        refresh_now_playing(<%= @station.id %>);
-      <%end%>
-    </script>
+  function setSongStats(duration_ms, start_ms) {
+    songDuration = duration_ms;
+    startTime = start_ms;
+  }
+
+  function togglePlaying() {
+
+    document.getElementById('iceaudio').muted = !document.getElementById('iceaudio').muted
+
+    var play = ctrl.innerHTML === '<i class="fa fa-volume-up fa-lg"></i>'
+    var method
+
+    if (play) {
+      ctrl.innerHTML = '<i class="fa fa-volume-off fa-lg"></i><i class="fa fa-remove" style="font-size: 0.8em;"></i>'
+      method = 'play'
+    } else {
+      ctrl.innerHTML = '<i class="fa fa-volume-up fa-lg"></i>'
+      method = 'pause'
+    }
+
+    // audioEl[method]()
+  }
+
+  <% if @station.now_playing %>
+    setSongStats(<%= @station.now_playing.song.duration %>, <%= @station.now_playing_start_ms %> );
+  <% end %>
+
+  window.setInterval(updateBar, 100);
+
+  function updateBar() {
+    canvas.clearRect(0, 0, canvasWidth, 50)
+    canvas.fillStyle = "#082739";
+    canvas.fillRect(0, 0, canvasWidth, 50)
+
+    var currentTime = Date.now()
+
+    if (currentTime > startTime + songDuration) {
+      return
+    }
+
+    msInSong = currentTime - startTime;
+    secondsInSong = msInSong*1.0 / 1000;
+    document.getElementById("current-time").innerHTML = convertElapsedTime(secondsInSong)
+
+    var percentage = msInSong / songDuration
+    var progress = (canvasWidth * percentage)
+    canvas.fillStyle = "#e2f1af"
+    canvas.fillRect(0, 0, progress, 50)
+  }
+
+  function convertElapsedTime(inputSeconds) {
+    var seconds = Math.floor(inputSeconds % 60)
+    if (seconds < 10) {
+      seconds = "0" + seconds
+    }
+    var minutes = Math.floor(inputSeconds / 60)
+    return minutes + ":" + seconds
+  }
+
+  function skip_are_you_sure() {
+    console.log("Ask if you are sure?");
+
+    // Check if logged in, and provide dialog popup
+    <% if logged_in? %>
+      var confirm_message = " <p> Are you sure you want to skip this song? <p> ";
+      var controls = "\
+        <button class='button button2 doAction'>Yes</button> \
+        &nbsp; &nbsp; \
+        <button class='button button2 cancelAction'>No</button> \
+        ";
+    <%else%>
+      var confirm_message = " <p> Sorry, you have to be logged in to skip a song (*tsk*tsk*)<p> ";
+      var controls = "\
+        <button class='button button2 cancelAction'>Close</button> \
+        ";
+    <%end%>
+
+    var content = `
+      <div class='dialog-ovelay'>
+        <div class='dialog'>
+          <div class='dialog-msg'>
+            ${confirm_message}
+          </div>
+          <div class='controls'>
+            ${controls}
+          </div>
+        </div>
+      </div>; `
+    $('body').prepend(content);
+
+    // Skip song
+    $('.doAction').click(function () {
+      document.getElementById("skipSong").submit();
+      $(this).parents('.dialog-ovelay').fadeOut(500, function () {
+        $(this).remove();
+      });
+    });
+
+    // Close Dialog Box
+    $('.cancelAction, .fa-close').click(function () {
+      $(this).parents('.dialog-ovelay').fadeOut(500, function () {
+        $(this).remove();
+      });
+    });
+
+  }
+
+</script>
+
+<script>
+
+  // Add a hidden input to all .in_place_form objects to tell the server where to redirect.
+  $(document).ready(function() {
+    redirect = window.location.href
+    $(".in_place_form").append('<input type="hidden" name="redirect" value="' + redirect + '">')
+  });
+
+  <% if logged_in? %>
+    $(() => {
+      liverpc_subscribe();
+
+      new_chat_messages = current_user().new_chat_messages || 0;
+      if (new_chat_messages) {
+          $("#chat_link").html(`Chat (${new_chat_messages})`);
+      }
+    });
+  <% end %>
+
+  <% if @station %>
+    refresh_now_playing(<%= @station.id %>);
+  <%end%>
+</script>
 
 </html>

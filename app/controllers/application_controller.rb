@@ -29,6 +29,7 @@ class ApplicationController < ActionController::Base
 
     $buddy_taste = ["Radio_played"] if $buddy_taste.nil?
     $buddy_on = false if $buddy_on.nil?
+    $buddy_max_songs = 3 if $buddy_max_songs.nil?
 
 
     # $spotify_user = nil
