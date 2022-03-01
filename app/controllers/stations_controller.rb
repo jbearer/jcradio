@@ -102,7 +102,7 @@ class StationsController < ApplicationController
         end
 
         # Only Buddy alone
-        if @station.users.length == 1 and @station.queue_max - @station.queue_pos >= 1
+        if @station.users.length == 1 and @station.queue_max - @station.queue_pos >= 3
             logger.info("****************************")
             logger.info("Buddy is lonely. Buddy will wait for smaller queue")
             logger.info("****************************")
@@ -236,7 +236,7 @@ class StationsController < ApplicationController
         next_user = @station.users.order(:position)[0]
         $the_next_letter = chosen_song.next_letter.capitalize()[0]
 
-        if next_user != @buddy then
+        if next_user != @buddy and @station.users.length > 2
             broadcast :next_up, next_user, $the_next_letter
         end
 
@@ -275,7 +275,8 @@ class StationsController < ApplicationController
         next_user = station.users.order(:position)[0]
         $the_next_letter = params[:song_next_letter].capitalize()[0]
 
-        if next_user != current_user then
+        if next_user != current_user and
+                @station.users.length > (1 + (@station.users.include?(User.find_by(username: "Buddy")) ? 1 : 0))
             broadcast :next_up, next_user, $the_next_letter
         end
 
