@@ -33,7 +33,7 @@ Rails.application.routes.draw do
   post '/stations/:id/user_spotify_logout', to: "stations#user_spotify_logout"
   post '/stations/:id/user_spotify_reload_library', to: "stations#user_spotify_reload_library"
 
-
+  post '/sessions/librespot_start', to: "sessions#librespot_start"
 
   get '/stations/:id/change_queue_pos', to: "stations#change_queue_pos"
   post '/stations/:id/edit_queue_pos',  to: "stations#edit_queue_pos"

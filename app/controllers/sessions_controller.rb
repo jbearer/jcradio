@@ -25,6 +25,13 @@ class SessionsController < ApplicationController
     redirect_to "/sessions"
   end
 
+  # POST /sessions/librespot_start
+  def librespot_start
+    logger.info("\n\n&&&&\nCalled librespot-start\n\n")
+    system("bash", "-lic", "librespot-start")
+    redirect_to "/sessions"
+  end
+
   # POST /sessions
   #     username: string
   def create
