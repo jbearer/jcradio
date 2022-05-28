@@ -24,6 +24,7 @@ class BuddyController < ApplicationController
     def configure
         buddy_on = params[:buddy_on] == "true"
         $buddy_taste = params[:buddy_taste]
+        $buddy_max_songs = params[:buddy_max_songs].to_i
 
         # Check if just turned on
         if buddy_on && !$buddy_on
@@ -35,6 +36,7 @@ class BuddyController < ApplicationController
 
         # Debug printing
         logger.info("\n\n**********************")
+        logger.info("buddy_max_songs: #{$buddy_max_songs}")
         logger.info("buddy_taste:")
         logger.info($buddy_taste.inspect)
         logger.info("**********************\n\n")

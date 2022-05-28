@@ -114,7 +114,7 @@ class StationsController < ApplicationController
         end
 
         # Only Buddy alone
-        if @station.users.length == 1 and @station.queue_max - @station.queue_pos >= 3
+        if @station.users.length == 1 and @station.queue_max - @station.queue_pos >= $buddy_max_songs
             logger.info("****************************")
             logger.info("Buddy is lonely. Buddy will wait for smaller queue")
             logger.info("****************************")
