@@ -44,7 +44,7 @@ class Song < ActiveRecord::Base
     end
 
     def self.spotify_search(entry)
-        spotify_songs = RSpotify::Track.search(entry)
+        spotify_songs = RSpotify::Track.search(entry, limit: 10)
 
         songs = SongsHelper.get_or_create_from_spotify_record(spotify_songs)
 

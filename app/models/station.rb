@@ -3,7 +3,7 @@ class Station < ActiveRecord::Base
     belongs_to :now_playing, class_name: "QueueEntry"
     has_many :users
 
-    
+
 
     include StationsHelper
 
@@ -51,8 +51,12 @@ class Station < ActiveRecord::Base
             # Otherwise, play this song immediately on spotify
             if $spotify_user.display_name == "JC Radio" then
                 # If we're using the JC Radio account, play on the pi
-                StationsHelper.set_device($JCRADIO_PI)
-                player.play_track(nil, song.uri)
+                begin
+                    StationsHelper.set_device($JCRADIO_PI)
+                    player.play_track(nil, song.uri)
+                rescue RestClient::NotFound
+                    return "Radio Spotify device is unavailable. Start librespot on the Pi with the JC Radio account and try again."
+                end
             else
                 return "Spotify not Playing, and IDK what device to use"
             end
@@ -173,9 +177,18 @@ class Station < ActiveRecord::Base
     end
 
     def internal_spotify_add_to_queue(uri)
-        url = "me/player/queue"
+        spotify_user = $spotify_user
+        url = RSpotify::API_URI + "me/player/queue"
         url += "?uri=#{uri}"
-        RSpotify::User.oauth_post($spotify_user.id, url, {})
+        headers = RSpotify::User.send(:oauth_header, spotify_user.id)
+        begin
+            RestClient.post(url, {}, headers)
+        rescue RestClient::Unauthorized => error
+            raise error unless error.response.to_s =~ /access token expired/
+            RSpotify::User.send(:refresh_token, spotify_user.id)
+            headers = RSpotify::User.send(:oauth_header, spotify_user.id)
+            RestClient.post(url, {}, headers)
+        end
     end
 end
 

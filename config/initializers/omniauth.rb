@@ -1,16 +1,11 @@
+require 'rspotify/oauth'
 
-begin
-  require 'rspotify/oauth'
+spotify_client_id = ENV.fetch('SPOTIFY_CLIENT_ID')
+spotify_client_secret = ENV.fetch('SPOTIFY_CLIENT_SECRET')
 
-  RSpotify.authenticate("b0f411963a924c1497bae046d67e03c9", "d4216a91bd1249e9aee62c3062c18a34")
+RSpotify.authenticate(spotify_client_id, spotify_client_secret)
 
-  Rails.application.config.middleware.use OmniAuth::Builder do
-    provider :spotify, "b0f411963a924c1497bae046d67e03c9", "d4216a91bd1249e9aee62c3062c18a34",
-            scope: 'playlist-modify-public user-modify-playback-state user-read-playback-state user-library-modify user-library-read'
-  end
-rescue RestClient::BadRequest => e
-  logger.info("=======\n" \
-       "Missing Spotify client credentials. Please enter SPOTIFY_CLIENT_ID\n" \
-       "and SPOTIFY_CLIENT_SECRET in config/env.yml.\n" \
-       "=======")
+Rails.application.config.middleware.use OmniAuth::Builder do
+  provider :spotify, spotify_client_id, spotify_client_secret,
+          scope: 'playlist-modify-public user-modify-playback-state user-read-playback-state user-library-modify user-library-read'
 end

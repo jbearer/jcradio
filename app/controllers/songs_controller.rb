@@ -43,11 +43,11 @@ class SongsController < ApplicationController
                 raise IndexError "Not logged into spotify"
             end
             spotify_songs = spotify_get_all_songs(client_spotify)
-            results = SongsHelper.get_or_create_from_spotify_record(spotify_songs, true)
+            results = SongsHelper.get_or_create_from_spotify_record(spotify_songs)
             songs = []
             results.each do |s|
                 if params[:query] == "" or params[:query] == SongsHelper.first_letter(s.title) then
-                    songs.append(s)
+                    songs << s
                 end
             end
         else

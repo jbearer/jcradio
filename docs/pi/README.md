@@ -10,6 +10,7 @@ installation. It is not a full backup.
 
     | Document | Purpose |
     | --- | --- |
+    | [Repair journal](repair-2026-09-12.md) | Approved player recovery, exact commands, checks, and rollback notes |
     | [Pi overview](../pi-overview.md) | High-level setup and current state |
     | [SSH inspection](inspection-2026-09-12.md) | Dated findings, configuration paths, and limits |
     | [Xfinity setup](network-setup.md) | Required ports, DHCP/device-selection caveat, and staged verification |

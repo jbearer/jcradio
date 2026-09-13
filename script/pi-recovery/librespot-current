@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+release="$HOME/.local/share/jcradio-player/raspotify-0.48.2"
+exec "$release/runtime/lib/arm-linux-gnueabihf/ld-linux-armhf.so.3" \
+    --library-path "$release/runtime/lib/arm-linux-gnueabihf:/lib/arm-linux-gnueabihf:/usr/lib/arm-linux-gnueabihf:/usr/lib/arm-linux-gnueabihf/pulseaudio" \
+    "$release/librespot" "$@"

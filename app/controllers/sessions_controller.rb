@@ -22,6 +22,8 @@ class SessionsController < ApplicationController
   # POST /sessions/radio_spotify_logout
   def radio_spotify_logout
     $spotify_user = nil
+    file_path = File.join(Dir.home, "/jcradio/.nothingtoseehere.yml")
+    File.delete(file_path) if File.exist?(file_path)
     redirect_to "/sessions"
   end
 

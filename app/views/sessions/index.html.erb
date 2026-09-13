@@ -33,10 +33,10 @@
     <% else %>
         <p>
             User Spotify: <strong><%= $client_spotifies[current_user.username].display_name %></strong>
-            <form action="/stations/1/user_spotify_logout", method="post" >
+            <form action="/stations/1/user_spotify_logout" method="post" >
                 <button class="button button9" type="submit">Logout of Spotify</button>
             </form>
-            <form action="/stations/1/user_spotify_reload_library", method="post" >
+            <form action="/stations/1/user_spotify_reload_library" method="post" >
                 <button class="button button10" type="submit">Reload Library</button>
             </form>
         </p>
@@ -52,7 +52,7 @@
 <% else %>
     <p>
         Radio Spotify: <%= $spotify_user.display_name %>
-        <form action="/sessions/radio_spotify_logout", method="post" >
+        <form action="/sessions/radio_spotify_logout" method="post" >
             <button class="button button9" type="submit">Logout of Spotify</button>
         </form>
     </p>
