@@ -1,5 +1,15 @@
 == README
 
+== Project Documentation
+
+Start with {the documentation index}[docs/README.md] for the project overview, architecture, letter rules,
+and recovery notes. These distinguish inspected code from historical context
+and configuration that still needs to be recovered from the Raspberry Pi.
+
+The setup and deployment instructions below are historical notes, not a
+verified current installation guide. Back up existing data and credentials
+before trying setup commands on an existing installation.
+
 ################################
 # RVM Setup:
 ################################
