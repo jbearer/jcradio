@@ -177,6 +177,8 @@ class Station < ActiveRecord::Base
     end
 
     def internal_spotify_add_to_queue(uri)
+        # Bypasses RSpotify::User.oauth_post because the queue endpoint returns a non-JSON body.
+        # oauth_header/refresh_token are private to the pinned RSpotify 2.9.2; re-check on upgrade.
         spotify_user = $spotify_user
         url = RSpotify::API_URI + "me/player/queue"
         url += "?uri=#{uri}"

@@ -64,8 +64,8 @@ consulted on the same date.
 - <details> <summary> <b>Static Address Versus Xfinity DHCP</b> </summary>
 
     The Pi currently sets Ethernet to `10.0.0.110/24` in `/etc/dhcpcd.conf`,
-    with gateway `10.0.0.1`. See the existing
-    [network configuration copy](file_copy/dhcpcd.conf).
+    with gateway `10.0.0.1` and DNS `10.0.0.1, 8.8.8.8`; `eth0` has metric 100
+    and `wlan0` metric 200.
 
     Xfinity's guide says its app forwarding works with IPv4 devices using DHCP;
     a device with its own static address may not appear in the device selector.

@@ -1,0 +1,18 @@
+# Install on the Pi (requires sudo; not done automatically):
+#   sudo install -m 644 /home/pi/jcradio/script/pi-recovery/jcradio-player.service /etc/systemd/system/
+#   sudo systemctl daemon-reload && sudo systemctl enable --now jcradio-player
+# Relies on OAuth credentials already cached in ~/.local/state/jcradio-player by run-player.sh.
+[Unit]
+Description=JC Radio Spotify Connect player (private librespot 0.8.0)
+After=network-online.target sound.target
+Wants=network-online.target
+
+[Service]
+User=pi
+Group=audio
+ExecStart=/home/pi/jcradio/script/pi-recovery/run-player.sh
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

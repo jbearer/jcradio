@@ -150,7 +150,7 @@ describe this session, not a guarantee of application or audio functionality.
     | Swap | 99 MiB, unused at first check |
     | Clock | America/Los_Angeles, NTP enabled/synchronized, no RTC reported |
 
-    Wired settings agree with the existing [network copy](file_copy/dhcpcd.conf).
+    Wired settings agree with the static Ethernet entry in `/etc/dhcpcd.conf`.
     Both physical interfaces also have IPv6 addresses; global address values
     are omitted. Router rules, firewall policy, public DNS resolution, and
     external reachability were not tested or changed.

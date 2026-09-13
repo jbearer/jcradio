@@ -14,8 +14,6 @@ installation. It is not a full backup.
     | [Pi overview](../pi-overview.md) | High-level setup and current state |
     | [SSH inspection](inspection-2026-09-12.md) | Dated findings, configuration paths, and limits |
     | [Xfinity setup](network-setup.md) | Required ports, DHCP/device-selection caveat, and staged verification |
-    | [SSH planning notes](Pi_SSH_Intructions.txt) | Original proposal, not a record of executed commands |
-    | [Network copy](file_copy/dhcpcd.conf) | Existing timestamped copy of `/etc/dhcpcd.conf` |
     | [Recovery checklist](../operations.md) | Preservation and investigation boundaries |
 
   </details>
@@ -40,30 +38,20 @@ installation. It is not a full backup.
 
   </details>
 
-## file_copy
+## System File Copies
 
-- <details> <summary> <b>file_copy</b> </summary>
+- <details> <summary> <b>System File Copies</b> </summary>
 
-    For a safe file copy, add a comment at the top with the copy time and full
-    source path, using the file format's comment syntax. Preserve the rest of
-    the file when it contains no secrets.
-
-    Example for [the existing network copy](file_copy/dhcpcd.conf):
-
-    ```text
-    # Copied: 2026-09-12 12:53 PDT
-    # Full Path: /etc/dhcpcd.conf
-
-    ... the rest of the actual file
-    ```
+    Raw copies of Pi system files are not kept in this repository. Record the
+    relevant facts in the dated inspection or setup pages instead, citing the
+    source path (for example `/etc/dhcpcd.conf`) so they can be re-read on the
+    Pi. If a copy is ever needed, add a comment at the top with the copy time
+    and full source path, and keep it outside the repository.
 
     Never commit passwords, OAuth tokens, private keys, databases, or unredacted
     credential-bearing launchers. Label redacted excerpts and omissions explicitly;
     do not present them as drop-in replacement configuration. Preserve originals
     privately.
-
-    The existing network copy was not modified. No new raw configuration copies
-    or database backups were made during the SSH inspection.
 
   </details>
 

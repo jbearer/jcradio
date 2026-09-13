@@ -98,12 +98,26 @@
     Some user/session tests contain executable assertions; their current validity
     has not been established. See [the test helper](../test/test_helper.rb),
     [station tests](../test/controllers/stations_controller_test.rb), and
-    [user tests](../test/controllers/users_controller_test.rb).
+    [user tests](../test/controllers/users_controller_test.rb). The 2026 repair
+    added focused tests for the search limit, queue response handling, and
+    library browse in [song tests](../test/models/song_test.rb),
+    [station model tests](../test/models/station_test.rb), and
+    [songs controller tests](../test/controllers/songs_controller_test.rb); they
+    passed in an isolated harness on the Pi, but `bin/rake test` has not been run
+    as a full suite.
 
     A cheap, dependency-light rule probe from the repository root is:
 
     ```sh
     ruby -Iapp/helpers -rsongs_helper -e 'raise unless SongsHelper.first_letter("The Radio") == "R"; raise unless SongsHelper.calculate_next_letter("Radio") == "A"; puts "Letter-rule probe passed"'
+    ```
+
+    To check the documentation structure and local links against
+    [the style guide](DOCS_STYLE_GUIDE.md), run
+    [script/check-docs.rb](../script/check-docs.rb) from the repository root:
+
+    ```sh
+    ruby script/check-docs.rb
     ```
 
     Next useful automated coverage would target title edge cases, wrong-turn
