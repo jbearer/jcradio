@@ -1,6 +1,6 @@
 # Raspberry Pi Overview
 
-The Pi hosts **the Rails website for the music game** and **a separate audio
+The Pi hosts **the Rails website for the radio** and **a separate audio
 pipeline that turns Spotify playback into a shared MP3 stream**. A No-IP
 client keeps `jcradio.ddns.net` pointed at the home connection.
 
@@ -36,7 +36,7 @@ The dated records that led here are under [Pi records](pi/README.md).
 
     ```mermaid
     flowchart TD
-        Browser[Queue and game browser] -->|HTTPS port 3000|Rails[Rails and Puma]
+        Browser[Queue and radio browser] -->|HTTPS port 3000|Rails[Rails and Puma]
         Rails <-->|Selections and application data|DB[(SQLite on SD card)]
         Rails -->|Search and playback control|Spotify[Spotify APIs]
         Spotify -->|Shared account playback|Player[librespot 0.8.0 systemd service]

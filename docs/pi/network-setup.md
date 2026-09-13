@@ -16,7 +16,7 @@ from outside the LAN.
 
     | Purpose | External Port | Internal Destination | Needed for Listeners? |
     | --- | --- | --- | --- |
-    | Website | TCP 3000 | Pi TCP 3000 | Yes, for the queue/game UI outside the LAN |
+    | Website | TCP 3000 | Pi TCP 3000 | Yes, for the queue/radio UI outside the LAN |
     | Audio stream | TCP 8000 | Pi TCP 8000 | Yes, if listening directly to Icecast |
     | Certificate renewal | TCP 80 | Pi TCP 80 | Indirectly: certbot's HTTP-01 challenge needs it; added 2026-09-13 |
     | Remote administration | TCP 10110 | Pi TCP 10110 | No; optional SSH access only |

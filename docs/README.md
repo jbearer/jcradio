@@ -3,7 +3,7 @@
 JC Radio is a shared, turn-based radio app. Friends in different locations join
 a station, take turns adding songs, and build a queue together. Each selection
 also sets the starting-letter constraint for the next selection. The shared
-queue is both a listening experience and a collaborative music game.
+queue is both a listening experience and a collaborative radio.
 
 Formatting follows the [documentation style guide](DOCS_STYLE_GUIDE.md).
 

@@ -2,7 +2,7 @@
 
 ## In One Sentence
 
-JC Radio is a shared radio and a turn-based music game: friends build one
+JC Radio is a collaborative constraint-based radio programming: friends build one
 Spotify-backed queue, with each song handing a starting letter to the next
 person.
 
