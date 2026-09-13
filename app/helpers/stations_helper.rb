@@ -68,15 +68,17 @@ class TitleExtractorWorker < ApplicationController
                 curr_song = player.currently_playing
                 if (not last_song) or (curr_song.id != last_song.id) then
                     # We have a new song
-                    last_song = curr_song
-
                     logger.error("***************************************")
                     logger.error("We have a new song")
                     logger.error("***************************************")
 
-                    # Update the queue with the new song
-                    Station.find(1).next_song(Song.get("Spotify", curr_song.id))
+                    # currently_playing already returned the full track; Track.find would be a
+                    # second request on the app token, which is what got rate limited.
+                    song = SongsHelper.get_or_create_from_spotify_record([curr_song], true).first
+                    Station.find(1).next_song(song)
                     Station.find(1).update_timing_stats()
+                    # Only remember the song once the station advanced, so a failed loop retries.
+                    last_song = curr_song
                     logger.error("***************************************")
                     logger.error("called next_song and update_timing")
                     logger.error("***************************************")
@@ -104,6 +106,9 @@ class TitleExtractorWorker < ApplicationController
 
             rescue => e
                 Rails.logger.error e.message
+                if e.respond_to?(:response) and e.response.respond_to?(:headers)
+                    Rails.logger.error "Retry-After: #{e.response.headers[:retry_after].inspect}"
+                end
                 e.backtrace.each { |line| Rails.logger.error line }
                 time_diff = 5
             end

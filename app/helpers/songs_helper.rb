@@ -95,7 +95,9 @@ module SongsHelper
       spotify_ids = songs.map{|s| [s.id, s]}.to_h
 
       # a list of Song objects that match the spotify songs
-      matches = Song.all.select{|item| spotify_ids.key? item.source_id}
+      # Sliced to stay under SQLite's 999 bound-variable limit for large libraries.
+      matches = spotify_ids.keys.each_slice(500)
+                  .flat_map{|ids| Song.where(source_id: ids).to_a}
                   .map{|s| [s.source_id, s]}.to_h
 
       results = []
@@ -130,7 +132,9 @@ module SongsHelper
             duration: s.duration_ms,
             first_letter: SongsHelper.first_letter(s.name),
             next_letter: SongsHelper.calculate_next_letter(s.name),
-            preview_url: s.preview_url,
+            # Spotify now returns null preview_url; s.preview_url would trigger RSpotify's
+            # lazy complete! (GET tracks/{id}) per track and burn the rate limit.
+            preview_url: s.instance_variable_get(:@preview_url),
           }
 
           if persist then

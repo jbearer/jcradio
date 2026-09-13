@@ -57,10 +57,8 @@ class SongsControllerTest < ActionController::TestCase
         controller.stub :spotify_get_all_songs, library do
           controller.stub :respond_to, respond do
             controller.stub :render, render do
-              Song.stub :all, [] do
-                Song.stub :create, persist do
-                  controller.browse
-                end
+              Song.stub :create, persist do
+                controller.browse
               end
             end
           end

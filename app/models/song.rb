@@ -20,7 +20,9 @@ class Song < ActiveRecord::Base
 
     def self.get(source, source_id)
         if source == "Spotify"
-            SongsHelper.get_or_create_from_spotify_record([RSpotify::Track.find(source_id)], true).first
+            # Known songs skip Spotify entirely so a rate-limited app token can't block them.
+            Song.find_by(source: "Spotify", source_id: source_id) ||
+                SongsHelper.get_or_create_from_spotify_record([RSpotify::Track.find(source_id)], true).first
         else
             nil
         end
