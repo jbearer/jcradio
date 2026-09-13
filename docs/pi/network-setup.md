@@ -18,6 +18,7 @@ from outside the LAN.
     | --- | --- | --- | --- |
     | Website | TCP 3000 | Pi TCP 3000 | Yes, for the queue/game UI outside the LAN |
     | Audio stream | TCP 8000 | Pi TCP 8000 | Yes, if listening directly to Icecast |
+    | Certificate renewal | TCP 80 | Pi TCP 80 | Indirectly: certbot's HTTP-01 challenge needs it; added 2026-09-13 |
     | Remote administration | TCP 10110 | Pi TCP 10110 | No; optional SSH access only |
 
     The observed wired Pi address is `10.0.0.110`; use that only while it remains
@@ -36,8 +37,9 @@ from outside the LAN.
     not require inbound forwarding rules.
 
     Do not forward all ports, enable DMZ, or expose SSH just to make listening
-    work. Ports 80/443 are not required by the current explicit-port URLs;
-    future TLS renewal or reverse-proxy choices may have separate requirements.
+    work. Port 80 is not used by the URLs above; it exists only so certbot's
+    `standalone` challenge can reach the Pi during renewal (nothing listens on
+    it otherwise). Port 443 is not required.
 
   </details>
 
@@ -46,9 +48,9 @@ from outside the LAN.
 - <details> <summary> <b>Before Opening Ports</b> </summary>
 
     The services run and work on the LAN, so forwarding is the only thing
-    between them and the internet. The certificate expired November 27, 2021;
-    forwarding cannot repair certificate validation, and every browser will
-    warn until it is renewed.
+    between them and the internet. The certificate was renewed on
+    2026-09-13 (valid to 2026-12-12); browsers no longer need an override for
+    the hostname, though numeric-IP access will still mismatch it.
 
     This app has username-only login and insufficiently separated operational
     controls. Public forwarding exposes those risks to anyone who finds the
@@ -100,9 +102,9 @@ from outside the LAN.
     3. Select **Add Port Forward**, then continue and select the Pi's Ethernet
        device. Xfinity associates the rule with a device, rather than just an
        arbitrary typed destination IP.
-    4. Choose **Manual Setup**. Add TCP 3000 and TCP 8000 as separate required
-       ports, using the same internal/external port where the interface offers
-       both fields. Do not open the range 3000 through 8000.
+    4. Choose **Manual Setup**. Add TCP 80, TCP 3000, and TCP 8000 as separate
+       required ports, using the same internal/external port where the interface
+       offers both fields. Do not open the range 80 through 8000.
     5. Save/finish with **Next**. Confirm the rules refer to the Pi's current
        IPv4 lease. Leave 10110 closed unless remote administration is explicitly
        needed and appropriately secured.
@@ -123,12 +125,13 @@ from outside the LAN.
     | Service listening locally | Process is running; forwarding is irrelevant until then | 3000 and 8000 listening |
     | Website and audio work from another LAN device | Local service/bind/firewall path works | Yes, from the laptop |
     | DDNS resolves to the current home public IPv4 | Hostname points to the new home, not the old one | Yes |
-    | Test from a phone on cellular, with Wi-Fi off | Exercises actual outside access rather than relying on NAT loopback | **Not tested** |
+    | Inbound forwarding works at all | Let's Encrypt reached the Pi on TCP 80 during renewal | Yes, 2026-09-13 |
+    | Test from a phone on cellular, with Wi-Fi off | Exercises actual outside access to 3000/8000 rather than relying on NAT loopback | **Not tested** |
 
     For local tests, substitute the current Pi address. HTTPS access by numeric
-    IP will not match the certificate's hostname, and this certificate is also
-    expired. Diagnose TLS separately from TCP reachability; do not normalize
-    disabling certificate checks as the permanent fix.
+    IP will not match the certificate's hostname. Diagnose TLS separately from
+    TCP reachability; do not normalize disabling certificate checks as the
+    permanent fix.
 
     DDNS updates the public address; it does not forward ports or start the
     website.

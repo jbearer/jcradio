@@ -12,6 +12,7 @@ For the current state and day-to-day commands, use
     | Document | Purpose |
     | --- | --- |
     | [Xfinity setup](network-setup.md) | Current guide: required ports, DHCP/device-selection caveat, and staged verification |
+    | [Post-upgrade inspection](inspection-2026-09-13.md) | **Historical.** State after the 2026-09-13 `apt upgrade` (610 packages): DarkIce 1.3, pending reboot, renewed certificate |
     | [Repair journal](repair-2026-09-12.md) | **Historical.** Player replacement, OAuth, queue/library fixes, exact commands, and rollback notes |
     | [SSH inspection](inspection-2026-09-12.md) | **Historical.** Pre-repair findings, configuration paths, and limits |
 

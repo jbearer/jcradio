@@ -24,6 +24,9 @@ Formatting follows the [documentation style guide](DOCS_STYLE_GUIDE.md).
     - **Data:** the Pi's development SQLite database is the live, authoritative
       history; it received writes today. A backup from before the repair is on
       the Pi under `~/jcradio-recovery/2026-09-12`.
+    - **HTTPS:** the `jcradio.ddns.net` certificate was renewed on 2026-09-13
+      after four years expired; certbot now renews it automatically and a
+      deploy hook restarts Rails. Browsers load the site without an override.
     - **Tests:** `bin/rake test` on the Pi passes (24 runs, 90 assertions).
 
     Still outstanding: see [Open Items](#open-items).
@@ -76,8 +79,9 @@ Formatting follows the [documentation style guide](DOCS_STYLE_GUIDE.md).
 
     | Item | Why | Needs |
     | --- | --- | --- |
-    | Renew the TLS certificate | The `jcradio.ddns.net` certificate expired 2021-11-27; browsers need an override | Certbot on the Pi; ports 80/443 or a DNS challenge |
+    | Reboot the Pi and re-verify | The 2026-09-13 `apt upgrade` replaced `libc6`, `systemd`, and DarkIce (now 1.3) under running processes; `/var/run/reboot-required` is set | A quiet moment, then `jcradio-start` and the stream checks in [operations](operations.md#routine-commands) |
     | Confirm outside access | DDNS resolves to the current public address, but reachability from outside the LAN was not tested | A phone on cellular, see [network setup](pi/network-setup.md) |
+    | Watch the first automatic renewal | The certbot deploy hook that restarts Rails was tested by hand on 2026-09-13, not yet by `certbot.timer` | Around 2026-11-12, check `/var/log/jcradio-cert-deploy.log` and the served certificate; see [operations](operations.md#routine-commands) |
     | Product-rule confirmation | Whether the one-word next-letter rule and join-after-first-selector behavior are intended house rules | Owner decision; see [letter rules](letter-rules.md) and [workflows](workflows.md) |
 
   </details>
