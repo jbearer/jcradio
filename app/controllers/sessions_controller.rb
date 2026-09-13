@@ -83,12 +83,13 @@ class SessionsController < ApplicationController
             if session[:subscription]
               @user.update subscription: JSON.dump(session[:subscription])
             end
-        end
-        broadcast :push, "#{current_user.username} joined the radio."
 
-        # Set the next_letter properly, if currently unset
-        if @station and $the_next_letter == "_" or $the_next_letter == ""
-          $the_next_letter = @user.station.queue[@user.station.queue_max - @user.station.queue_pos].song.next_letter
+            broadcast :push, "#{current_user.username} joined the radio."
+
+            # Set the next_letter properly, if currently unset
+            if @station and $the_next_letter == "_" or $the_next_letter == ""
+              $the_next_letter = @user.station.queue[@user.station.queue_max - @user.station.queue_pos].song.next_letter
+            end
         end
 
     end
