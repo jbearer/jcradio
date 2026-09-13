@@ -93,13 +93,11 @@
         was decoded from the stream while a track played. Full Icecast
         configuration is permission-protected and was not read.
 
-        The home page still has a **Restart Player** button
-        (`POST /sessions/librespot_restart` in
-        [SessionsController](../app/controllers/sessions_controller.rb)) that
-        runs the legacy `librespot-restart` shell function. That function targets
-        the 2020 binary with password login, which Spotify no longer accepts. Do
-        not use it; restart the systemd service instead. See
-        [operations](operations.md).
+        The home page's former **Restart Librespot** button
+        (`POST /sessions/librespot_restart`) was removed on 2026-09-13; it ran the
+        legacy password-login launcher. Restart the player with
+        `jcradio-player-restart` (wraps `sudo systemctl restart jcradio-player`).
+        See [operations](operations.md).
 
         Short Spotify previews in search results are separate from the shared stream.
 

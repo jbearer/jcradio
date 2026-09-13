@@ -77,8 +77,6 @@ Formatting follows the [documentation style guide](DOCS_STYLE_GUIDE.md).
     | Item | Why | Needs |
     | --- | --- | --- |
     | Renew the TLS certificate | The `jcradio.ddns.net` certificate expired 2021-11-27; browsers need an override | Certbot on the Pi; ports 80/443 or a DNS challenge |
-    | Retire the boot-time legacy player | `/etc/rc.local` still launches the 2020 `/usr/bin/librespot` with password arguments at boot; it fails to log in but competes for the `JCRadio` name | `sudo` edit of `/etc/rc.local` |
-    | Retire the site's Restart Player button | `POST /sessions/librespot_restart` runs the legacy `librespot-restart` shell function, not the systemd service | Code change, or remove the button |
     | Confirm outside access | DDNS resolves to the current public address, but reachability from outside the LAN was not tested | A phone on cellular, see [network setup](pi/network-setup.md) |
     | Product-rule confirmation | Whether the one-word next-letter rule and join-after-first-selector behavior are intended house rules | Owner decision; see [letter rules](letter-rules.md) and [workflows](workflows.md) |
 

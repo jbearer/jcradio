@@ -32,3 +32,8 @@ jcradio-stop() {
 jcradio-restart() {
     jcradio-stop && jcradio-start
 }
+
+# Spotify player is the jcradio-player systemd unit (private librespot 0.8.0).
+jcradio-player-restart() {
+    sudo systemctl restart jcradio-player && systemctl status jcradio-player --no-pager -n 5
+}

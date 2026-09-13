@@ -23,11 +23,9 @@ records are under [Pi records](pi/README.md).
     them. The shared radio account is restored from
     `~/jcradio/.nothingtoseehere.yml` on the first visit to the home page.
 
-    `/etc/rc.local` also still launches the **legacy** 2020 `/usr/bin/librespot`
-    at boot with password login. Spotify rejects that login, so it exits, but
-    it is dead weight and should be removed with `sudo` when convenient. Do not
-    run `librespot-start` or `librespot-restart` from `.bashrc`, and do not use
-    the site's Restart Player button; they target that legacy binary.
+    The legacy 2020 `/usr/bin/librespot` is no longer launched anywhere: its
+    `/etc/rc.local` line and the `librespot-*` `.bashrc` functions were removed
+    on 2026-09-13, along with the site's Restart Librespot button.
 
   </details>
 
@@ -44,15 +42,17 @@ records are under [Pi records](pi/README.md).
 
         ```sh
         jcradio-start                                   # daemonized rails server, HTTPS 0.0.0.0:3000
-        kill "$(cat ~/jcradio/tmp/pids/server.pid)"     # graceful stop
+        jcradio-stop                                    # SIGTERM via PID file, SIGKILL after 15s
+        jcradio-restart                                 # stop + start; needed after config/ changes
         ss -ltn | grep ':3000'                          # is it listening?
         tail -n 50 ~/jcradio/log/development.log        # recent requests and errors
         ```
 
         Rails runs in the development environment: edits under `app/` reload per
-        request; anything under `config/` needs a stop and `jcradio-start`.
-        `jcradio-startstop` in `.bashrc` contains force-kill steps; prefer the
-        PID file.
+        request; anything under `config/` needs `jcradio-restart`.
+        `jcradio-startstop` in `.bashrc` is `pkill -9 ruby`; avoid it.
+        The functions are kept in
+        [jcradio-shell-functions.bash](../script/pi-recovery/jcradio-shell-functions.bash).
 
       </details>
 
@@ -62,7 +62,7 @@ records are under [Pi records](pi/README.md).
 
         ```sh
         systemctl status jcradio-player
-        sudo systemctl restart jcradio-player
+        jcradio-player-restart                              # sudo systemctl restart jcradio-player + status
         tail -n 30 ~/.local/state/jcradio-player/player.log
         ruby ~/jcradio/script/pi-recovery/check-player.rb   # PID, version, auth marker, error marker
         ```

@@ -63,16 +63,10 @@ The dated records that led here are under [Pi records](pi/README.md).
     | Web runtime | RVM Ruby 2.4.9, Rails 4.2.8, Puma 4.3.5 |
     | Player | Raspotify 0.48.2's librespot 0.8.0 under `~/.local/share/jcradio-player`, run through a private Debian Bookworm glibc loader (`~/.local/bin/librespot-current`) because the system glibc is too old |
     | Player service | `/etc/systemd/system/jcradio-player.service`, identical to [the repo copy](../script/pi-recovery/jcradio-player.service); credentials cached in `~/.local/state/jcradio-player` |
-    | Website launcher | `jcradio-start` shell function in `/home/pi/.bashrc`: daemonized `rails server` with TLS, PID in `tmp/pids/server.pid`; no systemd unit |
-    | Audio boot path | `/etc/rc.local` launches the DarkIce wrapper (and the legacy librespot, see below); `/etc/modules` loads `snd-aloop` |
-    | Legacy player | Original `/usr/bin/librespot` (2020) untouched; `raspotify.service` disabled; `.bashrc` still defines `librespot-start`/`librespot-restart` for it |
+    | Website launcher | `jcradio-start` / `jcradio-stop` / `jcradio-restart` shell functions in `/home/pi/.bashrc`: daemonized `rails server` with TLS, PID in `tmp/pids/server.pid`; no systemd unit |
+    | Audio boot path | `/etc/rc.local` launches the DarkIce wrapper; `/etc/modules` loads `snd-aloop` |
+    | Legacy player | Original `/usr/bin/librespot` (2020) still on disk but no longer launched; `raspotify.service` disabled; legacy `.bashrc` functions and the `rc.local` line were removed 2026-09-13 |
     | DDNS | `noip2.service` enabled |
-
-    **Legacy boot conflict:** `/etc/rc.local` still starts the 2020 librespot
-    with password login, which Spotify no longer accepts, so it exits shortly
-    after boot. It uses the same device name `JCRadio`. Remove that line (needs
-    `sudo`) when convenient; until then it is harmless noise in
-    `/home/pi/librespot.log`.
 
     After a reboot the player, encoder, and stream come back on their own; the
     website does not. Log in and run `jcradio-start`.
