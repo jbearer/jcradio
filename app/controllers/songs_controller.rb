@@ -51,17 +51,17 @@ class SongsController < ApplicationController
                 end
             end
         else
+            # One query for distinct songs, most recently queued first; the old
+            # QueueEntry.map { |q| q.song } issued one song query per entry.
+            joins = source == "my_upvoted_songs" ? { queue_entries: :upvotes } : :queue_entries
+            index = Song.joins(joins).where.not(queue_entries: {position: nil})\
+                    .where(first_letter: params[:query])
             if source == "my_chosen_songs" then
-                index = QueueEntry.all.joins(:song).where.not(position: nil).where(selector: current_user.id)\
-                        .where(songs: {first_letter: params[:query]})
+                index = index.where(queue_entries: {selector_id: current_user.id})
             elsif source == "my_upvoted_songs" then
-                index = QueueEntry.all.joins(:upvotes).joins(:song).where.not(position: nil)\
-                        .where(upvotes: {upvoter_id: current_user.id}).where(songs: {first_letter: params[:query]})
-            else
-                index = QueueEntry.all.joins(:song).where.not(position: nil).where(songs: {first_letter: params[:query]})
+                index = index.where(upvotes: {upvoter_id: current_user.id})
             end
-            songs = index.limit(500).order("queue_entries.id DESC").map {|q| q.song}
-            songs = songs.uniq # Filter out duplicates (keeps most recent, b/c ordered by desc)
+            songs = index.group("songs.id").order("MAX(queue_entries.id) DESC").limit(500).to_a
             # Arn arbitrary large limit.  Hopefully, in the future the "More Results"
             # option will work
         end

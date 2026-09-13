@@ -71,13 +71,14 @@ class SessionsController < ApplicationController
               end
             end
             session[:user_id] = @user.id
+            @current_user = @user
 
             # See if we have a subscription to push notifications.
             if session[:subscription]
               @user.update subscription: JSON.dump(session[:subscription])
             end
 
-            broadcast :push, "#{current_user.username} joined the radio."
+            broadcast :push, "#{@user.username} joined the radio."
 
             # Set the next_letter properly, if currently unset
             if @station and $the_next_letter == "_" or $the_next_letter == ""

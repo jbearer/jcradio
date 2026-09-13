@@ -5,6 +5,10 @@
 
 <% if not songs.empty? then %>
 
+  <%# can_add_to_queue queries the DB; compute it once, not per row %>
+  <% can_add = logged_in? && current_user.can_add_to_queue %>
+  <% station_id = current_user.station.id if can_add %>
+
   <table>
 
     <tr>
@@ -23,11 +27,11 @@
                 <td> <%= song.album %> </td>
                 <td> <%= msToMinSec(song.duration) %> </td>
                 <td>
-                    <% if logged_in? and current_user.can_add_to_queue %>
+                    <% if can_add %>
                         <button class="button button6" onclick="confirmSong(<%=ind%>,<%= song.to_json %>)" >
                             <i class="fa fa-plus"></i>
                         </button>
-                        <form id="addSong<%=ind%>" action=<%="/stations/#{current_user.station.id}"%> method="post">
+                        <form id="addSong<%=ind%>" action=<%="/stations/#{station_id}"%> method="post">
                             <input type="hidden" name="source_id" value=<%= song.source_id %> >
                             <input type="hidden" id="song_next_letter_input_<%=ind%>" name="song_next_letter" >
                             <input type="hidden" name="was_recommended" value=<%=recommended%>>

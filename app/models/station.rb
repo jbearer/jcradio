@@ -16,7 +16,8 @@ class Station < ActiveRecord::Base
 
     def queue_before(before)
         if self.queue_pos
-            return QueueEntry.where(station: self).where.not(position: nil).where("position >= ?", self.queue_pos-before).order(:position)
+            # Views read song and selector for every row; load them in two queries, not 2N.
+            return QueueEntry.where(station: self).where.not(position: nil).where("position >= ?", self.queue_pos-before).order(:position).includes(:song, :selector)
         end
         return []
     end

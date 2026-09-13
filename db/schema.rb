@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20210420184241) do
+ActiveRecord::Schema.define(version: 20260913220000) do
 
   create_table "chat_messages", force: :cascade do |t|
     t.text     "message"
@@ -79,6 +79,8 @@ ActiveRecord::Schema.define(version: 20210420184241) do
     t.integer  "last_played",  limit: 8
     t.string   "preview_url"
   end
+
+  add_index "songs", ["source_id"], name: "index_songs_on_source_id"
 
   create_table "stations", force: :cascade do |t|
     t.string   "name"

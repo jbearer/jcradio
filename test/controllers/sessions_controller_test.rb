@@ -19,6 +19,8 @@ class SessionsControllerTest < ActionController::TestCase
     assert_equal @user.id, session[:user_id]
     assert_equal stations(:one), @user.reload.station
     assert_equal 0, @user.position
+    # current_user is memoized per request; the login must refresh it.
+    assert_equal @user, @controller.current_user
   end
 
   test "logging in as an unknown user does not start a session" do
