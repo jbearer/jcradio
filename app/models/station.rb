@@ -185,8 +185,7 @@ class Station < ActiveRecord::Base
         headers = RSpotify::User.send(:oauth_header, spotify_user.id)
         begin
             RestClient.post(url, {}, headers)
-        rescue RestClient::Unauthorized => error
-            raise error unless error.response.to_s =~ /access token expired/
+        rescue RestClient::Unauthorized
             RSpotify::User.send(:refresh_token, spotify_user.id)
             headers = RSpotify::User.send(:oauth_header, spotify_user.id)
             RestClient.post(url, {}, headers)

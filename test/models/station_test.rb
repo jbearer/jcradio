@@ -38,7 +38,7 @@ class StationTest < ActiveSupport::TestCase
         assert_equal 'test-refresh-token', body[:refresh_token]
         '{"access_token":"new-test-token"}'
       elsif requests.length == 1
-        raise RestClient::Unauthorized.new('access token expired')
+        raise RestClient::Unauthorized.new('Missing/invalid/expired access token')
       else
         assert_equal 'Bearer new-test-token', headers['Authorization']
         'spotify-request-id'
@@ -62,7 +62,7 @@ class StationTest < ActiveSupport::TestCase
       if url == RSpotify::TOKEN_URI
         'not-json'
       else
-        raise RestClient::Unauthorized.new('access token expired')
+        raise RestClient::Unauthorized.new('Missing/invalid/expired access token')
       end
     end
 
@@ -77,7 +77,7 @@ class StationTest < ActiveSupport::TestCase
   end
 
   test "queue HTTP failures do not retry or create a local entry" do
-    [RestClient::Unauthorized, RestClient::Forbidden, RestClient::NotFound,
+    [RestClient::Forbidden, RestClient::NotFound,
      RestClient::TooManyRequests, RestClient::InternalServerError].each do |error_class|
       song = set_playing_radio
       requests = 0
@@ -94,6 +94,58 @@ class StationTest < ActiveSupport::TestCase
       end
       assert_equal 1, requests
     end
+  end
+
+  test "a queue 401 that persists after refresh raises and creates no local entry" do
+    song = set_playing_radio
+    requests = []
+    request = lambda do |url, body, headers|
+      requests << url
+      if url == RSpotify::TOKEN_URI
+        '{"access_token":"new-test-token"}'
+      else
+        raise RestClient::Unauthorized.new('Missing/invalid/expired access token')
+      end
+    end
+    create_entry = lambda { |*arguments| flunk 'Must not create a queue entry when Spotify rejects it' }
+
+    RSpotify.stub :auth_header, {} do
+      RestClient.stub :post, request do
+        QueueEntry.stub :create, create_entry do
+          assert_raises(RestClient::Unauthorized) { Station.new.queue_song(song, nil, false) }
+        end
+      end
+    end
+    assert_equal 3, requests.length
+    assert_equal RSpotify::TOKEN_URI, requests[1]
+  end
+
+  test "RSpotify oauth requests refresh on the current Spotify 401 wording" do
+    set_radio_credentials
+    gets = 0
+    get = lambda do |url, headers|
+      gets += 1
+      if gets == 1
+        raise RestClient::Unauthorized.new('Missing/invalid/expired access token')
+      else
+        assert_equal 'Bearer new-test-token', headers['Authorization']
+        '{"is_playing":true}'
+      end
+    end
+    post = lambda do |url, body, headers|
+      assert_equal RSpotify::TOKEN_URI, url
+      '{"access_token":"new-test-token"}'
+    end
+
+    RSpotify.stub :auth_header, {} do
+      RestClient.stub :get, get do
+        RestClient.stub :post, post do
+          response = RSpotify::User.oauth_get('test-radio', 'me/player')
+          assert_equal true, response['is_playing']
+        end
+      end
+    end
+    assert_equal 2, gets
   end
 
   test "an unavailable radio device does not start playback or create a queue entry" do
