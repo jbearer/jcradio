@@ -2,32 +2,30 @@
 
 The Pi hosts **the Rails website for the music game** and **a separate audio
 pipeline that turns Spotify playback into a shared MP3 stream**. A No-IP
-client supports the historical DDNS setup.
+client keeps `jcradio.ddns.net` pointed at the home connection.
 
-This page combines read-only SSH observations from **September 12, 2026** with
-owner clarification. No services, files, or configuration were deliberately
-changed on the Pi. See [inspection evidence](pi/inspection-2026-09-12.md) and
-[Xfinity network setup](pi/network-setup.md).
+Facts on this page were checked on the Pi on **2026-09-13**, after the
+September 12 repair. For commands, see [operating the Pi](operations.md).
+The dated records that led here are under [Pi records](pi/README.md).
 
 ## Current State
 
 - <details open> <summary> <b>Current State</b> </summary>
 
-    **Owner context:** the radio is stopped, normally started with
-    `jcradio-start`, and port forwarding is believed not to be configured.
-
-    | Piece | Observed State |
+    | Piece | State |
     | --- | --- |
-    | Website | No Rails/Puma process or port-3000 listener; consistent with owner context |
-    | Player | No librespot process; loopback playback endpoint closed |
-    | Encoder / stream | DarkIce running; Icecast reports `/rapi.mp3`, 320 kbps MP3, zero listeners |
-    | HTTPS | Configured public certificate expired November 27, 2021 |
-    | SSH | Existing `jcradio-pi` alias works; server listens on TCP 10110 |
-    | Network | Ethernet and Wi-Fi connected; Ethernet preferred; DDNS updater running |
+    | Website | Rails running as `pi`, HTTPS on `0.0.0.0:3000`, started by `jcradio-start`; checkout `atc/dev`, clean tree |
+    | Player | librespot 0.8.0 running as the enabled `jcradio-player` systemd service, authenticated as JC Radio, device `JCRadio` |
+    | Encoder / stream | DarkIce running; Icecast serving `/rapi.mp3` at 320 kbps MP3; 1 listener connected at check time, peak 3 |
+    | Database | `db/development.sqlite3`, about 25 MB, written to today; live history |
+    | HTTPS | Certificate for `jcradio.ddns.net` **expired 2021-11-27**; browsers need an override |
+    | DDNS | `jcradio.ddns.net` resolves to the home's current public IPv4 |
+    | Router | Xfinity gateway (`Server: Xfinity Broadband Router Server` on `10.0.0.1`); forwarding rules not inspected |
+    | Tests | `bin/rake test` on the Pi: 24 runs, 90 assertions, green |
 
-    The expected stopped website is not evidence of an unexpected crash. An
-    active Icecast source does not prove that music is audible. Neither local
-    startup nor end-to-end listening was tested.
+    The player idles between tracks; when the queue runs out, the loopback
+    playback device closes and the stream carries silence until the next song
+    is added. That is normal, not a fault.
 
   </details>
 
@@ -37,19 +35,19 @@ changed on the Pi. See [inspection evidence](pi/inspection-2026-09-12.md) and
 
     ```mermaid
     flowchart TD
-        Browser[Queue and game browser] -->|Configured HTTPS port 3000|Rails[Rails and Puma]
+        Browser[Queue and game browser] -->|HTTPS port 3000|Rails[Rails and Puma]
         Rails <-->|Selections and application data|DB[(SQLite on SD card)]
         Rails -->|Search and playback control|Spotify[Spotify APIs]
-        Spotify -->|Shared account playback|Player[librespot]
+        Spotify -->|Shared account playback|Player[librespot 0.8.0 systemd service]
         Player -->|Playback: Loopback,1|Loopback[ALSA loopback]
         Loopback -->|Capture: Loopback,0|DarkIce[DarkIce MP3 encoder]
         DarkIce -->|320 kbps to localhost:8000|Icecast[Icecast /rapi.mp3]
-        Icecast -.->|HTTP stream; historical workflow|Listener[Listening tab]
+        Icecast -->|HTTP stream|Listener[Listening tab]
     ```
 
-    This is configured wiring, not a current end-to-end test. DarkIce captures
-    stereo, 16-bit, 44.1 kHz audio and produces constant-bitrate MP3. The stream
-    is separate from Rails' live title/progress updates and Spotify previews.
+    DarkIce captures stereo, 16-bit, 44.1 kHz audio and produces constant-bitrate
+    MP3. The stream is separate from Rails' live title/progress updates and
+    from Spotify previews in search results.
 
   </details>
 
@@ -57,24 +55,27 @@ changed on the Pi. See [inspection evidence](pi/inspection-2026-09-12.md) and
 
 - <details> <summary> <b>Host and Startup</b> </summary>
 
-    | Area | Recovered Setup |
+    | Area | Setup |
     | --- | --- |
-    | Hardware | Raspberry Pi 3 Model B Rev 1.2, 32-bit ARM |
-    | OS | Raspbian 9 Stretch, kernel 4.19.66-v7+ |
-    | Resources | 864 MiB reported RAM; 30 GB root filesystem, 21 GB available at inspection |
+    | Hardware | Raspberry Pi 3 Model B Rev 1.2, 32-bit ARM (`armv7l`) |
+    | OS | Raspbian 9 Stretch, kernel 4.19.66-v7+, glibc 2.24 |
+    | Resources | 864 MiB RAM; 30 GB root filesystem, 21 GB free |
     | Web runtime | RVM Ruby 2.4.9, Rails 4.2.8, Puma 4.3.5 |
-    | Audio runtime | Early-2020 Raspotify/librespot, custom DarkIce MP3 build, Icecast 2.4.2 |
-    | Website launcher | Shell function in `/home/pi/.bashrc`; daemonized Rails with TLS on port 3000 |
-    | Audio boot path | `/etc/rc.local` attempts librespot and a DarkIce wrapper; `/etc/modules` loads `snd-aloop` |
-    | DDNS | Enabled `noip2.service` |
+    | Player | Raspotify 0.48.2's librespot 0.8.0 under `~/.local/share/jcradio-player`, run through a private Debian Bookworm glibc loader (`~/.local/bin/librespot-current`) because the system glibc is too old |
+    | Player service | `/etc/systemd/system/jcradio-player.service`, identical to [the repo copy](../script/pi-recovery/jcradio-player.service); credentials cached in `~/.local/state/jcradio-player` |
+    | Website launcher | `jcradio-start` shell function in `/home/pi/.bashrc`: daemonized `rails server` with TLS, PID in `tmp/pids/server.pid`; no systemd unit |
+    | Audio boot path | `/etc/rc.local` launches the DarkIce wrapper (and the legacy librespot, see below); `/etc/modules` loads `snd-aloop` |
+    | Legacy player | Original `/usr/bin/librespot` (2020) untouched; `raspotify.service` disabled; `.bashrc` still defines `librespot-start`/`librespot-restart` for it |
+    | DDNS | `noip2.service` enabled |
 
-    There is no established single supervisor for the whole radio. The normal
-    Raspotify unit is disabled; no Rails-specific systemd unit was found.
-    The inspected user crontab has no active entries; root cron was not inspected.
+    **Legacy boot conflict:** `/etc/rc.local` still starts the 2020 librespot
+    with password login, which Spotify no longer accepts, so it exits shortly
+    after boot. It uses the same device name `JCRadio`. Remove that line (needs
+    `sudo`) when convenient; until then it is harmless noise in
+    `/home/pi/librespot.log`.
 
-    The old README's `jcradio-stop` was not among the inspected shell definitions.
-    Stop-like functions contain force-kill operations; treat them as historical
-    code, not a safe recovery recipe.
+    After a reboot the player, encoder, and stream come back on their own; the
+    website does not. Log in and run `jcradio-start`.
 
   </details>
 
@@ -82,40 +83,33 @@ changed on the Pi. See [inspection evidence](pi/inspection-2026-09-12.md) and
 
 - <details> <summary> <b>Local Versus Internet Access</b> </summary>
 
-    The observed wired address is `10.0.0.110`, preferred over Wi-Fi
-    `10.0.0.145`. `jcradio-start` binds locally to `0.0.0.0:3000` using HTTPS.
-    Router port forwarding is not needed for that bind or ordinary LAN access;
-    it is needed for direct inbound internet access through the router.
+    Wired address `10.0.0.110` (static, preferred), Wi-Fi `10.0.0.145`, gateway
+    `10.0.0.1`. Rails binds `0.0.0.0:3000` and Icecast `:8000`, so LAN access
+    needs no router change. Internet access needs TCP 3000 and 8000 forwarded
+    to the Pi; TCP 10110 is SSH and is optional. DDNS currently resolves to the
+    home's public address.
 
-    The legacy setup would forward TCP 3000 for the website and TCP 8000 for
-    Icecast, with TCP 10110 optional for remote SSH, not listeners. Xfinity's
-    app requires a DHCP IPv4 device, which may conflict with the Pi-side static
-    Ethernet configuration. Follow the [network guide](pi/network-setup.md)
-    before changing the address or opening ports.
-
-    The expired certificate is a separate browser-validation issue. Router
-    rules, DDNS resolution, external access, and TLS renewal were not tested.
+    Whether the Xfinity gateway forwards those ports today has not been tested
+    from outside the LAN. Follow the [network guide](pi/network-setup.md) to
+    check and, if needed, add rules. The expired certificate is a separate
+    issue: it does not block TCP reachability, but every browser will warn.
 
   </details>
 
-## Preserve Before Restarting or Moving
+## Preserve Before Changing
 
-- <details> <summary> <b>Preserve Before Restarting or Moving</b> </summary>
+- <details> <summary> <b>Preserve Before Changing</b> </summary>
 
-    `/home/pi/jcradio` is on `master` at
-    `1a232fd6582b12fb460de2b11a329a5d183fc966`, with three uncommitted files
-    changing the player control from **start** to **restart**. Preserve these
-    before pulling or redeploying. The development database is about 25 MB;
-    it was not opened, backed up, or confirmed as the authoritative history.
-
-    Launchers contain credential arguments. Some sensitive files have permissive
-    local read modes. Preserve originals privately, never as unredacted repository
-    copies. The old player log contains panic evidence, not a confirmed explanation
-    for its current stopped state.
-
-    A later approved session can test local startup and TLS, then outside access.
-    Cloud planning must cover audio delivery and private data as well as Rails.
-    See [Pi evidence](pi/README.md), [recovery](operations.md), and
-    [future hosting](hosting.md).
+    - Pre-repair backups (database, OAuth file, original binary, launchers,
+      source) are in `~/jcradio-recovery/2026-09-12`; see
+      [backups](operations.md#backups) for taking a new one.
+    - `~/jcradio/.nothingtoseehere.yml` and
+      `~/.local/state/jcradio-player/credentials.json` are credentials. Keep
+      them out of the repository and chat.
+    - `.bashrc` launcher functions still contain the legacy player's password
+      arguments. Rotate that password if it has not been, and do not paste
+      those functions anywhere.
+    - Cloud planning must cover audio delivery and private data as well as
+      Rails. See [future hosting](hosting.md).
 
   </details>

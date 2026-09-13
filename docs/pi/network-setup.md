@@ -1,9 +1,12 @@
 # Xfinity Network Setup
 
-This is a proposed setup guide, not a record of router or Pi changes. The Pi
-remains read-only. Port numbers come from the September 12, 2026 SSH inspection;
-the app steps come from [Xfinity's official guide](https://www.xfinity.com/support/articles/xfi-port-forwarding),
-consulted on the same date.
+A setup guide for internet access to the Pi. Port numbers come from the Pi's
+actual listeners; the app steps come from
+[Xfinity's official guide](https://www.xfinity.com/support/articles/xfi-port-forwarding),
+consulted 2026-09-12. Confirmed on 2026-09-13: the gateway at `10.0.0.1`
+identifies itself as an Xfinity router, and `jcradio.ddns.net` resolves to the
+home's current public IPv4. Whether forwarding rules exist has not been tested
+from outside the LAN.
 
 ## Ports for This Installation
 
@@ -22,16 +25,15 @@ consulted on the same date.
     interface, observed at `10.0.0.145`. Do not attach the rules to the wrong one.
 
     Website scheme: **HTTPS**, because `jcradio-start` binds Rails with TLS.
-    Audio scheme: **HTTP** for the inspected Icecast endpoint. Once services,
-    DNS, and forwarding are working, the historical-style URLs would be:
+    Audio scheme: **HTTP** for the Icecast endpoint. The addresses are:
 
     - `https://jcradio.ddns.net:3000`
     - `http://jcradio.ddns.net:8000/rapi.mp3`
 
-    These are intended addresses, not verified working links. The Pi's SSH
-    server listens on 10110, not 22. No UDP forwarding was identified as needed
+    Both work from the LAN. The Pi's SSH
+    server listens on 10110, not 22. No UDP forwarding is needed
     for this web/MP3 setup. Spotify outbound connections and No-IP updates do
-    not require additional inbound forwarding rules for the inspected design.
+    not require inbound forwarding rules.
 
     Do not forward all ports, enable DMZ, or expose SSH just to make listening
     work. Ports 80/443 are not required by the current explicit-port URLs;
@@ -43,19 +45,16 @@ consulted on the same date.
 
 - <details> <summary> <b>Before Opening Ports</b> </summary>
 
-    The radio is intentionally stopped. Forwarding does not start Rails or
-    librespot. First preserve the installation and verify local operation in
-    an approved session. The current certificate expired November 27, 2021;
-    forwarding cannot repair certificate validation.
+    The services run and work on the LAN, so forwarding is the only thing
+    between them and the internet. The certificate expired November 27, 2021;
+    forwarding cannot repair certificate validation, and every browser will
+    warn until it is renewed.
 
-    This old app has username-only login and insufficiently separated operational
-    controls. Public forwarding exposes those risks. Prefer private network
-    access for initial testing, and address authentication, TLS, dependency age,
-    and stream access before opening it to the internet. Public SSH forwarding
+    This app has username-only login and insufficiently separated operational
+    controls. Public forwarding exposes those risks to anyone who finds the
+    hostname. Address authentication, TLS, dependency age, and stream access
+    before opening it to more than the friend group. Public SSH forwarding
     is not recommended for this legacy host without a separate security plan.
-
-    Review [recovery notes](../operations.md). No service start, renewal,
-    network reconfiguration, or public exposure was performed during inspection.
 
   </details>
 
@@ -73,8 +72,7 @@ consulted on the same date.
 
     Before changing anything:
 
-    1. Confirm whether the router is an Xfinity gateway managed by the app or a
-       personally owned router. The app steps below apply to the former.
+    1. The router is an Xfinity gateway, so the app steps below apply.
     2. Identify the Pi's Ethernet device entry and its MAC address privately;
        do not confuse it with the Pi's Wi-Fi entry.
     3. Check whether the gateway supports a DHCP reservation for that Ethernet
@@ -119,22 +117,21 @@ consulted on the same date.
 
 - <details> <summary> <b>Verify in Order</b> </summary>
 
-    | Check | What It Establishes |
-    | --- | --- |
-    | Pi has the intended IPv4 address | Rules target the correct device |
-    | Service listening locally | Process is running; forwarding is irrelevant until then |
-    | Website and audio work from another LAN device | Local service/bind/firewall path works |
-    | DDNS resolves to the current home public IPv4 | Hostname points to the new home, not the old one |
-    | Test from a phone on cellular, with Wi-Fi off | Exercises actual outside access rather than relying on NAT loopback |
+    | Check | What It Establishes | Status 2026-09-13 |
+    | --- | --- | --- |
+    | Pi has the intended IPv4 address | Rules target the correct device | `10.0.0.110` static on `eth0` |
+    | Service listening locally | Process is running; forwarding is irrelevant until then | 3000 and 8000 listening |
+    | Website and audio work from another LAN device | Local service/bind/firewall path works | Yes, from the laptop |
+    | DDNS resolves to the current home public IPv4 | Hostname points to the new home, not the old one | Yes |
+    | Test from a phone on cellular, with Wi-Fi off | Exercises actual outside access rather than relying on NAT loopback | **Not tested** |
 
     For local tests, substitute the current Pi address. HTTPS access by numeric
     IP will not match the certificate's hostname, and this certificate is also
     expired. Diagnose TLS separately from TCP reachability; do not normalize
     disabling certificate checks as the permanent fix.
 
-    The No-IP updater is running, but its update success and the hostname's
-    current public resolution were not verified. DDNS updates the public address;
-    it does not forward ports or start the website.
+    DDNS updates the public address; it does not forward ports or start the
+    website.
 
     If an outside test is blocked despite a working LAN path, inspect the rule,
     public DNS, NAT topology, and Xfinity Advanced Security. Xfinity documents

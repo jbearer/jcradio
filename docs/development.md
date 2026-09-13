@@ -1,56 +1,56 @@
 # Development and Code Map
 
-## Historical Toolchain
+## Toolchain
 
-- <details> <summary> <b>Historical Toolchain</b> </summary>
+- <details> <summary> <b>Toolchain</b> </summary>
 
-    | Component | Repository Evidence |
+    | Component | Evidence |
     | --- | --- |
-    | Ruby 2.4.9 | [Original setup notes](../README.rdoc) |
+    | Ruby 2.4.9 (RVM) | [Original setup notes](../README.rdoc); confirmed on the Pi |
     | Rails 4.2.8 | [Gemfile](../Gemfile) |
     | Bundler 1.17.3 | [Lockfile](../Gemfile.lock) |
     | RSpotify 2.9.2, omniauth-oauth2 1.3.1 | [Lockfile](../Gemfile.lock) |
     | SQLite, Puma, Sass, CoffeeScript, jQuery, Turbolinks | [Gemfile](../Gemfile) |
-    | JavaScript runtime | Original README notes that Node.js was needed on one Ubuntu setup |
+    | librespot 0.8.0 (private install) | [Pi overview](pi-overview.md) |
 
-    These are legacy versions, not a recommended new public-server stack. A modern
-    Ruby installation being able to execute a helper does not mean it can boot
-    Rails 4.2 and all of these dependencies.
+    These are legacy versions, not a recommended new public-server stack. The
+    original README warns against an omniauth-oauth2 update that broke the old
+    RSpotify integration; keep the lockfile pinned. Two places depend on RSpotify
+    2.9.2 internals and must be re-checked if the gem is ever bumped:
+    [config/initializers/rspotify_token_refresh.rb](../config/initializers/rspotify_token_refresh.rb)
+    and `Station#internal_spotify_add_to_queue` in
+    [app/models/station.rb](../app/models/station.rb).
 
-    The original README specifically warns against an omniauth-oauth2 update that
-    broke the old RSpotify integration. Preserve the lockfile while reproducing
-    the baseline; do not start recovery with an unrestricted dependency update.
-
-   The [Pi inspection](pi/inspection-2026-09-12.md) found RVM Ruby 2.4.9 and a
-   matching legacy lockfile. Its deployed checkout has three uncommitted changes
-   to the player-start/restart control. Preserve those differences before using
-   the local checkout as a reproduction baseline.
+    Rails does not boot on the owner's laptop: its Ruby 2.4 OpenSSL extension
+    needs `libssl.so.1.1`, which current distributions no longer ship. Run the
+    app and the test suite on the Pi.
 
   </details>
 
-## Reproduction Sequence
+## Working on the Running Installation
 
-- <details> <summary> <b>Reproduction Sequence</b> </summary>
+- <details> <summary> <b>Working on the Running Installation</b> </summary>
 
-    1. Preserve the Pi's data and configuration using the [recovery checklist](operations.md).
-    2. Work on an isolated checkout and a database copy. Confirm the intended
-       Rails environment and database path before any database task.
-    3. Reproduce the historical Ruby/Bundler environment, following the original
-       README as evidence rather than assuming those install steps still work on
-       current Linux. Record OS and native-library issues as they arise.
-    4. Run `bundle check`; install missing dependencies in that isolated environment
-       when ready. Keep credential values out of the repository and logs shared here.
-    5. Inspect the station/user/queue assumptions before initializing a blank
-       database. The seeds are incomplete for production and empty-queue startup
-       needs testing.
-    6. Once the environment and test database are safe, try `bundle exec rake test`
-       and record the baseline failures.
-    7. Start a local-only instance with `bundle exec rails server -b 127.0.0.1`.
-       Verify pages and session behavior before enabling external playback.
+    The Pi checkout at `/home/pi/jcradio` is the deployment. Rails runs in the
+    development environment, so code changes under `app/` reload on the next
+    request; changes to `config/initializers` or the Gemfile need a Rails restart
+    (see [operations](operations.md)).
 
-    The old `rake db:setup` and `rake db:migrate` instructions are not permission to
-    run them on the only existing database. No full installation or server boot
-    was attempted during this documentation pass.
+    1. Edit and commit locally, push, then `git pull` on the Pi. For quick
+       iteration, `scp` the changed files to the same paths and keep both trees
+       at the same uncommitted state until you commit.
+    2. Run the suite on the Pi. `-l` loads RVM and `-i` loads the Spotify
+       environment variables from `.bashrc`:
+
+       ```sh
+       ssh jcradio-pi 'bash -lic "cd ~/jcradio && bin/rake test"'
+       ```
+
+    3. Never run `db:setup`, `db:reset`, `db:seed`, or migrations against
+       `db/development.sqlite3` on the Pi without a fresh backup; it is the live
+       history. The test suite uses `db/test.sqlite3`.
+    4. Keep credential values out of commits and chat: the OAuth restore file,
+       `SPOTIFY_CLIENT_*` values, and the player's `credentials.json`.
 
   </details>
 
@@ -73,55 +73,40 @@
     | Where are the confirmation and override controls? | [Search-results partial](../app/views/songs/_search_results.html.erb) |
     | What data must survive a move? | [Schema](../db/schema.rb) and [data model](data-model.md) |
 
-    The separate `html and css/` directory contains standalone design material.
-    The routed Rails UI inspected here lives under `app/views` and `app/assets`;
-    the standalone material's historical role still needs confirmation.
+    The separate `html and css/` directory contains standalone design material
+    that is not part of the routed Rails UI under `app/views` and `app/assets`.
 
   </details>
 
-## Verification Status
+## Tests and Checks
 
-- <details> <summary> <b>Verification Status</b> </summary>
+- <details> <summary> <b>Tests and Checks</b> </summary>
 
-    The initial documentation pass checked eight title-rule examples directly
-    against `SongsHelper`, without booting Rails or calling Spotify, and checked
-    local Markdown link targets. It did not run the Rails suite, exercise the UI,
-    contact the historical host, or verify the audio stream.
+    `bin/rake test` passes on the Pi as of 2026-09-13: 24 runs, 90 assertions.
+    Coverage is intentionally narrow:
 
-   A later read-only SSH pass inspected the Pi and queried Icecast status.
-   It did not start Rails, play audio, contact Spotify APIs, or run the Rails
-   tests. The owner confirmed the radio is currently stopped. See
-   [Pi overview](pi-overview.md) for current evidence rather than assuming the
-   earlier repository-only uncertainty still applies.
+    | File | Covers |
+    | --- | --- |
+    | [song_test.rb](../test/models/song_test.rb) | Search sends `limit: 10` and converts results |
+    | [station_test.rb](../test/models/station_test.rb) | Queue POST success without JSON, 401 refresh-and-retry, persistent 401, other HTTP failures, missing device, RSpotify `oauth_send` patch |
+    | [songs_controller_test.rb](../test/controllers/songs_controller_test.rb) | Library browse renders without persisting |
+    | [sessions_controller_test.rb](../test/controllers/sessions_controller_test.rb) | Login joins station 1, unknown user, logout |
+    | [users_controller_test.rb](../test/controllers/users_controller_test.rb) | Index/new/show render, create, duplicate, destroy rules |
 
-    Most core model/controller tests contain only commented scaffold examples.
-    Some user/session tests contain executable assertions; their current validity
-    has not been established. See [the test helper](../test/test_helper.rb),
-    [station tests](../test/controllers/stations_controller_test.rb), and
-    [user tests](../test/controllers/users_controller_test.rb). The 2026 repair
-    added focused tests for the search limit, queue response handling, and
-    library browse in [song tests](../test/models/song_test.rb),
-    [station model tests](../test/models/station_test.rb), and
-    [songs controller tests](../test/controllers/songs_controller_test.rb); they
-    passed in an isolated harness on the Pi, but `bin/rake test` has not been run
-    as a full suite.
+    Fixtures give station `one` the hard-coded `id: 1`. Tests stub HTTP with
+    `Minitest::Mock`/`stub`; they never contact Spotify.
 
-    A cheap, dependency-light rule probe from the repository root is:
+    Dependency-light checks that run on any Ruby, from the repository root:
 
     ```sh
     ruby -Iapp/helpers -rsongs_helper -e 'raise unless SongsHelper.first_letter("The Radio") == "R"; raise unless SongsHelper.calculate_next_letter("Radio") == "A"; puts "Letter-rule probe passed"'
-    ```
-
-    To check the documentation structure and local links against
-    [the style guide](DOCS_STYLE_GUIDE.md), run
-    [script/check-docs.rb](../script/check-docs.rb) from the repository root:
-
-    ```sh
     ruby script/check-docs.rb
     ```
 
-    Next useful automated coverage would target title edge cases, wrong-turn
-    rejection, blank-queue startup, queue drift, and persistence/restart behavior.
-    That testing work is separate from this documentation-only change.
+    The second checks documentation structure and local links against
+    [the style guide](DOCS_STYLE_GUIDE.md).
+
+    Useful next coverage: title edge cases, wrong-turn rejection, blank-queue
+    startup, queue drift, and Buddy's selection.
 
   </details>

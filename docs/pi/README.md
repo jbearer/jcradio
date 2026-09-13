@@ -1,8 +1,9 @@
-# Raspberry Pi Evidence
+# Raspberry Pi Records
 
-This folder records observations and selected Raspberry Pi system files to
-provide a documentation trail for understanding and eventually reproducing the
-installation. It is not a full backup.
+Dated journals from the September 2026 inspection and repair. They describe
+what was observed and done on those dates and are **not updated afterwards**.
+For the current state and day-to-day commands, use
+[Pi overview](../pi-overview.md) and [operating the Pi](../operations.md).
 
 ## Start Here
 
@@ -10,48 +11,31 @@ installation. It is not a full backup.
 
     | Document | Purpose |
     | --- | --- |
-    | [Repair journal](repair-2026-09-12.md) | Approved player recovery, exact commands, checks, and rollback notes |
-    | [Pi overview](../pi-overview.md) | High-level setup and current state |
-    | [SSH inspection](inspection-2026-09-12.md) | Dated findings, configuration paths, and limits |
-    | [Xfinity setup](network-setup.md) | Required ports, DHCP/device-selection caveat, and staged verification |
-    | [Recovery checklist](../operations.md) | Preservation and investigation boundaries |
+    | [Xfinity setup](network-setup.md) | Current guide: required ports, DHCP/device-selection caveat, and staged verification |
+    | [Repair journal](repair-2026-09-12.md) | **Historical.** Player replacement, OAuth, queue/library fixes, exact commands, and rollback notes |
+    | [SSH inspection](inspection-2026-09-12.md) | **Historical.** Pre-repair findings, configuration paths, and limits |
 
   </details>
 
-## Inspection Rules
+## Working on the Pi
 
-- <details> <summary> <b>Inspection Rules</b> </summary>
+- <details> <summary> <b>Working on the Pi</b> </summary>
 
-    Use `ssh jcradio-pi '<command>'`. Keep the Pi read-only until explicitly
-    approved otherwise. Do not source unknown shell files, run launchers, elevate
-    privileges, install packages, write remote files, or run database tasks.
+    Use `ssh jcradio-pi '<command>'`. Read-only inspection is always fine.
+    Changes to the checkout are routine (pull, or `scp` the same files to the
+    same paths). Anything needing `sudo`, package installation, service
+    changes, database tasks, or router changes should be a deliberate, recorded
+    step with a backup first; see [backups](../operations.md#backups).
 
-    Record timestamps and source paths. Distinguish installed software, configured
-    startup, running processes, and tested functionality. Ordinary SSH and HTTP
-    status reads can create service/access-log entries; this is not bit-for-bit
-    preservation.
-
-    Prefer allowlisted non-secret fields to raw dumps. The original proposal's
-    full process arguments and cron/script output can expose credentials. The
-    actual inspection used process names, selected configuration fields, and
-    diagnostic labels instead. Keep raw snapshots and secrets outside commits.
-
-  </details>
-
-## System File Copies
-
-- <details> <summary> <b>System File Copies</b> </summary>
+    Prefer allowlisted non-secret fields to raw dumps. Full process arguments,
+    `.bashrc` launcher functions, and the OAuth files contain credentials.
+    Record process names, selected configuration fields, and diagnostic labels
+    instead.
 
     Raw copies of Pi system files are not kept in this repository. Record the
-    relevant facts in the dated inspection or setup pages instead, citing the
-    source path (for example `/etc/dhcpcd.conf`) so they can be re-read on the
-    Pi. If a copy is ever needed, add a comment at the top with the copy time
-    and full source path, and keep it outside the repository.
-
-    Never commit passwords, OAuth tokens, private keys, databases, or unredacted
-    credential-bearing launchers. Label redacted excerpts and omissions explicitly;
-    do not present them as drop-in replacement configuration. Preserve originals
-    privately.
+    relevant facts in a dated page, citing the source path, so they can be
+    re-read on the Pi. Never commit passwords, OAuth tokens, private keys,
+    databases, or unredacted credential-bearing launchers.
 
   </details>
 

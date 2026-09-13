@@ -1,5 +1,10 @@
 # Pi Inspection: 2026-09-12
 
+> **Historical record.** This is the read-only survey taken *before* the
+> September 12 repair. The radio was stopped at the time. For today's state see
+> [Pi overview](../pi-overview.md); the fixes that followed are in the
+> [repair journal](repair-2026-09-12.md).
+
 Read-only inspection through the existing `jcradio-pi` SSH alias. Observations
 describe this session, not a guarantee of application or audio functionality.
 
@@ -162,6 +167,7 @@ describe this session, not a guarantee of application or audio functionality.
 
     The later [Xfinity guide](network-setup.md) explains its documented DHCP
     requirement, which may conflict with the current Pi-side static address.
+    The gateway was later identified as an Xfinity router.
 
   </details>
 
@@ -228,7 +234,10 @@ describe this session, not a guarantee of application or audio functionality.
 
 ## Preservation and Open Items
 
-- <details> <summary> <b>Preservation and Open Items</b> </summary>
+- <details> <summary> <b>Preservation and Open Items (as of the inspection)</b> </summary>
+
+    Most of these were resolved by the repair the same evening; see the
+    [repair journal](repair-2026-09-12.md) and current [open items](../README.md#open-items).
 
     - No backup was made. Preserve database, Pi-only edits, launchers, TLS files,
       and credentials privately before repairs or redeployment.

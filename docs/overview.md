@@ -22,10 +22,11 @@ The interface calls it **Jingle Churro Radio**. This documentation uses
     6. Listen, see what others choose, react to songs, chat, and repeat.
 
     **Owner context:** the regular group was four friends in different locations.
-    The website ran on a Raspberry Pi using a DDNS address, and people listened in
-    a separate tab. [Pi inspection](pi-overview.md) recovered a configured
-    librespot-to-ALSA-to-DarkIce-to-Icecast stream. The exact historical tab URL
-    and current audible playback still need confirmation.
+    The website runs on a Raspberry Pi behind a DDNS address, and people listen
+    in a separate tab open on the Icecast stream
+    (`http://jcradio.ddns.net:8000/rapi.mp3`). The
+    librespot-to-ALSA-to-DarkIce-to-Icecast chain was verified working on
+    September 12, 2026; see [Pi overview](pi-overview.md).
 
   </details>
 
@@ -48,8 +49,10 @@ The interface calls it **Jingle Churro Radio**. This documentation uses
 
 - <details> <summary> <b>Feature Map</b> </summary>
 
-    These features have implementations in the repository. That does not establish
-    that their external integrations still work today.
+    These features have implementations in the repository. Login, search, adding
+    a song, Buddy's automatic turn, and the audio stream were exercised live in
+    September 2026. Recommendations, plots, chat, emoji, and personal-library
+    browsing have not been re-verified against today's Spotify API.
 
     | Area | What It Provides | Code Entry Point |
     | --- | --- | --- |
@@ -74,16 +77,16 @@ The interface calls it **Jingle Churro Radio**. This documentation uses
 
   </details>
 
-## What This Is Not Yet
+## What This Is Not
 
-- <details> <summary> <b>What This Is Not Yet</b> </summary>
+- <details> <summary> <b>What This Is Not</b> </summary>
 
-    - Not a verified general-purpose, multi-station service: central paths use
+    - Not a general-purpose, multi-station service: central paths use
       station ID `1` and process-wide state.
     - Not a self-contained audio streaming implementation: Rails controls a
       Spotify player, while the listening stream uses separate Pi audio services.
-    - Not a ready-to-deploy cloud application: the old runtime, local commands,
-      credentials, and audio chain need recovery and validation first.
+    - Not a ready-to-deploy cloud application: the runtime is Rails 4.2 on
+      Ruby 2.4 with username-only login, and the audio chain is tied to the Pi.
 
   </details>
 

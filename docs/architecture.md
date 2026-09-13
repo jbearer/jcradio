@@ -19,12 +19,12 @@
         Spotify -->|Playback control|Device[Spotify Connect device]
         Device -->|Configured ALSA loopback|Encoder[DarkIce MP3 encoder]
         Encoder -->|320 kbps MP3|Stream[Icecast on Pi port 8000]
-        Stream -.->|Separate listening tab: owner context|Listeners[Listeners]
+        Stream -.->|Separate listening tab|Listeners[Listeners]
     ```
 
-    Solid connections describe inspected code and recovered host configuration,
-    not proof of current end-to-end operation. The exact historical listening-tab
-    workflow still needs owner confirmation. See [Pi overview](pi-overview.md).
+    Solid connections describe inspected code and the Pi configuration verified
+    working in September 2026. Listeners open the Icecast URL directly in a
+    separate tab. See [Pi overview](pi-overview.md).
 
   </details>
 
@@ -76,24 +76,30 @@
 
     - <details> <summary> <b>Audio Delivery</b> </summary>
 
-        The app calls a host-local `librespot-start` command from
-        [SessionsController](../app/controllers/sessions_controller.rb). The
-        [Station model](../app/models/station.rb) has a hard-coded Spotify device ID
-        for the Pi and a special case for the shared account's display name.
+        The [Station model](../app/models/station.rb) has a hard-coded Spotify
+        device ID for the Pi and a special case for the shared account's display
+        name (`JC Radio`). If the device is missing when the station is idle, the
+        add-song path returns a user-facing error instead of a 500.
 
         The [layout](../app/views/layouts/application.html.erb) contains a **commented-out**
-        audio element pointing to the historical
-        `http://jcradio.ddns.net:8000/rapi.mp3` address.
+        audio element pointing to `http://jcradio.ddns.net:8000/rapi.mp3`; the
+        sidebar volume button is wired to that element and is inert while it is
+        commented out. Listeners open the stream URL in their own tab.
 
-        **Verified on Pi, September 12, 2026:** librespot is configured to output
-        to `plughw:Loopback,1`; DarkIce captures `plughw:Loopback,0` and encodes
-        320 kbps MP3 for Icecast at `localhost:8000/rapi.mp3`. Icecast reported
-        the source active, while librespot was absent and the playback endpoint
-        closed. Audio content was not tested. Full Icecast configuration was
-        permission-protected. See [inspection evidence](pi/inspection-2026-09-12.md).
+        **Verified on Pi, September 2026:** librespot 0.8.0 (run as the
+        `jcradio-player` systemd service, device name `JCRadio`) outputs to
+        `plughw:Loopback,1`; DarkIce captures `plughw:Loopback,0` and encodes
+        320 kbps MP3 for Icecast at `localhost:8000/rapi.mp3`. Non-silent audio
+        was decoded from the stream while a track played. Full Icecast
+        configuration is permission-protected and was not read.
 
-        The Pi also has uncommitted edits changing the home-page player action
-        to `librespot-restart`; the local source still calls `librespot-start`.
+        The home page still has a **Restart Player** button
+        (`POST /sessions/librespot_restart` in
+        [SessionsController](../app/controllers/sessions_controller.rb)) that
+        runs the legacy `librespot-restart` shell function. That function targets
+        the 2020 binary with password login, which Spotify no longer accepts. Do
+        not use it; restart the systemd service instead. See
+        [operations](operations.md).
 
         Short Spotify previews in search results are separate from the shared stream.
 
@@ -115,15 +121,23 @@
     | State | Where It Lives | Consequence |
     | --- | --- | --- |
     | Songs, entries, users, station cursor, chat, reactions | SQLite | Database contents matter beyond the schema |
-    | Shared Spotify user | `$spotify_user`, with a YAML restore file under the host user's home directory | Depends on local credentials and startup behavior |
+    | Shared Spotify user | `$spotify_user`, restored at startup from `~/jcradio/.nothingtoseehere.yml` | The saved access token is stale after a restart; the first OAuth call refreshes it |
     | Personal Spotify users and library caches | `$client_spotifies`, `$spotify_libraries_cached` | Lost when the process restarts |
     | Next letter and Buddy configuration | Process globals | Not independent per station or shared across processes |
     | Playback poller and LiveRPC subscribers | Ruby thread and in-memory registries | Not a durable job or shared message service |
 
     Global defaults and station selection are in
     [ApplicationController](../app/controllers/application_controller.rb).
-    The restore file is `~/jcradio/.nothingtoseehere.yml`; treat it as a credential
-    file, not ordinary project documentation.
+    The restore file is a credential file, not ordinary project documentation.
+
+    Spotify's 401 body changed wording in 2026, which broke RSpotify 2.9.2's
+    built-in token refresh.
+    [config/initializers/rspotify_token_refresh.rb](../config/initializers/rspotify_token_refresh.rb)
+    patches `RSpotify::User.oauth_send` to refresh on any 401. The developer
+    app's client ID and secret come from the `SPOTIFY_CLIENT_ID` and
+    `SPOTIFY_CLIENT_SECRET` environment variables read by
+    [config/initializers/omniauth.rb](../config/initializers/omniauth.rb); Rails
+    refuses to boot without them.
 
   </details>
 
@@ -136,7 +150,7 @@
     the assigned letter, Buddy settings, or live connections. Moving only Rails
     also does not move the audio chain.
 
-    These are constraints to measure and resolve during recovery, not decisions to
+    These are constraints to measure and resolve before any move, not decisions to
     rewrite the application or select a hosting provider now.
 
   </details>

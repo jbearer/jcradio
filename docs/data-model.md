@@ -44,8 +44,8 @@
     | [Vapid](../app/models/vapid.rb) | public/private keys | Sensitive web-push key material |
 
     Other schema tables include fuzzy-search trigrams, sessions, and a `chats`
-    table. Their presence alone does not establish that every table is in active
-    use; the chat implementation inspected here uses `ChatMessage`.
+    table with no model or columns beyond timestamps; the chat implementation
+    uses `ChatMessage`.
 
   </details>
 
@@ -91,8 +91,9 @@
     rebuild historical selections, create Buddy, establish a now-playing entry,
     or produce a complete production installation.
 
-    Recover the authoritative database before deciding how to initialize a new
-    host. Do not run setup/reset/seed operations over the only copy of the old data.
+    The Pi's `db/development.sqlite3` is the live, authoritative history (about
+    25 MB, roughly 11,000 queue entries). Do not run setup/reset/seed operations
+    against it; work on a copy. See [operations](operations.md) for backups.
 
   </details>
 

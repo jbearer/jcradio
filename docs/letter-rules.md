@@ -52,8 +52,9 @@
     | 4 | First |
 
     For no remaining words, or an exception during next-letter calculation, it
-    chooses a random letter from `A` through `Z`. These are observed code rules;
-    whether every edge case matches the group's intended rules is an open question.
+    chooses a random letter from `A` through `Z`. These are the code's rules;
+    whether the short-word cases match the group's intended house rules has not
+    been confirmed by the owner.
 
   </details>
 
@@ -110,7 +111,6 @@
     old data and views.
 
     Before changing these rules, agree on the intended examples and decide how to
-    handle historical records. No rule changes or data migration are part of this
-    documentation pass.
+    handle historical records.
 
   </details>

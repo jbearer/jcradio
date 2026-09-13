@@ -1,8 +1,9 @@
 # Workflows
 
 This is a code-oriented companion to the [product overview](overview.md).
-Routes are defined in [the route file](../config/routes.rb). External service
-availability and end-to-end operation have not been verified.
+Routes are defined in [the route file](../config/routes.rb). Joining, adding a
+song, and Buddy's turn were exercised live in September 2026; the other paths
+are verified in code only.
 
 ## Joining and Taking Turns
 
@@ -33,9 +34,11 @@ availability and end-to-end operation have not been verified.
        Spotify track through [Song.get](../app/models/song.rb).
     4. [Station#queue_song](../app/models/station.rb) requires a shared Spotify
        account and player. If playback is running, it adds the URI to Spotify's
-       queue. If idle, it attempts direct playback on the configured Pi device for
-       the shared account's expected display name; other idle-player cases return
-       an error.
+       queue with a direct `RestClient.post`, because the queue endpoint returns a
+       non-JSON body that RSpotify's own helper cannot parse. If idle, it attempts
+       direct playback on the configured Pi device for the shared account's
+       expected display name; a missing device returns an error message rather
+       than raising.
     5. A `QueueEntry` records the song, station, selector, queue position, and
        recommendation flag. The controller advances the turn and assigned letter,
        broadcasting a next-turn notification when its participant-count conditions
@@ -56,8 +59,8 @@ availability and end-to-end operation have not been verified.
 
     | Path | Behavior |
     | --- | --- |
-    | Spotify text search | Calls `RSpotify::Track.search`; result pagination is marked TODO |
-    | Personal Spotify library | Loads saved tracks, caches them for roughly one day, optionally filters by computed first letter |
+    | Spotify text search | Calls `RSpotify::Track.search` with `limit: 10`, the maximum Spotify allows since February 2026; no pagination |
+    | Personal Spotify library | Loads saved tracks, caches them for roughly one day, optionally filters by computed first letter; results are not written to the database until a song is chosen |
     | Previously chosen songs | Filters positioned queue entries selected by the current user, using the song's stored first letter |
     | Previously upvoted songs | Filters entries the user upvoted, using stored first letter |
     | Radio history | Searches positioned entries across the shared history using stored first letter |
@@ -65,6 +68,8 @@ availability and end-to-end operation have not been verified.
     History browsing limits the query to 500 recent entries before deduplicating
     songs. An empty letter filter is explicitly supported for the personal-library
     path; it should not be assumed to behave identically in every history path.
+    Library browsing used to persist every track before rendering, which locked
+    the SQLite database; it now converts without saving.
     See [SongsController](../app/controllers/songs_controller.rb) and the
     [library cache helper](../app/helpers/recommendations_helper.rb).
 
@@ -82,8 +87,9 @@ availability and end-to-end operation have not been verified.
 
     The supported sliders are in [RecommendationsHelper](../app/helpers/recommendations_helper.rb).
     Genre seeds and min/max feature constraints appear in the historical TODO list,
-    not this inspected generation path. Current Spotify API permissions and access
-    to recommendations must be checked with the actual app/account.
+    not this inspected generation path. Spotify restricted the recommendations
+    endpoint for newer developer apps in late 2024; whether the owner's
+    replacement app can call it has not been tested.
 
   </details>
 

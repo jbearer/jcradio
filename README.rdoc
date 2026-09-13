@@ -2,13 +2,14 @@
 
 == Project Documentation
 
-Start with {the documentation index}[docs/README.md] for the project overview, architecture, letter rules,
-and recovery notes. These distinguish inspected code from historical context
-and configuration that still needs to be recovered from the Raspberry Pi.
+Start with {the documentation index}[docs/README.md] for the project overview,
+architecture, letter rules, how the Raspberry Pi is operated, and what is still
+outstanding.
 
-The setup and deployment instructions below are historical notes, not a
-verified current installation guide. Back up existing data and credentials
-before trying setup commands on an existing installation.
+The setup and deployment instructions below are historical notes from the
+original 2020 installation, not a current installation guide. The current
+start/stop/check commands are in docs/operations.md. Back up existing data and
+credentials before trying setup commands on an existing installation.
 
 ################################
 # RVM Setup:
@@ -98,7 +99,7 @@ TODO
 
         Re-sync whole database of songs to use standardized first_letter calculation
             eg. "Move Like you want - Live" autopopulates to L
-            
+
 
         Skip song ability
             notify all users who skipped the song
