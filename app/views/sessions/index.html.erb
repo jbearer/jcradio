@@ -58,10 +58,12 @@
     </p>
 <% end %>
 
+<br>
+
 <!-- Call bash alias`librespot-start` from the website -->
 <% if logged_in? %>
     <p>
-    <form action="/sessions/librespot_start" method="post" class="in_place_form">
+    <form action="/sessions/librespot_restart" method="post" class="in_place_form">
         <button class="button button9" type="submit">Restart Librespot</button>
     </form>
     </p>
