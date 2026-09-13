@@ -14,8 +14,9 @@ Formatting follows the [documentation style guide](DOCS_STYLE_GUIDE.md).
     Checked on the Pi on **2026-09-13**. The radio works end to end again after
     the September 12 repair; see [Pi overview](pi-overview.md) for details.
 
-    - **Website:** Rails runs on the Pi with HTTPS on port 3000, started by the
-      owner's `jcradio-start` shell function. The checkout is `atc/dev`.
+    - **Website:** Rails runs on the Pi with HTTPS on port 3000 as the
+      `jcradio-web` systemd service (autostarts since 2026-09-13). The checkout
+      is `atc/dev`.
     - **Player:** a current librespot (0.8.0) runs as the `jcradio-player`
       systemd service and restarts on failure and reboot. The original 2020
       binary and launchers are preserved but no longer used.
@@ -79,7 +80,6 @@ Formatting follows the [documentation style guide](DOCS_STYLE_GUIDE.md).
 
     | Item | Why | Needs |
     | --- | --- | --- |
-    | Reboot the Pi and re-verify | The 2026-09-13 `apt upgrade` replaced `libc6`, `systemd`, and DarkIce (now 1.3) under running processes; `/var/run/reboot-required` is set | A quiet moment, then `jcradio-start` and the stream checks in [operations](operations.md#routine-commands) |
     | Confirm outside access | DDNS resolves to the current public address, but reachability from outside the LAN was not tested | A phone on cellular, see [network setup](pi/network-setup.md) |
     | Watch the first automatic renewal | The certbot deploy hook that restarts Rails was tested by hand on 2026-09-13, not yet by `certbot.timer` | Around 2026-11-12, check `/var/log/jcradio-cert-deploy.log` and the served certificate; see [operations](operations.md#routine-commands) |
     | Product-rule confirmation | Whether the one-word next-letter rule and join-after-first-selector behavior are intended house rules | Owner decision; see [letter rules](letter-rules.md) and [workflows](workflows.md) |

@@ -123,14 +123,20 @@ were read.
 
 - <details> <summary> <b>Follow-ups</b> </summary>
 
-    - **Reboot is pending.** `libc6`, `systemd`, and `dbus` were upgraded under
-      running processes. Plan a reboot at a quiet time; after it, run
-      `jcradio-start` (Rails does not autostart) and re-check the stream.
+    Update 14:00 PDT: the owner rebooted. Player, DarkIce 1.3, Icecast, and
+    No-IP all came back (loopback capture RUNNING, Icecast source present);
+    the player's first start failed at `14:00:01` and systemd's restart
+    succeeded at `14:00:11`. The website did not start, as documented;
+    `jcradio-start` was the manual step. `jcradio-status` / `jcradio-logs`
+    helpers were added to `.bashrc` afterwards, and at `14:09` the website
+    became the `jcradio-web` systemd unit so it autostarts too.
+
     - **DarkIce 1.3 is untested.** The first process restart or reboot will run
       the new binary against the 2020 config. Verify `pcm0c` RUNNING, the
       Icecast source list, and a non-silent stream with a queued song. If it
       fails, `/etc/darkice.cfg` is unchanged and the old package version is
-      `1.0.1-999~mp3+1` (source not identified; no `.deb` cached).
+      `1.0.1-999~mp3+1` (source not identified; no `.deb` cached). *Resolved by
+      the reboot above, except the non-silent stream check.*
     - `certbot.service` shows `failed` from the mid-upgrade run; harmless, but
       `sudo systemctl reset-failed certbot.service` clears it.
     - Future `apt` runs on Stretch need

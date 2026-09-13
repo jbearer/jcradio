@@ -272,7 +272,16 @@ class StationsController < ApplicationController
             return json_error "it's not your turn to add to the queue"
         end
 
-        song = Song.get "Spotify", params[:source_id]
+        begin
+            song = Song.get "Spotify", params[:source_id]
+        rescue RestClient::TooManyRequests
+            return json_error "Spotify is rate limiting us right now; wait a minute and try again"
+        end
+
+        if not song
+            return json_error "couldn't look that song up on Spotify"
+        end
+
         err_str = station.queue_song(song, current_user, params[:was_recommended])
 
         song.update last_played: Time.now.to_f * 1000 # ms since 01/01/1970

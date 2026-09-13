@@ -1,0 +1,26 @@
+# Install on the Pi (requires sudo):
+#   mkdir -p ~/.config/jcradio && chmod 700 ~/.config/jcradio
+#   grep -E '^export SPOTIFY_CLIENT_(ID|SECRET)=' ~/.bashrc | sed 's/^export //' > ~/.config/jcradio/env && chmod 600 ~/.config/jcradio/env
+#   sudo install -m 644 /home/pi/jcradio/script/pi-recovery/jcradio-web.service /etc/systemd/system/
+#   sudo systemctl daemon-reload && sudo systemctl enable --now jcradio-web
+# Replaces the daemonized `rails server -d` from the old jcradio-start function;
+# jcradio-start/stop/restart now wrap systemctl. Rails still writes tmp/pids/server.pid.
+[Unit]
+Description=JC Radio Rails website (Puma, HTTPS 0.0.0.0:3000)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=pi
+Group=pi
+WorkingDirectory=/home/pi/jcradio
+EnvironmentFile=/home/pi/.config/jcradio/env
+Environment=HOME=/home/pi LANG=en_US.UTF-8 RAILS_ENV=development
+ExecStartPre=/bin/rm -f /home/pi/jcradio/tmp/pids/server.pid
+ExecStart=/home/pi/.rvm/wrappers/ruby-2.4.9/bundle exec rails server -b 'ssl://0.0.0.0:3000?key=/etc/letsencrypt/live/jcradio.ddns.net/privkey.pem&cert=/etc/letsencrypt/live/jcradio.ddns.net/fullchain.pem&verify_mode=none'
+Restart=on-failure
+RestartSec=10
+TimeoutStopSec=20
+
+[Install]
+WantedBy=multi-user.target

@@ -25,7 +25,7 @@ from outside the LAN.
     the address assigned to the chosen Ethernet device. Wi-Fi is a separate
     interface, observed at `10.0.0.145`. Do not attach the rules to the wrong one.
 
-    Website scheme: **HTTPS**, because `jcradio-start` binds Rails with TLS.
+    Website scheme: **HTTPS**, because `jcradio-web.service` binds Rails with TLS.
     Audio scheme: **HTTP** for the Icecast endpoint. The addresses are:
 
     - `https://jcradio.ddns.net:3000`

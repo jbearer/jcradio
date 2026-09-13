@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Jingle Churro Radio - Listen</title>
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(0deg, black -30%, #041f32 70%, #7ef9ff 130%);
+      color: #eae8ff;
+      font-family: Arial, Helvetica, sans-serif;
+      text-align: center;
+    }
+    main { width: min(400px, calc(100% - 48px)); padding: 48px 0; }
+    img { width: 96px; height: 96px; object-fit: cover; border-radius: 4px; }
+    h1 { margin: 24px 0 32px; font-size: 30px; line-height: 1.3; }
+    h1 span { display: block; color: #92dce5; font-weight: normal; }
+    audio { display: block; width: 100%; height: 54px; }
+    #play-status { min-height: 24px; margin: 20px 0 12px; line-height: 1.5; }
+    button { padding: 10px 18px; border: 0; border-radius: 4px; background: #e2f1af; color: #041f32; font: inherit; cursor: pointer; }
+    nav { display: flex; justify-content: center; flex-wrap: wrap; gap: 16px 24px; margin-top: 28px; }
+    a { color: #e2f1af; font-size: 14px; text-underline-offset: 4px; }
+    a:focus-visible, audio:focus-visible, button:focus-visible { outline: 2px solid #92dce5; outline-offset: 5px; }
+  </style>
+</head>
+<body>
+  <main>
+    <img src="https://i.ibb.co/CmygZL1/94426167-583747368918688-6925737925619482624-n.jpg" alt="" width="96" height="96">
+    <h1>Jingle Churro<span>Radio</span></h1>
+    <audio controls preload="none" src="rapi.mp3" aria-label="JC Radio live stream" aria-describedby="play-status">
+      <a href="rapi.mp3">Open MP3 stream</a>
+    </audio>
+    <p id="play-status" role="status">Hey! Make sure to press Play.</p>
+    <button id="play-live" type="button" hidden>Play live</button>
+    <nav aria-label="Radio links">
+      <a href="rapi.mp3" target="_blank" rel="noopener noreferrer">Open MP3 stream</a>
+      <a href="https://jcradio.ddns.net:3000/" target="_blank" rel="noopener noreferrer" aria-label="Open game in a new tab">Open game</a>
+    </nav>
+  </main>
+  <script>
+    (function () {
+      var audio = document.querySelector('audio');
+      var status = document.getElementById('play-status');
+      var playButton = document.getElementById('play-live');
+      var streamUrl = audio.getAttribute('src');
+
+      function prompt(message) {
+        status.textContent = message;
+        playButton.hidden = false;
+      }
+
+      function disconnect() {
+        audio.removeAttribute('src');
+        audio.load();
+      }
+
+      function playLive() {
+        status.textContent = 'Connecting...';
+        audio.src = streamUrl;
+        audio.load();
+        var playback = audio.play();
+        if (playback) playback.catch(function (error) {
+          if (error.name === 'AbortError') return;
+          if (error.name === 'NotAllowedError') {
+            disconnect();
+            prompt('Hey! Make sure to press Play.');
+          } else {
+            prompt('Stream unavailable. Press Play live to retry.');
+          }
+        });
+      }
+
+      playButton.addEventListener('click', playLive);
+      audio.addEventListener('playing', function () {
+        status.textContent = 'Playing live';
+        playButton.hidden = true;
+      });
+      audio.addEventListener('pause', function () {
+        if (audio.paused && !audio.ended && !audio.error) {
+          disconnect();
+          prompt('Press Play live to rejoin the stream.');
+        }
+      });
+      audio.addEventListener('waiting', function () {
+        status.textContent = 'Connecting...';
+      });
+      audio.addEventListener('error', function () {
+        prompt('Stream unavailable. Press Play live to retry.');
+      });
+      audio.addEventListener('ended', function () {
+        disconnect();
+        prompt('Stream ended. Press Play live to reconnect.');
+      });
+      playLive();
+    }());
+  </script>
+</body>
+</html>

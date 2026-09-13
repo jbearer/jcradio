@@ -71,4 +71,57 @@ class SongTest < ActiveSupport::TestCase
       end
     end
   end
+
+  test "get fetches an unknown song with the linked user's token" do
+    fetched = Song.new(title: 'Plans')
+    oauth_request = lambda do |user_id, path|
+      assert_equal 'linked-user', user_id
+      assert_equal 'tracks/new-track', path
+      { 'id' => 'new-track' }
+    end
+    app_request = lambda { |*| flunk 'must not fall back to the app token' }
+    convert = lambda { |tracks, persist| [fetched] }
+
+    with_spotify_user do
+      RSpotify::User.stub :oauth_get, oauth_request do
+        RSpotify.stub :get, app_request do
+          SongsHelper.stub :get_or_create_from_spotify_record, convert do
+            assert_same fetched, Song.get('Spotify', 'new-track')
+          end
+        end
+      end
+    end
+  end
+
+  test "get falls back to the app token when the user token is rate limited" do
+    fetched = Song.new(title: 'Plans')
+    rate_limited = lambda do |user_id, path|
+      raise RestClient::TooManyRequests.new
+    end
+    app_request = lambda do |path|
+      assert_equal 'tracks/new-track', path
+      { 'id' => 'new-track' }
+    end
+    convert = lambda { |tracks, persist| [fetched] }
+
+    with_spotify_user do
+      RSpotify::User.stub :oauth_get, rate_limited do
+        RSpotify.stub :get, app_request do
+          SongsHelper.stub :get_or_create_from_spotify_record, convert do
+            assert_same fetched, Song.get('Spotify', 'new-track')
+          end
+        end
+      end
+    end
+  end
+
+  private
+
+  def with_spotify_user
+    previous = $spotify_user
+    $spotify_user = Struct.new(:id).new('linked-user')
+    yield
+  ensure
+    $spotify_user = previous
+  end
 end

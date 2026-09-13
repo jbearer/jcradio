@@ -16,6 +16,12 @@
         </form></p>
 <% end %>
 
+<p>
+    <a href="http://jcradio.ddns.net:8000/listen.html" class="radio-listen-link" target="_blank" rel="noopener noreferrer">
+        <i class="fa fa-headphones" aria-hidden="true"></i> Open new tab for radio MP3 listening
+    </a>
+</p>
+
 <% if $spotify_user && current_user && $client_spotifies %>
     <!-- Debug prints -->
     spotify_user = <%=$spotify_user.display_name%> <br>

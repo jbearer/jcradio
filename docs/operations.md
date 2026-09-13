@@ -11,17 +11,19 @@ records are under [Pi records](pi/README.md).
 
     | Component | Runs as | Started by | Survives reboot? |
     | --- | --- | --- | --- |
-    | Rails website (HTTPS :3000) | `pi` | `jcradio-start` shell function in `/home/pi/.bashrc` | **No**, start it manually after a reboot |
+    | Rails website (HTTPS :3000) | `pi` | `jcradio-web.service` (systemd, since 2026-09-13) | Yes, enabled; restarts on failure |
     | Spotify player (librespot 0.8.0) | `pi` | `jcradio-player.service` (systemd) | Yes, enabled; restarts on failure |
-    | DarkIce MP3 encoder (Debian `1.3-0.1` since 2026-09-13; old build still the running process) | root | `/etc/rc.local` via `/home/pi/darkice.sh` | Yes |
+    | DarkIce MP3 encoder (Debian `1.3-0.1` since 2026-09-13; verified after reboot) | root | `/etc/rc.local` via `/home/pi/darkice.sh` | Yes |
     | Icecast (`:8000/rapi.mp3`) | `icecast2` | `icecast2` init service | Yes |
     | No-IP DDNS updater | `nobody` | `noip2.service` | Yes |
     | SSH (:10110) | root | `ssh.service` | Yes |
     | TLS renewal (certbot) | root | `certbot.timer`, twice daily | Yes |
 
-    `jcradio-start` needs `SPOTIFY_CLIENT_ID` and `SPOTIFY_CLIENT_SECRET` in
-    the environment; `.bashrc` exports them. Rails refuses to boot without
-    them. The shared radio account is restored from
+    Rails needs `SPOTIFY_CLIENT_ID` and `SPOTIFY_CLIENT_SECRET` and refuses to
+    boot without them. The unit reads them from `/home/pi/.config/jcradio/env`
+    (mode 600, a copy of the two `export` lines in `.bashrc`); interactive
+    shells still get them from `.bashrc`. If the client secret is rotated,
+    update both files. The shared radio account is restored from
     `~/jcradio/.nothingtoseehere.yml` on the first visit to the home page.
 
     The legacy 2020 `/usr/bin/librespot` is no longer launched anywhere: its
@@ -37,23 +39,51 @@ records are under [Pi records](pi/README.md).
     Run these on the Pi (`ssh jcradio-pi`), from an interactive shell so RVM
     and the environment variables load.
 
+    ### Health Check and Logs
+
+    - <details open> <summary> <b>Health Check and Logs</b> </summary>
+
+        ```sh
+        jcradio-status                  # website, player, encoder, stream, certificate on one screen
+        jcradio-logs                    # last 50 lines of the Rails log
+        jcradio-logs rails 200          # more lines
+        jcradio-logs web                # systemd journal for the Rails unit (boot errors land here)
+        jcradio-logs player             # librespot log (~/.local/state/jcradio-player/player.log)
+        jcradio-logs icecast            # /var/log/icecast2/error.log
+        jcradio-logs rails -f           # follow
+        ```
+
+        After a reboot everything comes back on its own, the website included
+        since 2026-09-13; Rails takes about a minute to boot on the Pi 3, so
+        give `jcradio-status` a moment before reading it as a failure.
+
+      </details>
+
     ### Website
 
     - <details open> <summary> <b>Website</b> </summary>
 
         ```sh
-        jcradio-start                                   # daemonized rails server, HTTPS 0.0.0.0:3000
-        jcradio-stop                                    # SIGTERM via PID file, SIGKILL after 15s
-        jcradio-restart                                 # stop + start; needed after config/ changes
+        jcradio-start                                   # sudo systemctl start jcradio-web
+        jcradio-stop                                    # sudo systemctl stop jcradio-web
+        jcradio-restart                                 # sudo systemctl restart jcradio-web; needed after config/ changes
+        systemctl status jcradio-web                    # state, PID, last log lines
         ss -ltn | grep ':3000'                          # is it listening?
-        tail -n 50 ~/jcradio/log/development.log        # recent requests and errors
         ```
+
+        The unit is [jcradio-web.service](../script/pi-recovery/jcradio-web.service):
+        `bundle exec rails server` through the RVM wrapper, bound to
+        `ssl://0.0.0.0:3000` with the Let's Encrypt key and chain, in the
+        foreground so systemd owns the process; `tmp/pids/server.pid` is still
+        written. It replaced the daemonized `rails server -d` that the original
+        `jcradio-start` function ran (backup: `~/jcradio-recovery/2026-09-12/bashrc-before-jcradio-web`).
 
         Rails runs in the development environment: edits under `app/` reload per
         request; anything under `config/` needs `jcradio-restart`.
-        `jcradio-startstop` in `.bashrc` is `pkill -9 ruby`; avoid it.
-        The functions are kept in
-        [jcradio-shell-functions.bash](../script/pi-recovery/jcradio-shell-functions.bash).
+        `jcradio-startstop` in `.bashrc` is `pkill -9 ruby`; avoid it (systemd
+        would just restart the site anyway). `.bashrc` sources the functions from
+        [jcradio-shell-functions.bash](../script/pi-recovery/jcradio-shell-functions.bash),
+        so editing that file in the checkout changes the commands.
 
       </details>
 
@@ -189,7 +219,7 @@ records are under [Pi records](pi/README.md).
 
     | Symptom | First Thing to Check |
     | --- | --- |
-    | Website unreachable on the Pi | `ss -ltn` for :3000; `jcradio-start` was run in a shell with the Spotify variables; `log/development.log` |
+    | Website unreachable on the Pi | `systemctl status jcradio-web` and `jcradio-logs web`; a missing `~/.config/jcradio/env` or certificate path stops the boot; then `log/development.log` |
     | Works on the Pi but not on the LAN | Bind is `0.0.0.0:3000`, so look at the host firewall |
     | Browser shows a certificate warning | `openssl x509 -dates` on `:3000` vs `sudo certbot certificates`; if certbot is newer, `jcradio-restart`; if both are old, see the certificate section above |
     | Works on LAN but not remotely | Router forwarding for 3000/8000, DDNS resolution; see [network setup](pi/network-setup.md) |

@@ -22,9 +22,23 @@ class Song < ActiveRecord::Base
         if source == "Spotify"
             # Known songs skip Spotify entirely so a rate-limited app token can't block them.
             Song.find_by(source: "Spotify", source_id: source_id) ||
-                SongsHelper.get_or_create_from_spotify_record([RSpotify::Track.find(source_id)], true).first
+                SongsHelper.get_or_create_from_spotify_record([find_spotify_track(source_id)], true).first
         else
             nil
+        end
+    end
+
+    # RSpotify::Track.find uses the client-credentials app token, which stays 429 for many minutes
+    # after a library-browse burst while the linked user's OAuth token keeps working.
+    def self.find_spotify_track(source_id)
+        spotify_user = $spotify_user
+        return RSpotify::Track.find(source_id) if spotify_user.nil?
+
+        begin
+            response = RSpotify::User.oauth_get(spotify_user.id, "tracks/#{source_id}")
+            RSpotify::Track.new response
+        rescue RestClient::TooManyRequests
+            RSpotify::Track.find(source_id)
         end
     end
 

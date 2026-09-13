@@ -14,12 +14,12 @@ The dated records that led here are under [Pi records](pi/README.md).
 
     | Piece | State |
     | --- | --- |
-    | Website | Rails running as `pi`, HTTPS on `0.0.0.0:3000`, started by `jcradio-start`; checkout `atc/dev`, clean tree |
+    | Website | Rails running as `pi`, HTTPS on `0.0.0.0:3000`, as the enabled `jcradio-web` systemd service; checkout `atc/dev`, clean tree |
     | Player | librespot 0.8.0 running as the enabled `jcradio-player` systemd service, authenticated as JC Radio, device `JCRadio` |
     | Encoder / stream | DarkIce running; Icecast serving `/rapi.mp3` at 320 kbps MP3; 1 listener connected at check time, peak 3 |
     | Database | `db/development.sqlite3`, about 25 MB, written to today; live history |
     | HTTPS | Certificate for `jcradio.ddns.net` renewed 2026-09-13 (standalone HTTP-01), valid to **2026-12-12**; a certbot deploy hook runs `jcradio-restart` on renewal |
-    | OS packages | Stretch fully upgraded from the frozen `legacy.raspbian.org` archive on 2026-09-13 (610 packages); **reboot pending**; DarkIce is now Debian `1.3-0.1`, untested until the next restart. See the [post-upgrade inspection](pi/inspection-2026-09-13.md) |
+    | OS packages | Stretch fully upgraded from the frozen `legacy.raspbian.org` archive on 2026-09-13 (610 packages) and rebooted; DarkIce is now Debian `1.3-0.1` and came up streaming. See the [post-upgrade inspection](pi/inspection-2026-09-13.md) |
     | DDNS | `jcradio.ddns.net` resolves to the home's current public IPv4 |
     | Router | Xfinity gateway (`Server: Xfinity Broadband Router Server` on `10.0.0.1`); forwarding rules not inspected |
     | Tests | `bin/rake test` on the Pi: 24 runs, 90 assertions, green |
@@ -64,14 +64,14 @@ The dated records that led here are under [Pi records](pi/README.md).
     | Web runtime | RVM Ruby 2.4.9, Rails 4.2.8, Puma 4.3.5 |
     | Player | Raspotify 0.48.2's librespot 0.8.0 under `~/.local/share/jcradio-player`, run through a private Debian Bookworm glibc loader (`~/.local/bin/librespot-current`) because the system glibc is too old |
     | Player service | `/etc/systemd/system/jcradio-player.service`, identical to [the repo copy](../script/pi-recovery/jcradio-player.service); credentials cached in `~/.local/state/jcradio-player` |
-    | Website launcher | `jcradio-start` / `jcradio-stop` / `jcradio-restart` shell functions in `/home/pi/.bashrc`: daemonized `rails server` with TLS, PID in `tmp/pids/server.pid`; no systemd unit |
+    | Website service | `/etc/systemd/system/jcradio-web.service`, identical to [the repo copy](../script/pi-recovery/jcradio-web.service): foreground `rails server` with TLS, Spotify credentials from `~/.config/jcradio/env`; `jcradio-start` / `jcradio-stop` / `jcradio-restart` in `.bashrc` wrap `systemctl` |
     | TLS renewal | `certbot.timer` (twice daily, `standalone` HTTP-01 on port 80); `/etc/letsencrypt/renewal-hooks/deploy/jcradio-restart-rails.sh` runs `jcradio-restart` after a renewal so Puma reloads the files; copy in [the repo](../script/pi-recovery/certbot-deploy-jcradio.sh) |
     | Audio boot path | `/etc/rc.local` launches the DarkIce wrapper; `/etc/modules` loads `snd-aloop` |
     | Legacy player | Original `/usr/bin/librespot` (2020) still on disk but no longer launched; `raspotify.service` disabled; legacy `.bashrc` functions and the `rc.local` line were removed 2026-09-13 |
     | DDNS | `noip2.service` enabled |
 
-    After a reboot the player, encoder, and stream come back on their own; the
-    website does not. Log in and run `jcradio-start`.
+    After a reboot the website, player, encoder, and stream all come back on
+    their own (website autostart added 2026-09-13).
 
   </details>
 
