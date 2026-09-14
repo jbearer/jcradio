@@ -47,6 +47,15 @@
     table with no model or columns beyond timestamps; the chat implementation
     uses `ChatMessage`.
 
+    Indexes: `queue_entries.position`, `queue_entries.selector_id`, the
+    trigram lookup indexes, and, since 2026-09-13, `songs.source_id`
+    ([migration](../db/migrate/20260913220000_add_source_id_index_to_songs.rb)),
+    which library browsing and `Song.get` use to match Spotify IDs. Do not add
+    indexes on `queue_entries.station_id` or `songs.first_letter`: measured on
+    a copy, SQLite chose them over rowid/position order and the queue and
+    browse queries got about twice as slow. See
+    [performance characteristics](architecture.md#performance-characteristics).
+
   </details>
 
 ## Queue Cursor and History

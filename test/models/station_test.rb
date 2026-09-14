@@ -28,6 +28,48 @@ class StationTest < ActiveSupport::TestCase
     assert_successful_queue_response('')
   end
 
+  test "successful queue additions record last played for Buddy and human selectors" do
+    station = stations(:one)
+    buddy = users(:two)
+    buddy.update! username: 'Buddy'
+    chosen_at = Time.utc(2026, 9, 13, 23, 21)
+
+    [buddy, users(:one)].each do |selector|
+      song = set_playing_radio
+      Time.stub :now, chosen_at do
+        station.stub :internal_spotify_add_to_queue, nil do
+          assert_difference 'QueueEntry.count', 1 do
+            assert_equal '', station.queue_song(song, selector, false)
+          end
+        end
+      end
+
+      assert_equal (chosen_at.to_f * 1000).to_i, song.reload.last_played
+      assert_equal selector, song.queue_entries.last.selector
+      assert_equal song.last_played, song.as_json['last_played']
+    end
+  end
+
+  test "rejected queue additions leave last played unchanged" do
+    station = stations(:one)
+    song = set_playing_radio
+    previous_play = 1_600_000_000_000
+    song.update! last_played: previous_play
+
+    station.stub :internal_spotify_add_to_queue, lambda { |uri| raise RestClient::Forbidden } do
+      assert_no_difference 'QueueEntry.count' do
+        assert_raises(RestClient::Forbidden) { station.queue_song(song, users(:one), false) }
+      end
+    end
+    assert_equal previous_play, song.reload.last_played
+
+    $spotify_user = nil
+    assert_no_difference 'QueueEntry.count' do
+      assert_equal 'Please log into spotify', station.queue_song(song, users(:one), false)
+    end
+    assert_equal previous_play, song.reload.last_played
+  end
+
   test "an expired queue token is refreshed and retried once" do
     set_radio_credentials
     requests = []
@@ -52,6 +94,21 @@ class StationTest < ActiveSupport::TestCase
     end
     assert_equal 3, requests.length
     assert_equal requests.first, requests.last
+  end
+
+  test "a queue POST on a connection Spotify already closed is retried once" do
+    set_radio_credentials
+    requests = 0
+    request = lambda do |url, body, headers|
+      requests += 1
+      raise RestClient::ServerBrokeConnection if requests == 1
+      'spotify-request-id'
+    end
+
+    RestClient.stub :post, request do
+      Station.new.internal_spotify_add_to_queue('spotify:track:test-track')
+    end
+    assert_equal 2, requests
   end
 
   test "a malformed refresh response is not mistaken for a queued song" do
@@ -199,7 +256,8 @@ class StationTest < ActiveSupport::TestCase
   def set_playing_radio
     set_radio_credentials
     $spotify_user.define_singleton_method(:player) { Struct.new(:playing?).new(true) }
-    Struct.new(:source, :uri).new('Spotify', 'spotify:track:test-track')
+    Song.create!(source: 'Spotify', source_id: 'test-track', uri: 'spotify:track:test-track',
+                 title: 'Test track', artist: 'Test artist', album: 'Test album')
   end
 
   def assert_successful_queue_response(response)

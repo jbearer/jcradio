@@ -68,7 +68,17 @@
         Server-Sent Events; [the browser handler](../app/assets/javascripts/live-rpc.js.erb)
         dispatches them. This is not WebSockets or Rails Action Cable. Connections and
         pending messages are held in memory, keyed by user ID; opening another live
-        subscription for that user replaces the previous one.
+        subscription for that user replaces the previous one. The client installs no
+        error handler, so a subscribe request that fails with a non-200 status leaves
+        that tab without live updates until it is reloaded.
+
+        Opening the queue page (`GET /stations/1`) renders from the database and
+        then runs `refresh_now_playing_and_stuff` (Spotify progress poll, Buddy's
+        turn check, timing push to clients) in a short-lived background thread,
+        one at a time, so the page is not held for the Spotify round trip. The
+        refresh button (`POST /stations/1/refresh`) still runs it synchronously.
+        Since 2026-09-13; see
+        [StationsController#refresh_now_playing_in_background](../app/controllers/stations_controller.rb).
 
       </details>
 
@@ -123,6 +133,7 @@
     | Personal Spotify users and library caches | `$client_spotifies`, `$spotify_libraries_cached` | Lost when the process restarts |
     | Next letter and Buddy configuration | Process globals | Not independent per station or shared across processes |
     | Playback poller and LiveRPC subscribers | Ruby thread and in-memory registries | Not a durable job or shared message service |
+    | Open HTTPS connections to Spotify | In-memory pool in [config/initializers/rest_client_keep_alive.rb](../config/initializers/rest_client_keep_alive.rb) | Reconnects transparently; nothing to persist |
 
     Global defaults and station selection are in
     [ApplicationController](../app/controllers/application_controller.rb).
@@ -136,6 +147,58 @@
     `SPOTIFY_CLIENT_SECRET` environment variables read by
     [config/initializers/omniauth.rb](../config/initializers/omniauth.rb); Rails
     refuses to boot without them.
+
+    RSpotify's transport, RestClient 2.0.2, opens a new TLS connection per call.
+    [config/initializers/rest_client_keep_alive.rb](../config/initializers/rest_client_keep_alive.rb)
+    hands RestClient pooled `Net::HTTP` connections per host that stay open
+    between calls (60 s idle limit; `Net::HTTP` reconnects on a closed socket).
+    `Station#internal_spotify_add_to_queue` retries its POST once if a pooled
+    connection turns out to be dead, because `Net::HTTP` only retries idempotent
+    verbs itself.
+
+  </details>
+
+## Performance Characteristics
+
+- <details> <summary> <b>Performance Characteristics</b> </summary>
+
+    Measured on the Pi 3 on 2026-09-13 with the scripts in
+    [script/perf](../script/perf) (log aggregation, HTTP page timing, in-process
+    micro-benchmarks, a SQLite index trial on a database copy, and a Spotify
+    idle-connection probe). The Pi's CPU is the limit, not the network: the
+    public DDNS path adds about 25 ms over the LAN.
+
+    | Component | Cost | Notes |
+    | --- | --- | --- |
+    | Rails boot | 24-26 s to listening; 29 s with eager loading | 33-36 s of CPU loading gems; Ruby 2.4 and Rails 4.2 offer no faster path |
+    | First request after boot | About 2 s | Template compilation and asset digests |
+    | One Spotify API call | About 280 ms cold, 60-80 ms on a kept-alive connection | DNS+TCP+TLS was about 205 ms of each cold call |
+    | Queue page `GET /stations/1` | About 200 ms server time, anonymous LAN 240-300 ms | Was 870 ms while it waited for Spotify and Buddy |
+    | Home and browse pages | 120-180 ms server time | Were 500-560 ms |
+    | 120-row results table, logged in | About 320 ms, 5 queries | Was 2.3 s and 722 queries |
+    | History browse query | About 200 ms | Was 1.75 s (one song query per entry) |
+    | Asset requests per page | 2 bundles, browser-cached for a year | Were 33 files in debug mode, about 55 ms each |
+    | TLS handshake to the Pi | 110-130 ms | Once per browser connection |
+
+    What made the difference: `current_user` is memoized per request
+    ([ApplicationHelper](../app/helpers/application_helper.rb)); the results
+    partial computes the add-button permission once; history browsing queries
+    `Song` directly with `GROUP BY`; `Station#queue_before` eager-loads songs and
+    selectors; `config.assets.debug` is off; `songs.source_id` is indexed;
+    the queue page defers its Spotify refresh; Spotify connections are pooled.
+
+    Two SQLite indexes were tried and rejected on a copy of the database:
+    `queue_entries.station_id` and `songs.first_letter` both made the queue and
+    browse queries about twice as slow, because SQLite preferred them over the
+    rowid/position order. Every row has the same station.
+
+    Remaining known costs: `Song#to_json` per results row (about 190 ms per 120
+    rows), the 3.5 MB Plotly script loaded in the layout `<head>` on every page,
+    Buddy's own selection pool still loading one song per entry when it is
+    Buddy's turn, and the Fuzzily `trigrams` table (about 197,000 rows) written
+    on every `Song.create` although the UI no longer uses fuzzy search.
+    `vcgencmd get_throttled` reported under-voltage and past throttling; a
+    stronger power supply may help the CPU-bound parts.
 
   </details>
 

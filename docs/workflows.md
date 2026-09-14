@@ -65,9 +65,11 @@ are verified in code only.
     | Previously upvoted songs | Filters entries the user upvoted, using stored first letter |
     | Radio history | Searches positioned entries across the shared history using stored first letter |
 
-    History browsing limits the query to 500 recent entries before deduplicating
-    songs. An empty letter filter is explicitly supported for the personal-library
-    path; it should not be assumed to behave identically in every history path.
+    History browsing returns up to 500 distinct songs, most recently queued
+    first, from one `Song` query grouped by song (until 2026-09-13 it loaded 500
+    queue entries and then one song per entry). An empty letter filter is
+    explicitly supported for the personal-library path; it should not be assumed
+    to behave identically in every history path.
     Library browsing used to persist every track before rendering, which locked
     the SQLite database; it now converts without saving.
     See [SongsController](../app/controllers/songs_controller.rb) and the
@@ -102,7 +104,9 @@ are verified in code only.
     The default seeds do not create that user.
 
     [StationsController#buddy_add_song](../app/controllers/stations_controller.rb)
-    runs through the station show/refresh path. It checks that Buddy has the turn,
+    runs through the station show/refresh path: synchronously on the refresh
+    button, and in a background thread after the queue page has been sent. It
+    checks that Buddy has the turn,
     builds a pool matching the assigned letter from configured history, upvotes,
     or linked libraries, and chooses randomly. If that pool is empty, it falls
     back to matching local song records. The radio-wide Spotify-library source
@@ -125,7 +129,9 @@ are verified in code only.
     not describe the active skip route.
 
     Refreshing wakes the playback poller when possible, checks Buddy's turn, and
-    updates timing. Saving the current track uses the listener's linked Spotify
+    updates timing. Opening the queue page does the same after the response, in
+    a background thread, and pushes the corrected timing to the page over SSE.
+    Saving the current track uses the listener's linked Spotify
     account. Listening to the shared audio itself depends on the external stream,
     not these metadata/control endpoints.
 

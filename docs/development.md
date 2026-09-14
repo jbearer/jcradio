@@ -15,9 +15,12 @@
 
     These are legacy versions, not a recommended new public-server stack. The
     original README warns against an omniauth-oauth2 update that broke the old
-    RSpotify integration; keep the lockfile pinned. Two places depend on RSpotify
-    2.9.2 internals and must be re-checked if the gem is ever bumped:
+    RSpotify integration; keep the lockfile pinned. Three places depend on gem
+    internals and must be re-checked if RSpotify or RestClient is ever bumped:
     [config/initializers/rspotify_token_refresh.rb](../config/initializers/rspotify_token_refresh.rb)
+    (RSpotify 2.9.2 `oauth_send`),
+    [config/initializers/rest_client_keep_alive.rb](../config/initializers/rest_client_keep_alive.rb)
+    (RestClient 2.0.2 `Request#net_http_object` and its `net.start { }` block),
     and `Station#internal_spotify_add_to_queue` in
     [app/models/station.rb](../app/models/station.rb).
 
@@ -34,7 +37,12 @@
     The Pi checkout at `/home/pi/jcradio` is the deployment. Rails runs in the
     development environment, so code changes under `app/` reload on the next
     request; changes to `config/initializers` or the Gemfile need a Rails restart
-    (see [operations](operations.md)).
+    (see [operations](operations.md)). Two settings in
+    [config/environments/development.rb](../config/environments/development.rb)
+    differ from Rails defaults on purpose: `eager_load = true` loads all of
+    `app/` at boot (lazy autoloading raced when two requests arrived together
+    after a restart), and `assets.debug = false` serves two concatenated asset
+    bundles instead of 33 files. Both keep hot reloading.
 
     1. Edit and commit locally, push, then `git pull` on the Pi. For quick
        iteration, `scp` the changed files to the same paths and keep both trees
@@ -72,6 +80,7 @@
     | Where are the navigation, sidebar, and player controls? | [Application layout](../app/views/layouts/application.html.erb) |
     | Where are the confirmation and override controls? | [Search-results partial](../app/views/songs/_search_results.html.erb) |
     | What data must survive a move? | [Schema](../db/schema.rb) and [data model](data-model.md) |
+    | Why is a page slow? | [script/perf](../script/perf) and [performance characteristics](architecture.md#performance-characteristics) |
 
     The separate `html and css/` directory contains standalone design material
     that is not part of the routed Rails UI under `app/views` and `app/assets`.
@@ -82,19 +91,24 @@
 
 - <details> <summary> <b>Tests and Checks</b> </summary>
 
-    `bin/rake test` passes on the Pi as of 2026-09-13: 24 runs, 90 assertions.
+    `bin/rake test` passes on the Pi as of 2026-09-13: 39 runs, 133 assertions.
     Coverage is intentionally narrow:
 
     | File | Covers |
     | --- | --- |
     | [song_test.rb](../test/models/song_test.rb) | Search sends `limit: 10` and converts results |
-    | [station_test.rb](../test/models/station_test.rb) | Queue POST success without JSON, 401 refresh-and-retry, persistent 401, other HTTP failures, missing device, RSpotify `oauth_send` patch |
-    | [songs_controller_test.rb](../test/controllers/songs_controller_test.rb) | Library browse renders without persisting |
-    | [sessions_controller_test.rb](../test/controllers/sessions_controller_test.rb) | Login joins station 1, unknown user, logout |
+    | [station_test.rb](../test/models/station_test.rb) | Queue POST success without JSON, 401 refresh-and-retry, persistent 401, other HTTP failures, dead pooled connection retried once, missing device, RSpotify `oauth_send` patch |
+    | [rest_client_keep_alive_test.rb](../test/models/rest_client_keep_alive_test.rb) | RestClient receives pooled connections, returns them after the request block or an exception, threads never share one, proxies bypass the pool |
+    | [songs_controller_test.rb](../test/controllers/songs_controller_test.rb) | Library browse renders without persisting; history browse returns distinct songs newest-first per source; `current_user` is queried once per request |
+    | [stations_controller_test.rb](../test/controllers/stations_controller_test.rb) | Queue page defers the Spotify refresh to a background thread |
+    | [sessions_controller_test.rb](../test/controllers/sessions_controller_test.rb) | Login joins station 1 and refreshes the memoized user, unknown user, logout |
     | [users_controller_test.rb](../test/controllers/users_controller_test.rb) | Index/new/show render, create, duplicate, destroy rules |
+    | [songs_helper_test.rb](../test/helpers/songs_helper_test.rb) | Library conversion reads `preview_url` without a per-track Spotify request |
 
     Fixtures give station `one` the hard-coded `id: 1`. Tests stub HTTP with
-    `Minitest::Mock`/`stub`; they never contact Spotify.
+    `Minitest::Mock`/`stub`; they never contact Spotify. Controller tests render
+    the full layout, so a logged-in test needs a positioned queue entry and
+    `station.queue_pos`, or the sidebar's letter strip does `nil` arithmetic.
 
     Dependency-light checks that run on any Ruby, from the repository root:
 
@@ -105,6 +119,21 @@
 
     The second checks documentation structure and local links against
     [the style guide](DOCS_STYLE_GUIDE.md).
+
+    Performance checks live in [script/perf](../script/perf); none of them log
+    in, write, or use a Spotify token:
+
+    ```sh
+    python3 script/perf/page-timings.py https://10.0.0.110:3000 /sessions /stations/1 /songs   # laptop: page + asset timings
+    ssh jcradio-pi 'cd ~/jcradio && ruby script/perf/log-timings.rb log/development.log 2026-09-13'  # per-action p50/p90 from the log
+    ssh jcradio-pi 'bash -lic "cd ~/jcradio && bin/rails runner script/perf/bench-inprocess.rb"'   # queries, helpers, rendering (40 s boot)
+    ssh jcradio-pi 'bash -lic "cd ~/jcradio && bin/rails runner script/perf/bench-keepalive.rb"'   # Spotify connection reuse
+    ssh jcradio-pi 'cd ~/jcradio && bash script/perf/sqlite-index-test.sh'                         # index trial on a DB copy
+    ```
+
+    `ruby` on the Pi means the RVM Ruby; the log script is plain Ruby. Baseline
+    and current numbers are in
+    [architecture](architecture.md#performance-characteristics).
 
     Useful next coverage: title edge cases, wrong-turn rejection, blank-queue
     startup, queue drift, and Buddy's selection.

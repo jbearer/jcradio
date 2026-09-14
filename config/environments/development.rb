@@ -6,8 +6,12 @@ Rails.application.configure do
   # since you don't have to restart the web server when you make code changes.
   config.cache_classes = false
 
-  # Do not eager load code on boot.
-  config.eager_load = false
+  # Load app/ classes at boot instead of on first use. Lazy autoloading is not
+  # thread-safe: two requests arriving together right after a restart (a browser
+  # SSE reconnect plus a page load is enough) raised "Circular dependency detected
+  # while autoloading constant ..." and the losing SSE stream stayed dead until
+  # the tab was reloaded. Costs a few seconds of boot; code still reloads on edit.
+  config.eager_load = true
 
   # Show full error reports and disable caching.
   config.consider_all_requests_local       = true

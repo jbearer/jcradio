@@ -69,6 +69,8 @@ class Station < ActiveRecord::Base
             selector: selector,
             was_recommended: was_recommended
 
+        song.update! last_played: (Time.now.to_f * 1000).to_i
+
         if not_playing
              # We're not currently playing a song, so immediately skip to this
              # one
@@ -189,6 +191,10 @@ class Station < ActiveRecord::Base
         rescue RestClient::Unauthorized
             RSpotify::User.send(:refresh_token, spotify_user.id)
             headers = RSpotify::User.send(:oauth_header, spotify_user.id)
+            RestClient.post(url, {}, headers)
+        rescue RestClient::ServerBrokeConnection, Errno::ECONNRESET, Errno::EPIPE
+            # Pooled connection died underneath us (rest_client_keep_alive.rb); Net::HTTP
+            # only retries idempotent verbs itself and Spotify never saw this POST.
             RestClient.post(url, {}, headers)
         end
     end

@@ -6,9 +6,6 @@ JC Radio is a collaborative constraint-based radio programming: friends build on
 Spotify-backed queue, with each song handing a starting letter to the next
 person.
 
-The interface calls it **Jingle Churro Radio**. This documentation uses
-**JC Radio** as the short name.
-
 ## A Typical Session
 
 - <details> <summary> <b>A Typical Session</b> </summary>

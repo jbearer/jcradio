@@ -28,7 +28,10 @@ Formatting follows the [documentation style guide](DOCS_STYLE_GUIDE.md).
     - **HTTPS:** the `jcradio.ddns.net` certificate was renewed on 2026-09-13
       after four years expired; certbot now renews it automatically and a
       deploy hook restarts Rails. Browsers load the site without an override.
-    - **Tests:** `bin/rake test` on the Pi passes (24 runs, 90 assertions).
+    - **Tests:** `bin/rake test` on the Pi passes (39 runs, 133 assertions).
+    - **Speed:** tuned on 2026-09-13; pages render in 120-300 ms on the LAN
+      instead of 0.5-2 s, and Spotify calls reuse connections. Numbers and what
+      changed: [architecture](architecture.md#performance-characteristics).
 
     Still outstanding: see [Open Items](#open-items).
 

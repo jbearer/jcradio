@@ -66,9 +66,22 @@ class StationsController < ApplicationController
             $the_next_letter = @station.queue[@station.queue_max - @station.queue_pos].song.next_letter
         end
 
-        # refresh the now_playing
-        refresh_now_playing_and_stuff
+        # The page renders from the DB; the Spotify progress poll, Buddy check and
+        # SSE timing push run after the response instead of blocking it ~0.3-1 s.
+        refresh_now_playing_in_background
+    end
 
+    def refresh_now_playing_in_background
+        return if $refresh_thread and $refresh_thread.alive?
+        $refresh_thread = Thread.new do
+            ActiveRecord::Base.connection_pool.with_connection do
+                begin
+                    refresh_now_playing_and_stuff
+                rescue => e
+                    Rails.logger.error "background refresh failed: #{e.message}"
+                end
+            end
+        end
     end
 
     def change_queue_pos
@@ -283,8 +296,6 @@ class StationsController < ApplicationController
         end
 
         err_str = station.queue_song(song, current_user, params[:was_recommended])
-
-        song.update last_played: Time.now.to_f * 1000 # ms since 01/01/1970
 
         if err_str != "" then
             return json_error err_str

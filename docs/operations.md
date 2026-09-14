@@ -54,8 +54,9 @@ records are under [Pi records](pi/README.md).
         ```
 
         After a reboot everything comes back on its own, the website included
-        since 2026-09-13; Rails takes about a minute to boot on the Pi 3, so
-        give `jcradio-status` a moment before reading it as a failure.
+        since 2026-09-13; Rails takes about 30 seconds to start listening on
+        the Pi 3 and the first page a couple of seconds more, so give
+        `jcradio-status` a moment before reading it as a failure.
 
       </details>
 
@@ -79,7 +80,10 @@ records are under [Pi records](pi/README.md).
         `jcradio-start` function ran (backup: `~/jcradio-recovery/2026-09-12/bashrc-before-jcradio-web`).
 
         Rails runs in the development environment: edits under `app/` reload per
-        request; anything under `config/` needs `jcradio-restart`.
+        request; anything under `config/` needs `jcradio-restart`. Since
+        2026-09-13 the environment eager-loads `app/` at boot (adds 3-5 s, avoids
+        an autoload race between the first concurrent requests) and serves
+        concatenated assets; see [development](development.md).
         `jcradio-startstop` in `.bashrc` is `pkill -9 ruby`; avoid it (systemd
         would just restart the site anyway). `.bashrc` sources the functions from
         [jcradio-shell-functions.bash](../script/pi-recovery/jcradio-shell-functions.bash),
@@ -144,6 +148,55 @@ records are under [Pi records](pi/README.md).
 
       </details>
 
+    ### Listening Page and Icons
+
+    - <details> <summary> <b>Listening Page and Icons</b> </summary>
+
+        The listener entry point is
+        [http://jcradio.ddns.net:8000/listen.html](http://jcradio.ddns.net:8000/listen.html).
+        Icecast serves it from `/usr/share/icecast2/web/`, separately from the
+        Rails website on HTTPS port 3000. Pulling changes into `~/jcradio` or
+        restarting Rails does **not** update Icecast's files.
+
+        The sources are [listen.html](../public/listen.html),
+        [favicon.ico](../public/favicon.ico),
+        [favicon-32x32.png](../public/favicon-32x32.png), and
+        [apple-touch-icon.png](../public/apple-touch-icon.png). Keep edits in
+        these repository files, sync them to the Pi checkout, then deploy all
+        four files. The page's root-relative icon URLs resolve on port 8000;
+        files in Rails' `public/` or asset pipeline alone do not satisfy them.
+
+        Run on the Pi after syncing the sources. Back up the deployed files,
+        install the icons before the page, and preserve web-readable permissions:
+
+        ```bash
+        cd ~/jcradio &&
+        backup=$(mktemp -d /home/pi/jcradio-recovery/listener-web-XXXXXX) &&
+        cp -p /usr/share/icecast2/web/{listen.html,favicon.ico,favicon-32x32.png,apple-touch-icon.png} "$backup/" &&
+        sudo -n install -o root -g root -m 0644 public/favicon.ico public/favicon-32x32.png public/apple-touch-icon.png /usr/share/icecast2/web/ &&
+        sudo -n install -o root -g root -m 0644 public/listen.html /usr/share/icecast2/web/listen.html
+        ```
+
+        No Icecast or Rails restart is needed. From the laptop, verify the
+        **HTTP port-8000** page and assets, not the HTTPS port-3000 copies:
+
+        ```bash
+        curl -fsS --max-time 15 http://jcradio.ddns.net:8000/listen.html | head -12
+        for asset in listen.html favicon.ico favicon-32x32.png apple-touch-icon.png; do
+          curl -fsS --max-time 15 -o /dev/null -w "$asset: HTTP %{http_code}, %{content_type}\n" "http://jcradio.ddns.net:8000/$asset" || break
+        done
+        ```
+
+        Expect favicon links in the page head, HTTP 200 for every file, and
+        image MIME types for the icons. On 2026-09-13, the Icecast page lacked
+        those links and all three icon URLs returned 404 despite working on
+        Rails. Deploying the four files fixed the mismatch; public response
+        hashes matched the repository files. The previous page is backed up at
+        `~/jcradio-recovery/listener-favicon-2026-09-13-qavCUc/` on the Pi.
+        Only investigate Chrome's favicon cache after these checks pass.
+
+      </details>
+
     ### Certificate
 
     - <details> <summary> <b>Certificate</b> </summary>
@@ -200,6 +253,9 @@ records are under [Pi records](pi/README.md).
     original `/usr/bin/librespot`, `.bashrc`, `/etc/rc.local`,
     `/etc/default/raspotify`, and the three Rails source files changed that day.
     `~/jcradio-recovery/incoming-2026-09-12` holds the staged player archive.
+    `~/jcradio-recovery/2026-09-13-perf` holds the online backup and `schema.rb`
+    taken just before the `songs.source_id` index migration ran on the live
+    database.
 
     Take a fresh database backup before any schema or data operation. Use
     SQLite's online backup, not `cp`, because Rails is writing:
@@ -223,11 +279,15 @@ records are under [Pi records](pi/README.md).
     | Works on the Pi but not on the LAN | Bind is `0.0.0.0:3000`, so look at the host firewall |
     | Browser shows a certificate warning | `openssl x509 -dates` on `:3000` vs `sudo certbot certificates`; if certbot is newer, `jcradio-restart`; if both are old, see the certificate section above |
     | Works on LAN but not remotely | Router forwarding for 3000/8000, DDNS resolution; see [network setup](pi/network-setup.md) |
+    | Listening page or tab icon is stale/missing | Check the HTTP port-8000 page and icon URLs; deploy the repository copies to Icecast's webroot, not just Rails; see [Listening Page and Icons](#listening-page-and-icons) |
     | `401 Unauthorized` from `RSpotify` after a restart | The token refresh patch in `config/initializers/rspotify_token_refresh.rb` is missing or Rails was not restarted after pulling it |
     | "Radio Spotify device is unavailable" when adding a song | `systemctl status jcradio-player`; auth marker in `player.log`; device name must be `JCRadio` |
     | Spotify plays but the stream is silent | Loopback status, DarkIce process, Icecast source list |
     | Song accepted but page shows an error, or Buddy never takes a turn | `log/development.log` for the exception class; historically a JSON parse of the queue response |
     | Title/queue looks stale | Polling thread and SSE; a Rails restart resets both |
+    | `Circular dependency detected while autoloading constant ...` right after a restart | Two requests autoloaded the same class at once; `config.eager_load = true` in `development.rb` prevents it, so check that it is still set. The losing request got a 500; if it was `/sessions/subscribe`, that tab has no live updates until reloaded |
+    | Spotify calls slow again (about 300 ms each) or `ServerBrokeConnection` in the log | `config/initializers/rest_client_keep_alive.rb` missing or Rails not restarted after pulling it; `bin/rails runner script/perf/bench-keepalive.rb` shows whether calls 2-5 reuse the connection |
+    | A page feels slow | `ruby script/perf/log-timings.rb log/development.log <date>` for per-action p50/p90, then [development](development.md#tests-and-checks) for the other perf scripts |
 
     Change one layer at a time. An unreachable website is not evidence that
     Spotify or the player is broken.
