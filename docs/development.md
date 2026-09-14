@@ -69,13 +69,15 @@
     | Question | First File to Read |
     | --- | --- |
     | Which URL invokes which action? | [Routes](../config/routes.rb) |
-    | How are the shared station and globals established? | [Application controller](../app/controllers/application_controller.rb) |
-    | How does login or Spotify restoration work? | [Sessions controller](../app/controllers/sessions_controller.rb) |
-    | How do turns advance and controls invoke Spotify? | [Stations controller](../app/controllers/stations_controller.rb) |
-    | How does the local queue follow Spotify? | [Station model](../app/models/station.rb) |
+    | How is the default station established for each request? | [Application controller](../app/controllers/application_controller.rb) |
+    | How does login work? | [Sessions controller](../app/controllers/sessions_controller.rb) |
+    | Who is in line, whose turn is it, what is the letter? | [Station model](../app/models/station.rb) (`join`, `leave`, `advance_turn`, `next_letter`) |
+    | How do selections reach Spotify and how does the queue follow it? | [Station model](../app/models/station.rb) (`queue_song`, `next_song`) and [stations controller](../app/controllers/stations_controller.rb) |
+    | Where are the radio and personal Spotify logins kept? | [SpotifyAccounts](../lib/spotify_accounts.rb) and [jcradio initializer](../config/initializers/jcradio.rb) |
+    | How does Buddy pick a song? | [Buddy](../app/models/buddy.rb) and [Buddy controller](../app/controllers/buddy_controller.rb) |
     | What are the title/letter rules? | [Songs helper](../app/helpers/songs_helper.rb) |
     | How are tracks found and cached? | [Song model](../app/models/song.rb) and [songs controller](../app/controllers/songs_controller.rb) |
-    | What updates playback timing? | [Stations helper and polling worker](../app/helpers/stations_helper.rb) |
+    | What follows the player and updates timing? | [PlaybackPoller](../lib/playback_poller.rb) |
     | How do live browser events work? | [LiveRPC server](../lib/live-rpc.rb) and [client](../app/assets/javascripts/live-rpc.js.erb) |
     | Where are the navigation, sidebar, and player controls? | [Application layout](../app/views/layouts/application.html.erb) |
     | Where are the confirmation and override controls? | [Search-results partial](../app/views/songs/_search_results.html.erb) |
@@ -91,24 +93,30 @@
 
 - <details> <summary> <b>Tests and Checks</b> </summary>
 
-    `bin/rake test` passes on the Pi as of 2026-09-13: 39 runs, 133 assertions.
-    Coverage is intentionally narrow:
+    `bin/rake test` passes on the Pi as of 2026-09-14: 78 runs, 294 assertions.
 
     | File | Covers |
     | --- | --- |
     | [song_test.rb](../test/models/song_test.rb) | Search sends `limit: 10` and converts results |
     | [station_test.rb](../test/models/station_test.rb) | Queue POST success without JSON, 401 refresh-and-retry, persistent 401, other HTTP failures, dead pooled connection retried once, missing device, RSpotify `oauth_send` patch |
+    | [station_turn_test.rb](../test/models/station_turn_test.rb) | Join/leave position shifting, current selector, turn advance and its broadcast, next-letter fallback and override, `songs_remaining`, `next_song` drift handling, Buddy setting defaults |
+    | [buddy_test.rb](../test/models/buddy_test.rb) | Buddy's turn: waits when not his turn, alone with a full queue, or the queue is long; keeps his place when Spotify refuses; draws from played, upvoted, and linked-library tastes; concurrent callers skip |
+    | [playback_poller_test.rb](../test/models/playback_poller_test.rb) | Background refresh runs off-thread one at a time; idle without a radio or playback; a new track advances the station; failures retry |
+    | [spotify_accounts_test.rb](../test/models/spotify_accounts_test.rb) | Linking, paged library fetch and cache, restore-file round trip, progress when idle |
     | [rest_client_keep_alive_test.rb](../test/models/rest_client_keep_alive_test.rb) | RestClient receives pooled connections, returns them after the request block or an exception, threads never share one, proxies bypass the pool |
     | [songs_controller_test.rb](../test/controllers/songs_controller_test.rb) | Library browse renders without persisting; history browse returns distinct songs newest-first per source; `current_user` is queried once per request |
-    | [stations_controller_test.rb](../test/controllers/stations_controller_test.rb) | Queue page defers the Spotify refresh to a background thread |
+    | [stations_controller_test.rb](../test/controllers/stations_controller_test.rb) | Queue JSON snapshot, human turn hand-off and broadcast, out-of-turn rejection, queue page defers the refresh to the poller |
     | [sessions_controller_test.rb](../test/controllers/sessions_controller_test.rb) | Login joins station 1 and refreshes the memoized user, unknown user, logout |
     | [users_controller_test.rb](../test/controllers/users_controller_test.rb) | Index/new/show render, create, duplicate, destroy rules |
-    | [songs_helper_test.rb](../test/helpers/songs_helper_test.rb) | Library conversion reads `preview_url` without a per-track Spotify request |
+    | [songs_helper_test.rb](../test/helpers/songs_helper_test.rb) | The letter-rules examples table; library conversion reads `preview_url` without a per-track Spotify request |
 
     Fixtures give station `one` the hard-coded `id: 1`. Tests stub HTTP with
-    `Minitest::Mock`/`stub`; they never contact Spotify. Controller tests render
-    the full layout, so a logged-in test needs a positioned queue entry and
-    `station.queue_pos`, or the sidebar's letter strip does `nil` arithmetic.
+    `Minitest::Mock`/`stub` and stub `LiveRPC.broadcast` to capture browser
+    events; they never contact Spotify. Process state set in a test
+    (`SpotifyAccounts.radio`, linked accounts) must be restored in `teardown`.
+    Controller tests render the full layout, so a logged-in test needs a
+    positioned queue entry and `station.queue_pos`, or the sidebar's letter
+    strip does `nil` arithmetic.
 
     Dependency-light checks that run on any Ruby, from the repository root:
 
@@ -135,7 +143,7 @@
     and current numbers are in
     [architecture](architecture.md#performance-characteristics).
 
-    Useful next coverage: title edge cases, wrong-turn rejection, blank-queue
-    startup, queue drift, and Buddy's selection.
+    Useful next coverage: title edge cases beyond the documented examples,
+    blank-queue startup, and the Spotify library browse path end to end.
 
   </details>

@@ -24,7 +24,9 @@ records are under [Pi records](pi/README.md).
     (mode 600, a copy of the two `export` lines in `.bashrc`); interactive
     shells still get them from `.bashrc`. If the client secret is rotated,
     update both files. The shared radio account is restored from
-    `~/jcradio/.nothingtoseehere.yml` on the first visit to the home page.
+    `~/jcradio/.nothingtoseehere.yml` when Rails boots (logged as
+    `Radio Spotify account restored`), and the playback poller thread starts
+    with it (`PlaybackPoller started`).
 
     The legacy 2020 `/usr/bin/librespot` is no longer launched anywhere: its
     `/etc/rc.local` line and the `librespot-*` `.bashrc` functions were removed

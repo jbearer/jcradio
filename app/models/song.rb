@@ -31,7 +31,7 @@ class Song < ActiveRecord::Base
     # RSpotify::Track.find uses the client-credentials app token, which stays 429 for many minutes
     # after a library-browse burst while the linked user's OAuth token keeps working.
     def self.find_spotify_track(source_id)
-        spotify_user = $spotify_user
+        spotify_user = SpotifyAccounts.radio
         return RSpotify::Track.find(source_id) if spotify_user.nil?
 
         begin

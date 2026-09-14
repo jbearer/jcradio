@@ -90,8 +90,10 @@
 
     [StationsController#update](../app/controllers/stations_controller.rb) enforces
     whose turn it is, but does not independently reject a starting-letter mismatch.
-    It sets the global assigned letter from the first character of the capitalized
-    submitted next-letter value. This is not strict `A-Z` validation.
+    [Station#advance_turn](../app/models/station.rb) stores the assigned letter on
+    the station from the first character of the submitted next-letter value,
+    upcased, or the song's own `next_letter` when none was submitted. This is not
+    strict `A-Z` validation.
 
     The override changes the current handoff, not the song's stored `next_letter`
     or a separate per-entry letter record. Historical plots therefore cannot be

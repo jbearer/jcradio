@@ -118,10 +118,10 @@ class SongTest < ActiveSupport::TestCase
   private
 
   def with_spotify_user
-    previous = $spotify_user
-    $spotify_user = Struct.new(:id).new('linked-user')
+    previous = SpotifyAccounts.radio
+    SpotifyAccounts.radio = Struct.new(:id).new('linked-user')
     yield
   ensure
-    $spotify_user = previous
+    SpotifyAccounts.radio = previous
   end
 end

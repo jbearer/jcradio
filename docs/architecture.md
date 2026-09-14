@@ -51,11 +51,15 @@
 
     - <details> <summary> <b>Playback State and Browser Updates</b> </summary>
 
-        [TitleExtractorWorker](../app/helpers/stations_helper.rb) is a plain Ruby thread
-        inside the application process, despite its worker-style name. It polls the
-        shared Spotify player, notices track changes, and updates station ID `1`.
-        Its polling delay depends on the estimated remaining track time, with a
-        one-second minimum; it sleeps when the player is idle.
+        [PlaybackPoller](../lib/playback_poller.rb) is one Ruby thread inside the
+        application process, started at boot by
+        [config/initializers/jcradio.rb](../config/initializers/jcradio.rb) when the
+        process is the web server. It polls the radio account's player, notices
+        track changes, updates the default station, lets Buddy take his turn, and
+        nudges a listener whose turn it is when the queue is about to run dry. Its
+        polling delay is a tenth of the estimated remaining track time, with a
+        one-second minimum; it sleeps when the player is idle until a page load or
+        radio sign-in wakes it.
 
         [Station#next_song](../app/models/station.rb) searches forward in the local
         queue for the track Spotify reports, updates the cursor when a match exists,
@@ -73,12 +77,11 @@
         that tab without live updates until it is reloaded.
 
         Opening the queue page (`GET /stations/1`) renders from the database and
-        then runs `refresh_now_playing_and_stuff` (Spotify progress poll, Buddy's
-        turn check, timing push to clients) in a short-lived background thread,
-        one at a time, so the page is not held for the Spotify round trip. The
-        refresh button (`POST /stations/1/refresh`) still runs it synchronously.
-        Since 2026-09-13; see
-        [StationsController#refresh_now_playing_in_background](../app/controllers/stations_controller.rb).
+        then runs [Station#refresh_playback](../app/models/station.rb) (wake the
+        poller, Buddy's turn check, timing push to clients) through
+        `PlaybackPoller.refresh_later`, a short-lived background thread, one at a
+        time, so the page is not held for the Spotify round trip. The refresh
+        button (`POST /stations/1/refresh`) still runs it synchronously.
 
       </details>
 
@@ -86,10 +89,12 @@
 
     - <details> <summary> <b>Audio Delivery</b> </summary>
 
-        The [Station model](../app/models/station.rb) has a hard-coded Spotify
-        device ID for the Pi and a special case for the shared account's display
-        name (`JC Radio`). If the device is missing when the station is idle, the
-        add-song path returns a user-facing error instead of a 500.
+        The [Station model](../app/models/station.rb) plays through the Pi's Spotify
+        Connect device (`SpotifyAccounts.radio_device_id`, overridable with the
+        `JCRADIO_SPOTIFY_DEVICE_ID` environment variable) and has a special case for
+        the shared account's display name (`JC Radio`). If the device is missing
+        when the station is idle, the add-song path returns a user-facing error
+        instead of a 500.
 
         The [layout](../app/views/layouts/application.html.erb) contains a **commented-out**
         audio element pointing to `http://jcradio.ddns.net:8000/rapi.mp3`; the
@@ -129,13 +134,17 @@
     | State | Where It Lives | Consequence |
     | --- | --- | --- |
     | Songs, entries, users, station cursor, chat, reactions | SQLite | Database contents matter beyond the schema |
-    | Shared Spotify user | `$spotify_user`, restored at startup from `~/jcradio/.nothingtoseehere.yml` | The saved access token is stale after a restart; the first OAuth call refreshes it |
-    | Personal Spotify users and library caches | `$client_spotifies`, `$spotify_libraries_cached` | Lost when the process restarts |
-    | Next letter and Buddy configuration | Process globals | Not independent per station or shared across processes |
-    | Playback poller and LiveRPC subscribers | Ruby thread and in-memory registries | Not a durable job or shared message service |
+    | Next letter and Buddy settings | `stations.next_letter`, `stations.buddy_taste`, `stations.buddy_max_songs` (since 2026-09-14) | Survive restarts; the letter falls back to the last queued song's `next_letter` when unset |
+    | Shared Spotify user | [SpotifyAccounts](../lib/spotify_accounts.rb)`.radio`, restored at boot from `~/jcradio/.nothingtoseehere.yml` | The saved access token is stale after a restart; the first OAuth call refreshes it |
+    | Personal Spotify users and library caches | `SpotifyAccounts.linked`/`.library`, in memory keyed by username | Lost when the process restarts |
+    | Playback poller and LiveRPC subscribers | [PlaybackPoller](../lib/playback_poller.rb) thread and in-memory registries | Not a durable job or shared message service |
     | Open HTTPS connections to Spotify | In-memory pool in [config/initializers/rest_client_keep_alive.rb](../config/initializers/rest_client_keep_alive.rb) | Reconnects transparently; nothing to persist |
 
-    Global defaults and station selection are in
+    `SpotifyAccounts`, `PlaybackPoller`, and `LiveRPC` live in `lib/` and are
+    required once by [config/initializers/jcradio.rb](../config/initializers/jcradio.rb)
+    so their in-memory state survives development-mode code reloads; everything
+    under `app/` is reloaded. The default station is `Station.default` (ID 1),
+    set for every request in
     [ApplicationController](../app/controllers/application_controller.rb).
     The restore file is a credential file, not ordinary project documentation.
 

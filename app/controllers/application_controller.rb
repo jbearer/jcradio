@@ -1,43 +1,12 @@
-require "live-rpc"
-
-# # Global Variables, b/c ruby is confusing
-# $client_spotifies = {} # Moved location, for loading on home page
-# $the_next_letter = '_'
-# $spotify_libraries_cached = {} # Cache spotify library for each user (logging time too, for expiry)
-# $spotify_user = nil
-
-# $station = nil
-
 # Disable SQL logging
 ActiveRecord::Base.logger.level = 1
 
 class ApplicationController < ActionController::Base
     include ApplicationHelper
 
-    # logger.info("\n\n\n\n********************$$$$$$$$$$$$$**************@@@@@@@@@@@@@***********")
-    # logger.info(" Global defined again...")
-    # logger.info("********************$$$$$$$$$$$$$**************@@@@@@@@@@@@@***********\n\n\n\n")
-    # logger.info("\n*"*10)
-
-    # Global Variables, b/c ruby is confusing
-    $client_spotifies = {} if $client_spotifies.nil?
-    
-    $the_next_letter = '_' if $the_next_letter.nil?
-
-    # Cache spotify library for each user (logging time too, for expiry)
-    $spotify_libraries_cached = {} if $spotify_libraries_cached.nil? 
-
-    $buddy_taste = ["Radio_played"] if $buddy_taste.nil?
-    $buddy_on = false if $buddy_on.nil?
-    $buddy_max_songs = 3 if $buddy_max_songs.nil?
-
-
-    # $spotify_user = nil
-    # $station = nil
-
     before_action :set_station
     def set_station
-        @station = Station.find 1
+        @station = Station.default
     end
 
     EMOJI_REGEX = /:[A-Za-z_-]+:/

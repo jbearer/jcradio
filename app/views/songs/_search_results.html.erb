@@ -92,7 +92,7 @@ function playAudio(ind) {
 
 function confirmSong(ind, song) {
 
-        const next_letter = '<%= $the_next_letter %>';
+        const next_letter = '<%= @station.next_letter %>';
         const threshold = 1000 * 60 * 60 * 24 * 2; // 2 days
         const time_diff = song.last_played
                             ? Date.now() - song.last_played

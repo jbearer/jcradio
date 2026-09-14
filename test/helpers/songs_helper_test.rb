@@ -2,6 +2,26 @@ require 'test_helper'
 require 'minitest/mock'
 
 class SongsHelperTest < ActiveSupport::TestCase
+  # The examples table in docs/letter-rules.md.
+  test "letter rules match the documented examples" do
+    examples = {
+      'The Sound of Silence (Live) - Remastered' => %w[S S],
+      'Move Like You Want - Live' => %w[M W],
+      'Radio' => %w[R A],
+      'Love' => %w[L L],
+      'ABC' => %w[A C],
+      'AB' => %w[A A],
+      'X' => %w[X X],
+    }
+    examples.each do |title, (first, following)|
+      assert_equal first, SongsHelper.first_letter(title), title
+      assert_equal following, SongsHelper.calculate_next_letter(title), title
+    end
+
+    assert_equal '_', SongsHelper.first_letter('123')
+    assert_match(/\A[A-Z]\z/, SongsHelper.calculate_next_letter('123'))
+  end
+
   test "converting a track with a null preview_url does not fetch the track again" do
     track = RSpotify::Track.new(
       'id' => 'library-track', 'name' => 'Mountain Sound', 'uri' => 'spotify:track:library-track',

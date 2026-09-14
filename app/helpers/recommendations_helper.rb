@@ -18,42 +18,4 @@ module RecommendationsHelper
             {name: "valence", min: 0, max: 1, scale: 100}
         ]
     end
-
-    def spotify_number_of_tracks(user_id)
-        limit = 1
-        offset = 0
-        url = "me/tracks?limit=#{limit}&offset=#{offset}"
-        response = RSpotify::User.oauth_get(user_id, url)
-        json = RSpotify.raw_response ? JSON.parse(response) : response
-        total = json['total']
-
-        return total
-    end
-
-    def spotify_get_all_songs(client_spotify, username=nil)
-        if username.nil?
-            username = current_user.username
-        end
-        # Check if recently polled User songs
-        spotify_library_cache = $spotify_libraries_cached[username]
-        if Time.now() < (spotify_library_cache[0] + (1 * 24 * 60 * 60).seconds) # Update once a day
-            return spotify_library_cache[1]
-        end
-
-        num_tracks = spotify_number_of_tracks(client_spotify.id)
-        all_tracks = []
-        offset = 1
-        batch_size = 50
-        loop do
-            tracks = client_spotify.saved_tracks(limit: 50, offset: offset)
-            all_tracks.concat(tracks)
-            offset += batch_size
-
-            break if offset >= num_tracks
-        end
-
-        $spotify_libraries_cached[username] = [Time.now(), all_tracks]
-
-        return all_tracks
-    end
 end

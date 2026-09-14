@@ -1,30 +1,14 @@
-require 'yaml'
-
-
 class SessionsController < ApplicationController
   include ActionController::Live
-  include StationsHelper
-  # include Magique
 
   # GET /sessions
   def index
-    # Auto-login to spotify if possible
-    if not $spotify_user
-      file_path = File.join(Dir.home, "/jcradio/.nothingtoseehere.yml")
-      if File.exist?(file_path)
-        $spotify_user = RSpotify::User.new(YAML.load_file(file_path))
-        # Update the song that's currently playing
-        TitleExtractorWorker.perform_async(@station)
-      end
-    end
   end
 
   # POST /sessions/radio_spotify_logout
   def radio_spotify_logout
-    $spotify_user = nil
-    file_path = File.join(Dir.home, "/jcradio/.nothingtoseehere.yml")
-    File.delete(file_path) if File.exist?(file_path)
-    redirect_to "/sessions"
+    SpotifyAccounts.sign_out_radio
+    redirect_to sessions_path
   end
 
   # POST /sessions
@@ -37,39 +21,9 @@ class SessionsController < ApplicationController
         if not @user
             error "no such user #{params[:username]}"
         else
-            if @user.station.nil?
-                station = Station.find 1
+            # Someone already in line (say, logged in from another browser) keeps their spot.
+            @station.join(@user) if @user.position.nil?
 
-                # Push back all other users
-                User.where("position > ?", station.users.minimum(:position) || -1).each do |inc_user|
-                  logger.info("\n\n\n&&&&&&&")
-                  logger.info("#{inc_user.username}, #{inc_user.position}")
-                  inc_user.update position: inc_user.position + 1
-                  logger.info("#{inc_user.username}, #{inc_user.position}")
-                  logger.info("\n\n\n&&&&&&&")
-                end
-
-                @user.update station: station,
-                             position: (station.users.minimum(:position) || -1) + 1
-                logger.info("\n\n\n&&&&&&&")
-                logger.info("#{@user.username}, #{@user.position}")
-            else
-              if @user.position.nil?
-                # Push back all other users
-                User.where("position > ?", @user.station.users.minimum(:position) || -1).each do |inc_user|
-                  logger.info("\n\n\n&&&&&&&")
-                  logger.info("#{inc_user.username}, #{inc_user.position}")
-                  inc_user.update position:  inc_user.position + 1
-                  logger.info("#{inc_user.username}, #{inc_user.position}")
-                  logger.info("\n\n\n&&&&&&&")
-                end
-                # If we're already a member of a station, but we're not in line to add
-                # songs to that station, join the back of the line.
-                @user.update position: (@user.station.users.minimum(:position) || -1) + 1
-                logger.info("\n\n\n&&&&&&&")
-                logger.info("#{inc_user.username}, #{inc_user.position}")
-              end
-            end
             session[:user_id] = @user.id
             @current_user = @user
 
@@ -77,15 +31,7 @@ class SessionsController < ApplicationController
             if session[:subscription]
               @user.update subscription: JSON.dump(session[:subscription])
             end
-
-            broadcast :push, "#{@user.username} joined the radio."
-
-            # Set the next_letter properly, if currently unset
-            if @station and $the_next_letter == "_" or $the_next_letter == ""
-              $the_next_letter = @user.station.queue[@user.station.queue_max - @user.station.queue_pos].song.next_letter
-            end
         end
-
     end
 
     return_to_page
@@ -94,25 +40,8 @@ class SessionsController < ApplicationController
   # DELETE /sessions
   def destroy
     if logged_in?
-        # # If spotify linked, reset spotify library cache time
-        # if $client_spotifies.key?(current_user.username)
-        #   $spotify_libraries_cached[current_user.username][0] = Time.at(0) # Reset cache
-        # end
-
-        # Push back all other users
-        User.where("position > ?", current_user.position).each do |inc_user|
-          logger.info("\n\n\n&&&&&&&")
-          logger.info("#{inc_user.username}, #{inc_user.position}")
-          inc_user.update position: inc_user.position-1
-          logger.info("#{inc_user.username}, #{inc_user.position}")
-          logger.info("\n\n\n&&&&&&&")
-        end
-
-        current_user.update station: nil, position: nil
         LiveRPC.close current_user.id
-
-        broadcast :push, "#{current_user.username} left the radio." # Send a notification to everyone else
-
+        @station.leave(current_user)
         reset_session
     else
         error "cannot log out (not logged in)"

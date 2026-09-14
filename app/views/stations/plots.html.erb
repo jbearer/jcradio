@@ -6,7 +6,7 @@
             Expected distribution after
             <input id="expected_distribution_turns" type=text value="1" style="width: 40px;" onchange="updateExpectedDistribution();">
             turns starting with
-            <input id="expected_distribution_seed" type=text value="<%= $the_next_letter == "_" ? "A" : $the_next_letter %>" style="width: 40px;" onchange="updateExpectedDistribution()">
+            <input id="expected_distribution_seed" type=text value="<%= @station.next_letter == "_" ? "A" : @station.next_letter %>" style="width: 40px;" onchange="updateExpectedDistribution()">
         </h3>
         <div id="expected_distribution"></div>
     </div>

@@ -17,7 +17,7 @@ Note that these are merely "target" values
 <br>
 Then press the magnifying glass at the bottom of the page to get a list of recommendations.  It will
 automatically filter results whose first letter matches the search form.  The search
-form should be prepopulated with $the_next_letter.  If you search with an empty form, it will show
+form should be prepopulated with the station's next letter.  If you search with an empty form, it will show
 all 100 results.  Recommendations are semi-random, so searching multiple times will probably yield different results.
 Adding more seeds will increase the randomness.  If it's your turn, you can press the "+" button to
 add the song to the queue.
@@ -155,7 +155,7 @@ add the song to the queue.
 <br>
 <h2> Recommendations by First Letter </h2>
 
-  <input type="text" name="query" value="<%= $the_next_letter %>" style="width:40px">
+  <input type="text" name="query" value="<%= @station.next_letter %>" style="width:40px">
   <button type="submit" class="button button3">
     <i class="fa fa-search">
   </i></button>

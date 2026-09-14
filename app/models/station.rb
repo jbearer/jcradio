@@ -1,11 +1,21 @@
+# The shared radio: its queue, whose turn it is, the letter being handed off, and how
+# selections reach the radio Spotify account. There is one station (DEFAULT_ID).
 class Station < ActiveRecord::Base
+    DEFAULT_ID = 1
+
     has_and_belongs_to_many :songs
     belongs_to :now_playing, class_name: "QueueEntry"
     has_many :users
 
+    serialize :buddy_taste, JSON
 
+    def self.default
+        find(DEFAULT_ID)
+    end
 
-    include StationsHelper
+    #
+    # Queue
+    #
 
     def queue
         if self.queue_pos
@@ -27,16 +37,107 @@ class Station < ActiveRecord::Base
         return QueueEntry.where(station: self).where.not(position: nil).maximum(:position)
     end
 
+    # Songs queued after the one playing now.
+    def songs_remaining
+        (queue_max || 0) - (queue_pos || 0)
+    end
+
+    #
+    # Turn order
+    #
+
+    # Listeners in line, current selector first.
+    def members
+        users.where.not(position: nil).order(:position)
+    end
+
+    def humans
+        members.where.not(username: Buddy::USERNAME)
+    end
+
+    def current_selector
+        members.first
+    end
+
+    def turn?(user)
+        user && user == current_selector
+    end
+
+    # A newcomer goes right behind the current selector; everyone after them shifts back.
+    def join(user)
+        head = users.minimum(:position) || -1
+        users.where("position > ?", head).each do |member|
+            member.update position: member.position + 1
+        end
+        user.update station: self, position: head + 1
+        LiveRPC.broadcast :push, ["#{user.username} joined the radio."]
+    end
+
+    def leave(user)
+        if user.position
+            users.where("position > ?", user.position).each do |member|
+                member.update position: member.position - 1
+            end
+        end
+        user.update station: nil, position: nil
+        LiveRPC.broadcast :push, ["#{user.username} left the radio."]
+    end
+
+    # After a selection: the selector goes to the back of the line, hands off a letter,
+    # and everyone's browser learns who is next.
+    def advance_turn(selector, letter)
+        selector.update position: (users.maximum(:position) || -1) + 1
+        assign_next_letter(letter)
+        announce_turn(selector)
+    end
+
+    def announce_turn(selector)
+        next_user = current_selector
+        return unless next_user
+
+        notify_turn = next_user != selector && !Buddy.is?(next_user) && humans.count > 1
+        LiveRPC.broadcast :next_up, [next_user, next_letter, notify_turn]
+    end
+
+    #
+    # Letters
+    #
+
+    # The letter the next selector must start with. Falls back to the letter handed off
+    # by the last queued song when none has been stored (e.g. before the column existed).
+    def next_letter
+        stored = self[:next_letter]
+        return stored if stored.present? && stored != "_"
+
+        last = QueueEntry.where(station: self).where.not(position: nil).order(:position).last
+        (last && last.song && last.song.next_letter) || "_"
+    end
+
+    # Accepts the selector's override; only the first character counts.
+    def assign_next_letter(letter)
+        first = letter.to_s.strip[0]
+        update next_letter: first.upcase if first
+    end
+
+    def buddy_taste
+        super || Buddy::DEFAULT_TASTE
+    end
+
+    #
+    # Playback
+    #
+
     def queue_song(song, selector, was_recommended)
         if song.source != "Spotify"
             return "Please select a song from Spotify (not #{song.source})"
         end
 
-        if not $spotify_user
+        radio = SpotifyAccounts.radio
+        if not radio
             return "Please log into spotify"
         end
 
-        player = $spotify_user.player
+        player = radio.player
 
         # TODO: Automatically create the spotify player. I don't think this
         # can be done with the spotify API
@@ -50,10 +151,10 @@ class Station < ActiveRecord::Base
         else
             not_playing = true
             # Otherwise, play this song immediately on spotify
-            if $spotify_user.display_name == "JC Radio" then
+            if radio.display_name == SpotifyAccounts::RADIO_DISPLAY_NAME then
                 # If we're using the JC Radio account, play on the pi
                 begin
-                    StationsHelper.set_device($JCRADIO_PI)
+                    SpotifyAccounts.transfer_radio_playback(SpotifyAccounts.radio_device_id)
                     player.play_track(nil, song.uri)
                 rescue RestClient::NotFound
                     return "Radio Spotify device is unavailable. Start librespot on the Pi with the JC Radio account and try again."
@@ -81,94 +182,33 @@ class Station < ActiveRecord::Base
         return ""
     end
 
+    # Spotify reports `song` is playing. Normally it is the next entry in the queue, but the
+    # queue can drift (songs added outside JC Radio, a missed change), so search forward from
+    # the cursor and skip anything in between. A song not in the queue at all gets an
+    # unpositioned entry so now_playing is still accurate.
     def next_song(song)
-        # We expect the next song to be the first song on the queue; however, the queue may drift
-        # out of sync with what's actually in Spotify (for example, if someone added songs to the
-        # queue not using the JCRadio interface, or if we missed a song change). This is a chance
-        # to resync the initial part of the queue with Spotify, by dequeuing until we reach the
-        # expected song (possibly clearing the queue if the whole thing is invalid).
-        #
-        # Whatever happens, this method will ensure that `song` is now playing.
-
-        logger.error("**************")
-        logger.error("station.rb: next_song() start")
-        logger.error("**************")
-
-
-        entry = nil
-
-        tmp_pos = queue_pos
-
-        while queue.any? and tmp_pos <= queue_max
-
-            # print "$$$$$$$$$$$$$$$$$$$$$$$44444\n"
-            # print "$$$$$$$$$$$$$$$$$$$$$$$44444\n"
-            # print "$$$$$$$$$$$$$$$$$$$$$$$44444\n"
-            # print "  QueueSize: %d\n" % queue.length
-            # print "  QueuePos: %d\n" % queue_pos
-            # print "  TmpPos: %d\n" % tmp_pos
-            # print "  QueueMax: %d\n" % queue_max
-
-            if queue[tmp_pos - queue_pos].song == song then
-                entry = queue[tmp_pos - queue_pos]
-
-                # print "Found song pos: %d\n" % entry.position
-
-                update queue_pos: tmp_pos # Update actual queue pos if found the song
-                queue.reload
-            else
-                tmp_pos = tmp_pos + 1
-            end
-
-
-            # queue[0].update position: nil+
-
-            break unless entry.nil?
-        end
-
-        if entry.nil? then
-            # print "$$$$$$$$$$$$$$$$$$$$$$$44444\n"
-            # print "  Song not found. Creating new QueueEntry\n"
+        entry = queue.detect { |queued| queued.song_id == song.id }
+        if entry
+            update queue_pos: entry.position
+        else
             entry = QueueEntry.create song: song
         end
 
         update now_playing: entry
+        logger.info "Now playing: #{song.title} (queue position #{entry.position.inspect})"
 
-        logger.error("**************")
-        logger.error("station.rb: next_song() entry")
-        logger.error(entry.inspect)
-        logger.error("**************")
-
-        # Update the clients about the new song.
         users.each do |user|
             user.notify :next_song_js, entry
-            logger.error("**************")
-            logger.error("station.rb: next_song().notify")
-            logger.error("**************")
-        end
-
-        # Update the clients about the timing.
-        users.each do |user|
             user.notify :update_timing, 0, 0, entry
-            logger.error("**************")
-            logger.error("station.rb: next_song().notify update_timing")
-            logger.error("**************")
         end
-
-
-        logger.error("**************")
-        logger.error("station.rb: next_song() end")
-        logger.error("**************")
-
     end
 
-    # Update now_playing_start_ms
-    # Call javascript to update the now_playing progress bar
+    # Re-anchor now_playing_start_ms to Spotify's progress and resend it to the browsers.
     def update_timing_stats()
-        progress_ms = StationsHelper.get_progress_ms
+        progress_ms = SpotifyAccounts.radio_progress_ms
         update now_playing_start_ms: Time.now.to_f * 1000 - progress_ms
+        return unless now_playing
 
-        # Update the clients about the timing.
         users.each do |user|
             user.notify :update_timing, now_playing.song.duration, now_playing_start_ms
         end
@@ -179,10 +219,17 @@ class Station < ActiveRecord::Base
         time_diff = end_time - Time.now.to_f * 1000
     end
 
+    # Page loads call this: nudge the poller, let Buddy act, and resend timing.
+    def refresh_playback
+        PlaybackPoller.wake
+        Buddy.take_turn(self)
+        update_timing_stats
+    end
+
     def internal_spotify_add_to_queue(uri)
         # Bypasses RSpotify::User.oauth_post because the queue endpoint returns a non-JSON body.
         # oauth_header/refresh_token are private to the pinned RSpotify 2.9.2; re-check on upgrade.
-        spotify_user = $spotify_user
+        spotify_user = SpotifyAccounts.radio
         url = RSpotify::API_URI + "me/player/queue"
         url += "?uri=#{uri}"
         headers = RSpotify::User.send(:oauth_header, spotify_user.id)
@@ -199,5 +246,3 @@ class Station < ActiveRecord::Base
         end
     end
 end
-
-$JCRADIO_PI = "d94494a49582daf871e6a18d955ea69946163d6f"

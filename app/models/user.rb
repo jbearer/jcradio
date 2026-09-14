@@ -6,7 +6,7 @@ class User < ActiveRecord::Base
     has_many :pending_notifications, class_name: "Notification"
 
     def can_add_to_queue
-        station and position == station.users.minimum(:position)
+        station and station.turn?(self)
     end
 
     def to_h

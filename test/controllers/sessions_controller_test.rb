@@ -3,13 +3,6 @@ require 'test_helper'
 class SessionsControllerTest < ActionController::TestCase
   setup do
     @user = users(:one)
-    @previous_next_letter = $the_next_letter
-    # A blank queue cannot supply a next letter, so skip that lookup on login.
-    $the_next_letter = 'A'
-  end
-
-  teardown do
-    $the_next_letter = @previous_next_letter
   end
 
   test "logging in joins the station and starts a session" do

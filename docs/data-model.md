@@ -33,7 +33,7 @@
 
     | Record | Important Fields | Role |
     | --- | --- | --- |
-    | [Station](../app/models/station.rb) | `name`, `queue_pos`, `now_playing_id`, `now_playing_start_ms` | Shared queue cursor and current playback metadata |
+    | [Station](../app/models/station.rb) | `name`, `queue_pos`, `now_playing_id`, `now_playing_start_ms`, `next_letter`, `buddy_taste`, `buddy_max_songs` | Shared queue cursor, current playback metadata, the assigned letter, and Buddy's settings |
     | [User](../app/models/user.rb) | `username`, `station_id`, `position`, `subscription`, `last_viewed_chat` | Identity, turn position, notification/chat state |
     | [Song](../app/models/song.rb) | Spotify source/ID/URI, title/artist/album, duration, first/next letter, `last_played`, preview URL | Cached track metadata reused across selections |
     | [QueueEntry](../app/models/queue_entry.rb) | `song_id`, `station_id`, `selector_id`, `position`, `was_recommended` | An individual selection and its place in the queue/history |

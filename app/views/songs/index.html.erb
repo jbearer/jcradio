@@ -11,7 +11,7 @@
 
   <!-- Determine default 'checked', based on if linked to Spotify -->
   <%
-    check_all_songs = !($spotify_user && current_user && $client_spotifies.key?(current_user.username))
+    check_all_songs = !(SpotifyAccounts.radio && SpotifyAccounts.linked?(current_user))
   %>
 
 
@@ -24,7 +24,7 @@
   <input type="radio" name="source" value="my_spotify_library" <%if !check_all_songs%> checked <%else%> disabled <%end%> >
     <label for="my_spotify_library">My Spotify Library</label>
 
-  <input type="text" name="query" value="<%= $the_next_letter %>" style="width:40px" autocomplete="off">
+  <input type="text" name="query" value="<%= @station.next_letter %>" style="width:40px" autocomplete="off">
   <button class="button button3" type="submit">
     <i class="fa fa-search"></i>
     <div id="loadingspinner" class="loader" ></div>

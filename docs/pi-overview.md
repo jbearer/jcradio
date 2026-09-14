@@ -22,7 +22,7 @@ The dated records that led here are under [Pi records](pi/README.md).
     | OS packages | Stretch fully upgraded from the frozen `legacy.raspbian.org` archive on 2026-09-13 (610 packages) and rebooted; DarkIce is now Debian `1.3-0.1` and came up streaming. See the [post-upgrade inspection](pi/inspection-2026-09-13.md) |
     | DDNS | `jcradio.ddns.net` resolves to the home's current public IPv4 |
     | Router | Xfinity gateway (`Server: Xfinity Broadband Router Server` on `10.0.0.1`); forwarding rules not inspected |
-    | Tests | `bin/rake test` on the Pi: 39 runs, 133 assertions, green |
+    | Tests | `bin/rake test` on the Pi: 78 runs, 294 assertions, green |
 
     The player idles between tracks; when the queue runs out, the loopback
     playback device closes and the stream carries silence until the next song

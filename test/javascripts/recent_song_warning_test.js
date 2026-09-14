@@ -7,7 +7,7 @@ const partial = fs.readFileSync(
   path.join(__dirname, '../../app/views/songs/_search_results.html.erb'), 'utf8'
 );
 const script = partial.slice(partial.indexOf('function confirmSong('), partial.lastIndexOf('</script>'))
-  .replace('<%= $the_next_letter %>', 'L');
+  .replace('<%= @station.next_letter %>', 'L');
 const now = Date.parse('2026-09-14T00:00:00Z');
 const twoDays = 1000 * 60 * 60 * 24 * 2;
 let dialog;

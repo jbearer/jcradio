@@ -107,21 +107,24 @@ are verified in code only.
 - <details> <summary> <b>Buddy</b> </summary>
 
     [BuddyController](../app/controllers/buddy_controller.rb) controls membership,
-    taste sources, and a solo queue limit. A database user named `Buddy` must exist.
-    The default seeds do not create that user.
+    taste sources, and a solo queue limit; the settings are stored on the station
+    (`buddy_taste`, `buddy_max_songs`). A database user named `Buddy` must exist.
+    The default seeds do not create that user. Selectable taste sources are the
+    radio as a whole plus every listener who has selected a song.
 
-    [StationsController#buddy_add_song](../app/controllers/stations_controller.rb)
-    runs through the station show/refresh path: synchronously on the refresh
-    button, and in a background thread after the queue page has been sent. It
-    checks that Buddy has the turn,
-    builds a pool matching the assigned letter from configured history, upvotes,
-    or linked libraries, and chooses randomly. If that pool is empty, it falls
-    back to matching local song records. The radio-wide Spotify-library source
-    is explicitly unimplemented. Queue-size and time-spacing checks limit additions.
+    [Buddy.take_turn](../app/models/buddy.rb) runs from the station show/refresh
+    path (synchronously on the refresh button, in a background thread after the
+    queue page has been sent) and from each pass of the
+    [playback poller](../lib/playback_poller.rb) while music plays. It checks that
+    Buddy has the turn, builds a pool matching the assigned letter from configured
+    history, upvotes, or linked libraries, and chooses randomly among distinct
+    songs. If that pool is empty, it falls back to matching local song records.
+    The radio-wide Spotify-library source is explicitly unimplemented. A queue-size
+    check limits additions, and a lock makes concurrent callers skip rather than
+    add twice.
 
-    Buddy is not a separate always-running scheduling service. Do not assume it
-    continues filling the queue without station requests. Its configuration lives
-    in process globals, and some selectable user names are hard-coded.
+    Because the poller only runs while the player is playing, Buddy still does not
+    refill a silent radio on his own; a page load or refresh is needed to start it.
 
   </details>
 

@@ -4,14 +4,14 @@ require 'minitest/mock'
 class StationTest < ActiveSupport::TestCase
   def setup
     super
-    @previous_spotify_user = $spotify_user
+    @previous_radio = SpotifyAccounts.radio
     @previous_credentials = if RSpotify::User.class_variable_defined?(:@@users_credentials)
       RSpotify::User.class_variable_get(:@@users_credentials).dup
     end
   end
 
   def teardown
-    $spotify_user = @previous_spotify_user
+    SpotifyAccounts.radio = @previous_radio
     if @previous_credentials
       RSpotify::User.class_variable_set(:@@users_credentials, @previous_credentials)
     elsif RSpotify::User.class_variable_defined?(:@@users_credentials)
@@ -63,7 +63,7 @@ class StationTest < ActiveSupport::TestCase
     end
     assert_equal previous_play, song.reload.last_played
 
-    $spotify_user = nil
+    SpotifyAccounts.radio = nil
     assert_no_difference 'QueueEntry.count' do
       assert_equal 'Please log into spotify', station.queue_song(song, users(:one), false)
     end
@@ -209,15 +209,15 @@ class StationTest < ActiveSupport::TestCase
     player = Minitest::Mock.new
     player.expect :!, false
     player.expect :playing?, false
-    $spotify_user = Struct.new(:player, :display_name).new(player, 'JC Radio')
+    SpotifyAccounts.radio = Struct.new(:player, :display_name).new(player, 'JC Radio')
     song = Struct.new(:source, :uri).new('Spotify', 'spotify:track:test-track')
     transfer = lambda do |device_id|
-      assert_equal $JCRADIO_PI, device_id
+      assert_equal SpotifyAccounts.radio_device_id, device_id
       raise RestClient::NotFound
     end
     create_entry = lambda { |*arguments| flunk 'Must not create a queue entry when transfer fails' }
 
-    StationsHelper.stub :set_device, transfer do
+    SpotifyAccounts.stub :transfer_radio_playback, transfer do
       QueueEntry.stub :create, create_entry do
         message = Station.new.queue_song(song, nil, false)
         assert_match(/device is unavailable/, message)
@@ -232,11 +232,11 @@ class StationTest < ActiveSupport::TestCase
     player.expect :!, false
     player.expect :playing?, false
     player.expect(:play_track, nil) { |device_id, uri| raise RestClient::NotFound }
-    $spotify_user = Struct.new(:player, :display_name).new(player, 'JC Radio')
+    SpotifyAccounts.radio = Struct.new(:player, :display_name).new(player, 'JC Radio')
     song = Struct.new(:source, :uri).new('Spotify', 'spotify:track:test-track')
     create_entry = lambda { |*arguments| flunk 'Must not create a queue entry when playback fails' }
 
-    StationsHelper.stub :set_device, nil do
+    SpotifyAccounts.stub :transfer_radio_playback, nil do
       QueueEntry.stub :create, create_entry do
         message = Station.new.queue_song(song, nil, false)
         assert_match(/device is unavailable/, message)
@@ -247,7 +247,7 @@ class StationTest < ActiveSupport::TestCase
   private
 
   def set_radio_credentials
-    $spotify_user = RSpotify::User.new(
+    SpotifyAccounts.radio = RSpotify::User.new(
       'id' => 'test-radio',
       'credentials' => { 'token' => 'test-token', 'refresh_token' => 'test-refresh-token' }
     )
@@ -255,7 +255,7 @@ class StationTest < ActiveSupport::TestCase
 
   def set_playing_radio
     set_radio_credentials
-    $spotify_user.define_singleton_method(:player) { Struct.new(:playing?).new(true) }
+    SpotifyAccounts.radio.define_singleton_method(:player) { Struct.new(:playing?).new(true) }
     Song.create!(source: 'Spotify', source_id: 'test-track', uri: 'spotify:track:test-track',
                  title: 'Test track', artist: 'Test artist', album: 'Test album')
   end

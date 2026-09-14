@@ -4,12 +4,13 @@ require 'minitest/mock'
 class SongsControllerTest < ActionController::TestCase
   def setup
     super
-    @previous_client_spotifies = $client_spotifies
-    $client_spotifies = { 'test-listener' => Object.new }
+    @listener = Struct.new(:username).new('test-listener')
+    @account = Object.new
+    SpotifyAccounts.link(@listener, @account)
   end
 
   def teardown
-    $client_spotifies = @previous_client_spotifies
+    SpotifyAccounts.unlink(@listener)
     super
   end
 
@@ -99,7 +100,6 @@ class SongsControllerTest < ActionController::TestCase
       )
     end
     controller = SongsController.new
-    user = Struct.new(:username).new('test-listener')
     rendered = nil
     format = Object.new
     format.define_singleton_method(:js) { |&block| block.call }
@@ -108,15 +108,15 @@ class SongsControllerTest < ActionController::TestCase
       assert_equal 'search', template
       rendered = options[:locals][:songs]
     end
-    library = lambda do |spotify_user|
-      assert_same $client_spotifies['test-listener'], spotify_user
+    library = lambda do |user|
+      assert_equal 'test-listener', user.username
       tracks
     end
     persist = lambda { |*arguments| flunk 'Browsing must not save library songs' }
 
     controller.stub :params, { source: 'my_spotify_library', query: letter } do
-      controller.stub :current_user, user do
-        controller.stub :spotify_get_all_songs, library do
+      controller.stub :current_user, @listener do
+        SpotifyAccounts.stub :library, library do
           controller.stub :respond_to, respond do
             controller.stub :render, render do
               Song.stub :create, persist do

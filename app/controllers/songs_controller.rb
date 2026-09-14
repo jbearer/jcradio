@@ -1,5 +1,4 @@
 class SongsController < ApplicationController
-    include RecommendationsHelper
 
     # GET /songs
     def index
@@ -38,17 +37,12 @@ class SongsController < ApplicationController
         source = params[:source]
 
         if source == "my_spotify_library" then
-            client_spotify = $client_spotifies[current_user.username]
-            if not client_spotify then
-                raise IndexError "Not logged into spotify"
+            if not SpotifyAccounts.linked?(current_user)
+                raise IndexError, "Not logged into spotify"
             end
-            spotify_songs = spotify_get_all_songs(client_spotify)
-            results = SongsHelper.get_or_create_from_spotify_record(spotify_songs)
-            songs = []
-            results.each do |s|
-                if params[:query] == "" or params[:query] == SongsHelper.first_letter(s.title) then
-                    songs << s
-                end
+            results = SongsHelper.get_or_create_from_spotify_record(SpotifyAccounts.library(current_user))
+            songs = results.select do |s|
+                params[:query] == "" or params[:query] == SongsHelper.first_letter(s.title)
             end
         else
             # One query for distinct songs, most recently queued first; the old

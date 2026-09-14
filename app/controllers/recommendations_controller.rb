@@ -1,7 +1,6 @@
 class RecommendationsController < ApplicationController
 
     include RecommendationsHelper
-    include SongsHelper
 
     # GET /recommendations
     def suggest
@@ -104,7 +103,7 @@ class RecommendationsController < ApplicationController
 
         if source == "my_spotify_library" then
 
-            client_spotify = $client_spotifies[current_user.username]
+            client_spotify = SpotifyAccounts.linked(current_user)
             if not client_spotify then
                 fail "Not logged into spotify"
             end
@@ -113,7 +112,7 @@ class RecommendationsController < ApplicationController
             if recency == "last" then
                 offset = idx
             else
-                total = spotify_number_of_tracks(client_spotify.id)
+                total = SpotifyAccounts.library_size(client_spotify)
                 offset = rand(0..total-1)
             end
             track = client_spotify.saved_tracks(limit: 1, offset: offset).first

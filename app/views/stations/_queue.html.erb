@@ -7,7 +7,7 @@
       <th>Selector</th>
       <th>QPos</th>
     </tr>
-  <% @station.queue_before([[User.where.not(position: nil).length * 5, 15].min, 5].max).each do |queue_entry| %>
+  <% @station.queue_before([[@station.members.count * 5, 15].min, 5].max).each do |queue_entry| %>
     <tr>
       <td><%= queue_entry.position - @station.queue_pos %></td>
       <td><%= queue_entry.song.title %></td>

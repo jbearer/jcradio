@@ -28,7 +28,7 @@ Formatting follows the [documentation style guide](DOCS_STYLE_GUIDE.md).
     - **HTTPS:** the `jcradio.ddns.net` certificate was renewed on 2026-09-13
       after four years expired; certbot now renews it automatically and a
       deploy hook restarts Rails. Browsers load the site without an override.
-    - **Tests:** `bin/rake test` on the Pi passes (39 runs, 133 assertions).
+    - **Tests:** `bin/rake test` on the Pi passes (78 runs, 294 assertions).
     - **Speed:** tuned on 2026-09-13; pages render in 120-300 ms on the LAN
       instead of 0.5-2 s, and Spotify calls reuse connections. Numbers and what
       changed: [architecture](architecture.md#performance-characteristics).
@@ -93,10 +93,15 @@ Formatting follows the [documentation style guide](DOCS_STYLE_GUIDE.md).
 
 - <details> <summary> <b>Code Anchors</b> </summary>
 
-    - [Station model](../app/models/station.rb): sends selections to Spotify,
-      records queue entries, and tracks the current song.
-    - [Stations controller](../app/controllers/stations_controller.rb): checks
-      whose turn it is and advances the selection order.
+    - [Station model](../app/models/station.rb): who is in line and whose turn it
+      is, the assigned letter, sending selections to Spotify, recording queue
+      entries, and tracking the current song.
+    - [Stations controller](../app/controllers/stations_controller.rb): the HTTP
+      side of adding a song and the Spotify sign-in callback.
+    - [Buddy](../app/models/buddy.rb): the house listener's song choice.
+    - [SpotifyAccounts](../lib/spotify_accounts.rb) and
+      [PlaybackPoller](../lib/playback_poller.rb): the radio and personal Spotify
+      logins, and the thread that follows the player.
     - [Queue entry model](../app/models/queue_entry.rb): connects a song, station,
       selector, and reactions.
     - [Original README](../README.rdoc): historical setup and deployment notes.
