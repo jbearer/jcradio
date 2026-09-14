@@ -1,29 +1,65 @@
-function next_up(user, letter) {
-    $("#next-up").html(`Next up... ${user.username} with '${letter}'`);
-        // Update the next up indicator.
+var queue_refresh_in_flight = false;
+var queue_refresh_pending = false;
+var queue_refresh_timer;
 
-    // If the current user is the next up user, notify them.
-    if (logged_in() && current_user().id == user.id) {
-        message = `It's your turn! Your letter is: ${letter}`;
+function update_next_up(user, letter) {
+    $("#next-up").text(user
+        ? `Next up... ${user.username} with '${letter}'`
+        : `Next letter... '${letter}'`);
+}
 
-        last_two_paths = new URL(window.location.href).pathname.split('/').slice(-2);
+function refresh_queue() {
+    const queue = $("#station-queue");
+    if (!queue.length || document.hidden) return;
+    if (queue_refresh_in_flight) {
+        queue_refresh_pending = true;
+        return;
+    }
 
-
-        if (last_two_paths[0] === "stations" || last_two_paths[1] == "search") {
-            // If we're already on the queue or song page, just reload it to enable the song-choosing controls.
-            location.reload();
-
-            // Display a push notification with no URL, since we're already on the right page.
-            push(message);
-        } else {
-            // Otherwise, display a push notification to take the user to the queue.
-            push(message, "/stations/1");
+    queue_refresh_in_flight = true;
+    $.ajax({
+        url: `/stations/${queue.attr("data-station-id")}.json`,
+        dataType: "json",
+        cache: false,
+        timeout: 10000
+    }).done((state) => {
+        queue.html(state.queue_html);
+        update_next_up(state.next_user, state.next_letter);
+    }).always(() => {
+        queue_refresh_in_flight = false;
+        if (queue_refresh_pending) {
+            queue_refresh_pending = false;
+            refresh_queue();
         }
+    });
+}
+
+$(function() {
+    if (queue_refresh_timer) window.clearInterval(queue_refresh_timer);
+    refresh_queue();
+    queue_refresh_timer = window.setInterval(refresh_queue, 3000);
+    $(document).off("visibilitychange.queue").on("visibilitychange.queue", refresh_queue);
+    $(window).off("focus.queue").on("focus.queue", refresh_queue);
+});
+
+function next_up(user, letter, notify_turn = true) {
+    update_next_up(user, letter);
+    refresh_queue();
+
+    const on_queue = $("#station-queue").length > 0;
+    const my_turn = user && logged_in() && current_user().id == user.id;
+    if (my_turn && notify_turn && !(on_queue && !document.hidden && document.hasFocus())) {
+        push(`It's your turn! Your letter is: ${letter}`, "/stations/1");
+    }
+
+    if (my_turn && !on_queue && /\/songs\/search\/?$/.test(window.location.pathname)) {
+        location.reload();
     }
 }
 
 function next_song_js(queue_entry) {
 
+    refresh_queue();
     console.log(`song.title: ${queue_entry.song.title}`);
 
     $("#now-playing-title").html(queue_entry.song.title);

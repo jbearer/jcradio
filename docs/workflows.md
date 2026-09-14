@@ -20,6 +20,13 @@ are verified in code only.
     plus one. See [User#can_add_to_queue](../app/models/user.rb) and
     [StationsController#update](../app/controllers/stations_controller.rb).
 
+    Successful human and Buddy additions broadcast `next_up` to update every
+    connected viewer, including when there is only one human. The event carries
+    a separate notification flag: desktop turn notifications require more than
+    one human in the station and are sent only to the next selector. A visible,
+    focused queue page updates quietly instead. Other pages and background tabs
+    still notify, subject to browser permission and an active SSE connection.
+
   </details>
 
 ## Adding a Song
@@ -41,13 +48,13 @@ are verified in code only.
        than raising.
     5. A `QueueEntry` records the song, station, selector, queue position, and
        recommendation flag. The controller advances the turn and assigned letter,
-       broadcasting a next-turn notification when its participant-count conditions
-       are met.
+       broadcasting the new turn with the notification policy described above.
 
     Spotify calls, database writes, and turn changes are not transactional together.
-    The `last_played` timestamp is written by the controller even before it checks
-    the error returned by `queue_song`. Treat it as an approximate selection-time
-    field, not proof that a track played successfully.
+     `queue_song` records `last_played` in epoch milliseconds after queue creation
+     for both humans and Buddy; rejected Spotify additions do not update it.
+     Treat it as an approximate selection-time field, not proof that a track
+     played successfully.
 
     The letter handoff and overrides are detailed in [letter rules](letter-rules.md).
 
@@ -131,6 +138,15 @@ are verified in code only.
     Refreshing wakes the playback poller when possible, checks Buddy's turn, and
     updates timing. Opening the queue page does the same after the response, in
     a background thread, and pushes the corrected timing to the page over SSE.
+    While visible, the queue page fetches `GET /stations/:id.json` every three
+    seconds and on turn/playback events, tab return, or window focus. This
+    database-only snapshot replaces the queue table and next-up text without
+    reloading the page, calling Spotify, or triggering Buddy. It also recovers
+    from missed SSE events; failed requests retry on the next polling tick.
+    See [queue client](../app/assets/javascripts/queue.js.erb). Client regressions
+    run with `node test/javascripts/queue_updates_test.js`; controller regressions
+    are included in `bin/rake test`.
+
     Saving the current track uses the listener's linked Spotify
     account. Listening to the shared audio itself depends on the external stream,
     not these metadata/control endpoints.

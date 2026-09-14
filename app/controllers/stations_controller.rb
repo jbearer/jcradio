@@ -66,9 +66,17 @@ class StationsController < ApplicationController
             $the_next_letter = @station.queue[@station.queue_max - @station.queue_pos].song.next_letter
         end
 
-        # The page renders from the DB; the Spotify progress poll, Buddy check and
-        # SSE timing push run after the response instead of blocking it ~0.3-1 s.
-        refresh_now_playing_in_background
+        respond_to do |format|
+            format.html { refresh_now_playing_in_background }
+            format.json do
+                response.headers['Cache-Control'] = 'no-store'
+                render json: {
+                    queue_html: render_to_string(partial: 'queue', formats: [:html]),
+                    next_user: @station.users.order(:position).first,
+                    next_letter: $the_next_letter
+                }
+            end
+        end
     end
 
     def refresh_now_playing_in_background
@@ -257,13 +265,8 @@ class StationsController < ApplicationController
 
         @buddy.update position: @station.users.maximum(:position) + 1
 
-        # Notify the next user that it's their turn to pick a song.
-        next_user = @station.users.order(:position)[0]
         $the_next_letter = chosen_song.next_letter.capitalize()[0]
-
-        if next_user != @buddy and @station.users.length > 2
-            broadcast :next_up, next_user, $the_next_letter
-        end
+        broadcast_next_turn(@station, @buddy)
 
     end
 
@@ -303,14 +306,8 @@ class StationsController < ApplicationController
 
         current_user.update position: station.users.maximum(:position) + 1
 
-        # Notify the next user that it's their turn to pick a song.
-        next_user = station.users.order(:position)[0]
         $the_next_letter = params[:song_next_letter].capitalize()[0]
-
-        if next_user != current_user and
-                @station.users.length > (1 + (@station.users.include?(User.find_by(username: "Buddy")) ? 1 : 0))
-            broadcast :next_up, next_user, $the_next_letter
-        end
+        broadcast_next_turn(station, current_user)
 
         json_ok
     end
@@ -419,6 +416,17 @@ class StationsController < ApplicationController
     # GET /stations/1/plots
     def plots
 
+    end
+
+    private
+
+    def broadcast_next_turn(station, selector)
+        next_user = station.users.order(:position).first
+        return unless next_user
+
+        notify_turn = next_user != selector && next_user.username != 'Buddy' &&
+            station.users.where.not(username: 'Buddy').count > 1
+        broadcast :next_up, next_user, $the_next_letter, notify_turn
     end
 
 end

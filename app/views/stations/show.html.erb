@@ -12,27 +12,9 @@
 <br>
 
 <!-- Song queue -->
-<table>
-    <tr>
-      <th>i</th>
-      <th>Song</th>
-      <th>Artist</th>
-      <th>Album</th>
-      <th>Selector</th>
-      <th>QPos</th>
-    </tr>
-  <% @station.queue_before([[User.where.not(position: nil).length * 5, 15].min, 5].max).each_with_index do |queue_entry, i| %>
-    <tr>
-      <!-- <td><%= i + 1 %></td> -->
-      <td><%= queue_entry.position - @station.queue_pos%></td>
-      <td><%= queue_entry.song.title %></td>
-      <td><%= queue_entry.song.artist %></td>
-      <td><%= queue_entry.song.album %></td>
-      <td><%= queue_entry.selector.nil? ? "" : queue_entry.selector.username %></td>
-      <td><%= queue_entry.position%></td>
-    </tr>
-  <% end %>
-</table>
+<div id="station-queue" data-station-id="<%= @station.id %>">
+  <%= render 'queue' %>
+</div>
 <br>
 <br>
 <br>
