@@ -93,8 +93,15 @@
         Connect device (`SpotifyAccounts.radio_device_id`, overridable with the
         `JCRADIO_SPOTIFY_DEVICE_ID` environment variable) and has a special case for
         the shared account's display name (`JC Radio`). If the device is missing
-        when the station is idle, the add-song path returns a user-facing error
-        instead of a 500.
+        when the station is idle, the add-song path asks
+        [PlayerWatchdog](../lib/player_watchdog.rb) to restart `jcradio-player`
+        (`sudo -n systemctl restart jcradio-player`, overridable with
+        `JCRADIO_PLAYER_RESTART`), waits up to 20 s for Spotify to list the device
+        again, and retries once; otherwise it returns a user-facing error instead
+        of a 500. The poller also has the watchdog check `me/player/devices` once
+        a minute while idle, because librespot can keep its TCP session after a
+        Spotify disconnect while its Connect registration is gone (seen
+        2026-09-14). Restarts are at most one per five minutes.
 
         The [layout](../app/views/layouts/application.html.erb) contains a **commented-out**
         audio element pointing to `http://jcradio.ddns.net:8000/rapi.mp3`; the

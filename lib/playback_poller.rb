@@ -1,6 +1,7 @@
 # Follows the radio account's Spotify player from one background thread. When the track
 # changes it advances the station; it also lets Buddy take his turn and nudges a listener
-# whose turn it is when the queue is about to run dry.
+# whose turn it is when the queue is about to run dry. While idle it has PlayerWatchdog
+# confirm the Pi player is still registered with Spotify.
 #
 # Lives in lib/ (not autoloaded) so the thread handles survive development-mode reloads.
 class PlaybackPoller
@@ -68,7 +69,12 @@ class PlaybackPoller
         return nil unless radio
 
         player = radio.player
-        return nil if !player || !player.playing?
+        return nil unless player
+        unless player.playing?
+            # Idle is when a lost Connect registration would otherwise go unnoticed.
+            PlayerWatchdog.check
+            return PlayerWatchdog::CHECK_INTERVAL
+        end
 
         station = Station.default
         track = player.currently_playing

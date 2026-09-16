@@ -205,26 +205,63 @@ class StationTest < ActiveSupport::TestCase
     assert_equal 2, gets
   end
 
-  test "an unavailable radio device does not start playback or create a queue entry" do
+  test "an unavailable radio device that cannot be recovered does not create a queue entry" do
     player = Minitest::Mock.new
     player.expect :!, false
     player.expect :playing?, false
     SpotifyAccounts.radio = Struct.new(:player, :display_name).new(player, 'JC Radio')
     song = Struct.new(:source, :uri).new('Spotify', 'spotify:track:test-track')
+    transfers = 0
     transfer = lambda do |device_id|
+      transfers += 1
       assert_equal SpotifyAccounts.radio_device_id, device_id
       raise RestClient::NotFound
     end
+    recover = lambda { |reason| assert_match(/404/, reason); false }
     create_entry = lambda { |*arguments| flunk 'Must not create a queue entry when transfer fails' }
 
     SpotifyAccounts.stub :transfer_radio_playback, transfer do
-      QueueEntry.stub :create, create_entry do
-        message = Station.new.queue_song(song, nil, false)
-        assert_match(/device is unavailable/, message)
-        assert_match(/Start librespot/, message)
+      PlayerWatchdog.stub :recover, recover do
+        QueueEntry.stub :create, create_entry do
+          message = Station.new.queue_song(song, nil, false)
+          assert_equal Station::DEVICE_UNAVAILABLE, message
+          assert_match(/device is unavailable/, message)
+        end
       end
     end
+    assert_equal 1, transfers, 'a skipped restart must not retry the transfer'
     player.verify
+  end
+
+  test "a missing radio device is recovered by restarting the player and retrying once" do
+    station = stations(:one)
+    station.update! queue_pos: 1
+    song = set_playing_radio
+    played = []
+    player = Struct.new(:playing?).new(false)
+    player.define_singleton_method(:play_track) { |device_id, uri| played << uri }
+    SpotifyAccounts.radio = Struct.new(:player, :display_name).new(player, 'JC Radio')
+    transfers = 0
+    transfer = lambda do |device_id|
+      transfers += 1
+      raise RestClient::NotFound if transfers == 1
+    end
+    recovered = 0
+    recover = lambda { |reason| recovered += 1; true }
+
+    SpotifyAccounts.stub :transfer_radio_playback, transfer do
+      SpotifyAccounts.stub :radio_progress_ms, 0 do
+        PlayerWatchdog.stub :recover, recover do
+          assert_difference 'QueueEntry.count', 1 do
+            assert_equal '', station.queue_song(song, users(:one), false)
+          end
+        end
+      end
+    end
+    assert_equal 1, recovered
+    assert_equal 2, transfers
+    assert_equal [song.uri], played
+    assert_equal song, station.reload.now_playing.song
   end
 
   test "a radio device disappearing before playback does not create a queue entry" do
@@ -237,9 +274,11 @@ class StationTest < ActiveSupport::TestCase
     create_entry = lambda { |*arguments| flunk 'Must not create a queue entry when playback fails' }
 
     SpotifyAccounts.stub :transfer_radio_playback, nil do
-      QueueEntry.stub :create, create_entry do
-        message = Station.new.queue_song(song, nil, false)
-        assert_match(/device is unavailable/, message)
+      PlayerWatchdog.stub :recover, false do
+        QueueEntry.stub :create, create_entry do
+          message = Station.new.queue_song(song, nil, false)
+          assert_match(/device is unavailable/, message)
+        end
       end
     end
   end

@@ -32,15 +32,21 @@ class PlaybackPollerTest < ActiveSupport::TestCase
     assert_not PlaybackPoller.running?
   end
 
-  test "a poll idles until woken when there is no radio account or nothing is playing" do
+  test "a poll idles until woken when there is no radio account or player" do
     SpotifyAccounts.radio = nil
-    assert_nil PlaybackPoller.new.poll
-
-    SpotifyAccounts.radio = Struct.new(:player).new(Struct.new(:playing?).new(false))
     assert_nil PlaybackPoller.new.poll
 
     SpotifyAccounts.radio = Struct.new(:player).new(nil)
     assert_nil PlaybackPoller.new.poll
+  end
+
+  test "an idle poll has the watchdog confirm the device and checks again later" do
+    SpotifyAccounts.radio = Struct.new(:player).new(Struct.new(:playing?).new(false))
+    checks = 0
+    PlayerWatchdog.stub :check, lambda { checks += 1; false } do
+      assert_equal PlayerWatchdog::CHECK_INTERVAL, PlaybackPoller.new.poll
+    end
+    assert_equal 1, checks
   end
 
   test "a poll that sees a new track advances the station and schedules the next check" do

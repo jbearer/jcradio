@@ -1,7 +1,9 @@
 # Process-level radio state lives in lib/ so it is loaded once and survives
-# development-mode code reloads; see lib/spotify_accounts.rb and lib/playback_poller.rb.
+# development-mode code reloads; see lib/spotify_accounts.rb, lib/playback_poller.rb
+# and lib/player_watchdog.rb.
 require "live-rpc"
 require "spotify_accounts"
+require "player_watchdog"
 require "playback_poller"
 
 Rails.application.config.after_initialize do

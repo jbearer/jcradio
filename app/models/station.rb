@@ -2,6 +2,7 @@
 # selections reach the radio Spotify account. There is one station (DEFAULT_ID).
 class Station < ActiveRecord::Base
     DEFAULT_ID = 1
+    DEVICE_UNAVAILABLE = "Radio Spotify device is unavailable. The Pi player is being restarted; try again in a moment."
 
     has_and_belongs_to_many :songs
     belongs_to :now_playing, class_name: "QueueEntry"
@@ -154,10 +155,15 @@ class Station < ActiveRecord::Base
             if radio.display_name == SpotifyAccounts::RADIO_DISPLAY_NAME then
                 # If we're using the JC Radio account, play on the pi
                 begin
-                    SpotifyAccounts.transfer_radio_playback(SpotifyAccounts.radio_device_id)
-                    player.play_track(nil, song.uri)
+                    start_radio_playback(player, song)
                 rescue RestClient::NotFound
-                    return "Radio Spotify device is unavailable. Start librespot on the Pi with the JC Radio account and try again."
+                    # The Pi player has lost its Connect registration; restart it and retry once.
+                    return DEVICE_UNAVAILABLE unless PlayerWatchdog.recover("transfer to the radio device returned 404")
+                    begin
+                        start_radio_playback(player, song)
+                    rescue RestClient::NotFound
+                        return DEVICE_UNAVAILABLE
+                    end
                 end
             else
                 return "Spotify not Playing, and IDK what device to use"
@@ -224,6 +230,12 @@ class Station < ActiveRecord::Base
         PlaybackPoller.wake
         Buddy.take_turn(self)
         update_timing_stats
+    end
+
+    # Move the radio account's playback to the Pi and start `song` there.
+    def start_radio_playback(player, song)
+        SpotifyAccounts.transfer_radio_playback(SpotifyAccounts.radio_device_id)
+        player.play_track(nil, song.uri)
     end
 
     def internal_spotify_add_to_queue(uri)

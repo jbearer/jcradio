@@ -283,7 +283,7 @@ records are under [Pi records](pi/README.md).
     | Works on LAN but not remotely | Router forwarding for 3000/8000, DDNS resolution; see [network setup](pi/network-setup.md) |
     | Listening page or tab icon is stale/missing | Check the HTTP port-8000 page and icon URLs; deploy the repository copies to Icecast's webroot, not just Rails; see [Listening Page and Icons](#listening-page-and-icons) |
     | `401 Unauthorized` from `RSpotify` after a restart | The token refresh patch in `config/initializers/rspotify_token_refresh.rb` is missing or Rails was not restarted after pulling it |
-    | "Radio Spotify device is unavailable" when adding a song | `systemctl status jcradio-player`; auth marker in `player.log`; device name must be `JCRadio` |
+    | "Radio Spotify device is unavailable" when adding a song | The watchdog already tried one restart (`PlayerWatchdog:` lines in `log/development.log`); `systemctl status jcradio-player`; auth marker in `player.log`; device name must be `JCRadio` |
     | Spotify plays but the stream is silent | Loopback status, DarkIce process, Icecast source list |
     | Song accepted but page shows an error, or Buddy never takes a turn | `log/development.log` for the exception class; historically a JSON parse of the queue response |
     | Title/queue looks stale | Polling thread and SSE; a Rails restart resets both |

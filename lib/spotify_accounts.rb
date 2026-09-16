@@ -70,6 +70,18 @@ module SpotifyAccounts
             RSpotify::User.oauth_put(radio.id, "me/player", { device_ids: [device_id] }.to_json)
         end
 
+        # IDs of the Connect devices Spotify currently lists for the radio account.
+        def radio_device_ids
+            return [] unless radio
+            response = RSpotify::User.oauth_get(radio.id, "me/player/devices")
+            json = RSpotify.raw_response ? JSON.parse(response) : response
+            (json["devices"] || []).map { |device| device["id"] }
+        end
+
+        def radio_device_present?
+            radio_device_ids.include?(radio_device_id)
+        end
+
         #
         # Listeners' personal accounts
         #
